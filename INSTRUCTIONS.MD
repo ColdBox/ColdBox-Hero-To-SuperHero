@@ -65,11 +65,11 @@ APPNAME=ColdBox
 ENVIRONMENT=development
 
 # Database Information
-DB_CONNECTIONSTRING=jdbc:mysql://127.0.0.1:3306/cms?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=true
+DB_CONNECTIONSTRING=jdbc:mysql://127.0.0.1:3307/cms?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=true
 DB_CLASS=com.mysql.jdbc.Driver
 DB_DRIVER=MySQL
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=3307
 DB_DATABASE=cms
 DB_USER=cms
 DB_PASSWORD=coldbox
@@ -91,6 +91,43 @@ This will allow for CommandBox and the servers we run have access to these envir
 ## CFConfig
 
 Let's review our `.cfconfig.json` file.
+
+```json
+{
+	"requestTimeoutEnabled":true,
+    "whitespaceManagement":"white-space-pref",
+	"requestTimeout":"0,0,5,0",
+	"cacheDefaultObject":"coldbox",
+    "caches":{
+        "coldbox":{
+            "storage":"true",
+            "type":"RAM",
+            "custom":{
+                "timeToIdleSeconds":"1800",
+                "timeToLiveSeconds":"3600"
+            },
+            "class":"lucee.runtime.cache.ram.RamCache",
+            "readOnly":"false"
+        }
+    },
+	"datasources" : {
+		 "${DB_DATABASE}":{
+			 "host":"${DB_HOST}",
+			 "dbdriver":"${DB_DRIVER}",
+			 "database":"${DB_DATABASE}",
+			 "dsn":"jdbc:mysql://{host}:{port}/{database}",
+			 "custom":"useUnicode=true&characterEncoding=UTF-8&useLegacyDatetimeCode=true&autoReconnect=true",
+			 "port":"${DB_PORT}",
+			 "class":"${DB_CLASS}",
+			 "username":"${DB_USER}",
+			 "password":"${DB_PASSWORD}",
+			 "connectionLimit":"100",
+			 "connectionTimeout":"1"
+		 }
+	}
+}
+```
+
 
 ## Start it up!
 
@@ -134,14 +171,17 @@ This will start a watcher so you can do your code changes and tests will be exec
 
 We will install several modules to assist us with the development of our API
 
-  * `route-visualizer` : Visualizer your routes (https://www.forgebox.io/view/route-visualizer)
-  * `bcrypt` - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)
-  * `cbsecurity` - To secure our API and provide us with JWT Tokens (https://www.forgebox.io/view/cbsecurity)
-  * `mementifier` - To convert our objects to native data structures for JSON exporting (arrays/structs) (https://www.forgebox.io/view/mementifier)
+ * `qb` - Fluent query builder for fancy queries (https://forgebox.io/view/qb)
+ * `cbvalidation` - To provide server side validations (https://forgebox.io/view/cbValidation)
+ * `bcrypt` - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)
+ * `cbsecurity` - To secure our API and provide us with JWT Tokens (https://www.forgebox.io/view/cbsecurity)
+ * `mementifier` - To convert our objects to native data structures for JSON exporting (arrays/structs) (https://www.forgebox.io/view/mementifier)
+ * `route-visualizer` : Visualizer your routes (https://www.forgebox.io/view/route-visualizer)
+  
 
 ```bash
 install route-visualizer --saveDev
-install bcrypt,mementifier,cbsecurity
+install cbvalidation,qb,bcrypt,mementifier,cbsecurity
 coldbox reinit
 ```
 
@@ -378,12 +418,12 @@ That's it!  Make sure your tests work: `testbox run`
 Let's focus now on the user registration requirement. This is the BDD story to complete:
 
 ```java
-story( "I want to be able to register users in my system and assign them a JWT login token" );
+story( "I want to be able to register users in my system and assign them a JWT token upon registration" );
 ```
 
 Let's start by modeling our user object:
 
-### User.cfc
+### `User.cfc`
 
 Here are the properties we want to model
 
@@ -395,20 +435,23 @@ Here are the properties we want to model
 * `createdDate:date`
 * `modifiedDate:date`
 
-We will create the model object, a basic compile unit test:
+We will create the model object and a basic compile unit test:
 
 ```bash
 coldbox create model name="User"  properties="id,name,email,username,password,createdDate:date,modifiedDate:date"
 ```
 
-Ahora, abramos el archivo y agreguemos inicializacion para las fechas, un metodo de utilidad para saber si el modelo es nuevo o viene de la base de datos `isLoaded()`, e instrucciones para el `mementifier` para saber como convertir este modelo a una represenacion nativa para Json.
+Let's open the file and add some initialization procedures and a utility method to know if the User object has been populated from the database or not: `isLoaded()`.  We will also add instructions for the `mementifier` module to know how to convert the object to JSON, and our validation constraints.
 
-```java
+```js
 /**
 * I am a new Model Object
 */
 component accessors="true"{
-	
+    
+    // DI
+    property name="qb" inject="provider:QueryBuilder@qb";
+
 	// Properties
 	property name="id"           type="string";
 	property name="name"         type="string";
@@ -416,10 +459,19 @@ component accessors="true"{
 	property name="username"     type="string";
 	property name="password"     type="string";
 	property name="createdDate"  type="date";
-	property name="modifiedDate" type="date";
-	
+    property name="modifiedDate" type="date";
+    
+    this.constraints = {
+        name        : { required : true },
+        email       : { required : true, type : "email" },
+        username    : { required : true, udf : ( value, target ) => {
+            return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
+        }},
+        password    : { required : true }
+    };
+
     this.memento = {
-		defaultIncludes = [ "id", "name", "email", "username", "createdDate", "modifiedDate" ],
+		defaultIncludes = [ "*" ],
 		neverInclude = [ "password" ]
 	};
 
@@ -430,7 +482,7 @@ component accessors="true"{
 
 		variables.createdDate = now();
 		variables.modifiedDate = now();
-		
+
 		return this;
 	}
 
@@ -441,16 +493,352 @@ component accessors="true"{
 }
 ```
 
-Ahora abre la prueba: `/tests/specs/unit/UserTest.cfc`:
+Now open the unit test: `/tests/specs/unit/UserTest.cfc` and update it to this:
 
 ```java
-describe( "Usuario", function(){
+describe( "A User", function(){
 			
-    it( "puede ser creado", function(){
+    it( "can be created", function(){
         expect( model ).toBeComponent();
     });
 
 });
 ```
 
-Corre tus tests!
+Run your tests!
+
+### Authentication and JWTSubject
+
+Since we will be using cbsecurity's authentication service (**cbauth**) and it's jwt services, let's make sure our User object adhers to those requirements by implementing the methods it asks us to do. We won't test them, since those will be tested by the integration portions.
+
+`IAuthUser` - https://coldbox-security.ortusbooks.com/usage/authentication-services#user-interface
+
+We will skip adding the `getId()` function since that is added already by the accessor.  We don't have any permissions yet in the system, so we will always return true, and for `isLoggedIn()` we will delegate to cbauth (`authenticationService@cbauth`).
+
+```js
+interface{
+
+    /**
+     * Return the unique identifier for the user
+     */
+    function getId();
+
+    /**
+     * Verify if the user has one or more of the passed in permissions
+     *
+     * @permission One or a list of permissions to check for access
+     *
+     */
+    boolean function hasPermission( required permission );
+
+    /**
+     * Shortcut to verify it the user is logged in or not.
+     */
+    boolean function isLoggedIn();
+
+}
+```
+
+`IJwtSubject` - https://coldbox-security.ortusbooks.com/jwt/jwt-services#jwt-subject-interface
+
+For now we won't have any custom claims or custom security scopes.  Maybe later on in our training we will add them.
+
+```js
+interface{
+
+    /**
+     * A struct of custom claims to add to the JWT token
+     */
+    struct function getJwtCustomClaims();
+
+    /**
+     * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+     */
+    array function getJwtScopes();
+
+}
+```
+
+So our `User.cfc` will end up like this:
+
+```js
+/**
+* I am a new Model Object
+*/
+component accessors="true"{
+
+	// DI
+    property name="auth" inject="authenticationService@cbauth";
+    property name="qb" inject="provider:QueryBuilder@qb";
+
+	// Properties
+	property name="id"           type="string";
+	property name="name"         type="string";
+	property name="email"        type="string";
+	property name="username"     type="string";
+	property name="password"     type="string";
+	property name="createdDate"  type="date";
+	property name="modifiedDate" type="date";
+
+    this.constraints = {
+        name        : { required : true },
+        email       : { required : true, type : "email" },
+        username    : { required : true, udf : ( value, target ) => {
+            return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
+        }},
+        password    : { required : true }
+    };
+
+    this.memento = {
+		defaultIncludes = [ "*" ],
+		neverInclude = [ "password" ]
+	};
+
+	/**
+	 * Constructor
+	 */
+	User function init(){
+
+		variables.createdDate = now();
+		variables.modifiedDate = now();
+
+		return this;
+	}
+
+	boolean function isLoaded(){
+		return ( !isNull( variables.id ) && len( variables.id ) );
+	}
+
+	/**
+     * A struct of custom claims to add to the JWT token
+     */
+    struct function getJwtCustomClaims(){
+		return {};
+	}
+
+    /**
+     * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+     */
+	array function getJwtScopes(){
+		return [];
+	}
+
+    /**
+     * Verify if the user has one or more of the passed in permissions
+     *
+     * @permission One or a list of permissions to check for access
+     *
+     */
+    boolean function hasPermission( required permission ){
+		return true;
+	}
+
+    /**
+     * Shortcut to verify it the user is logged in or not.
+     */
+    boolean function isLoggedIn(){
+		return auth.isLoggedIn();
+	}
+
+}
+```
+
+Run your tests again and see if it compiles.
+
+### BDD Integration
+
+Now that our model is complete and satisfies the cbsecurity requirements for authentication and jwt services let's focus on the actual registration. We will create our BDD spec first to write down our requirements.  We will then rprceed to create the implementation.
+
+```bash
+coldbox create handler name="registration" actions="create" directory=modules_app/api/modules_app/v1/handlers
+```
+
+The BDD test will be created here: `/tests/specs/integration/registrationTest.cfc` and we will start here:
+
+```js
+component extends="tests.resources.BaseIntegrationSpec"{
+
+	property name="qb" inject="provider:QueryBuilder@qb";
+
+	/*********************************** BDD SUITES ***********************************/
+
+	function run(){
+
+		story( "I want to be able to register users in my system and assign them a JWT token upon registration", function(){
+
+			beforeEach(function( currentSpec ){
+				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+				setup();
+			});
+
+			given( "valid registration data and the username is available", function(){
+				then( "I will be able to register my new user and get an access token", function(){
+					// Test user doesn't exist
+					expect(
+						qb.from( "users" )
+							.where( "username", "testadmin" )
+							.count()
+					).toBe( 0 );
+
+					var event = post( "/api/v1/registration", {
+						"name"					= "Your Name",
+						"email"                	= "testadmin@ortussolutions.com",
+						"username"             	= "testadmin",
+						"password"             	= "testadmin"
+					} );
+					var response = event.getPrivateValue( "response" );
+
+					expect( response.getError() ).toBeFalse();
+					expect( response.getData().token ).notToBeEmpty();
+					expect( response.getData().user.id ).toBeNumeric();
+					expect( response.getData().user.name ).toBe( "Your Name" );
+
+					// data = { user:struct, token:jwt token }
+
+				});
+			});
+
+		});
+
+	}
+
+}
+```
+
+Run it, of course it will fail!
+
+### Routing
+
+Ok, let's start our implementation by adding our registration routes.  We will be basing all our routes on ColdBox Resources (https://coldbox.ortusbooks.com/the-basics/routing/routing-dsl/resourceful-routes) as much as possible in order to make our handlers standardized and light-weight.
+
+Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and add our resources:
+
+```js
+component{
+
+    function configure(){
+
+		route( "/", "echo.index" );
+
+		resources( resource="registration", only="create" );
+
+        route( "/:handler/:action" ).end();
+    }
+
+}
+```
+
+This will add all the necessary routing for the `registration` resource under the `v1` module.  Issue a `coldbox reinit` and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer
+
+### Event Handler
+
+Now that we have our route, let's fill out our event handler for registration.  Open the `registration.cfc` in our `v1` module and let's code it out.  We will need to populate a new user object from incoming `rc` data, validate it, create it and then tell the cbsecurity's jwt services to create a token for the user.  Also remember that our handler's MUST Inherit from our `BaseHandler` from our `api` module.
+
+```js
+/**
+ * My RESTFul Event Handler which inherits from the module `api`
+ */
+component extends="api.handlers.BaseHandler"{
+
+	// DI
+	property name="userService"	inject="UserService";
+
+	/**
+	 * Register a new user in our system
+	 */
+	function create( event, rc, prc ){
+		// populate, validate and create
+		prc.oUser = userService.create(
+			validateOrFail( populateModel( "User" ) )
+		);
+
+		// Respond back with user rep and token
+		prc.response.setData( {
+			"user" 	: prc.oUser.getMemento(),
+			"token"	: jwtAuth().fromUser( prc.oUser )
+		} );
+	}
+
+}
+```
+
+Once we write up this code, two new scenarios should pop up in your head:
+
+```js
+given( "invalid registration data", function(){
+    then( "a validation message should be sent to the user with a 400 error code", function(){
+
+    });
+} );
+given( "valid registration data but with a non-unique username", function(){
+    then( "a validation message should be sent to the user with a 400 error code", function(){
+
+    });
+} );
+```
+
+You will have to fill these out on your own!  
+
+### User Services
+
+Since we must use a `UserService` in our handler, then I guess we need to build it.  How? Well, we know we need to add a `create()` method:
+
+Let's generate the model alongside its unit test.
+
+```bash
+coldbox create model name="UserService" persistence="singleton" methods="create"
+```
+
+Open the unit test `tests/specs/unit/UserServiceTest.cfc` and just do a compile time test, the rest will be covered by the integration tests.
+
+```js
+describe( "UserService", function(){
+    it( "can be created", function(){
+        expect( model ).toBeComponent();
+    });
+});
+```
+
+Now let's do the code implementations for the service:
+
+```js
+/**
+* User Services
+*/
+component singleton accessors="true"{
+
+	// Properties
+	property name="bcrypt"      inject="@BCrypt";
+	property name="qb"          inject="provider:QueryBuilder@qb";
+
+	/**
+	 * Constructor
+	 */
+	UserService function init(){
+		return this;
+	}
+
+	User function new() provider="User";
+
+	/**
+	* create
+	*/
+	function create( required user ){
+		var qResults = qb.from( "users" )
+			.insert( values = {
+				"name" 		= arguments.user.getName(),
+				"email" 	= arguments.user.getEmail(),
+				"username" 	= arguments.user.getUsername(),
+				"password" 	= bcrypt.hashPassword( arguments.user.getPassword() )
+			} );
+
+		// populate the id
+		arguments.user.setId( qResults.generatedKey );
+
+		return arguments.user;
+	}
+
+}
+```
+
+Now let's verify our tests and adjust as necessary, but we should have a working registration now.
