@@ -31,7 +31,7 @@ component singleton accessors="true"{
 			} );
 
 		// populate the id
-		arguments.user.setId( qResults.generatedKey );
+		arguments.user.setId( qResults.result.generatedKey );
 
 		return arguments.user;
 	}

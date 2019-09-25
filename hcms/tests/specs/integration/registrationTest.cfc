@@ -30,11 +30,12 @@ component extends="tests.resources.BaseIntegrationSpec"{
 					} );
 					var response = event.getPrivateValue( "response" );
 
-					expect( response.getError() ).toBeFalse();
+					expect( response.getError() ).toBeFalse( response.getMessages().toString() );
 					expect( response.getData().token ).notToBeEmpty();
 					expect( response.getData().user.id ).toBeNumeric();
 					expect( response.getData().user.name ).toBe( "Your Name" );
 
+					debug( response.getData() );
 					// data = { user:struct, token:jwt token }
 
 				});

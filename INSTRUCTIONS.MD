@@ -688,11 +688,12 @@ component extends="tests.resources.BaseIntegrationSpec"{
 					} );
 					var response = event.getPrivateValue( "response" );
 
-					expect( response.getError() ).toBeFalse();
+					expect( response.getError() ).toBeFalse( response.getMessages().toString() );
 					expect( response.getData().token ).notToBeEmpty();
 					expect( response.getData().user.id ).toBeNumeric();
 					expect( response.getData().user.name ).toBe( "Your Name" );
 
+                    debug( response.getData() );
 					// data = { user:struct, token:jwt token }
 
 				});
@@ -833,7 +834,7 @@ component singleton accessors="true"{
 			} );
 
 		// populate the id
-		arguments.user.setId( qResults.generatedKey );
+		arguments.user.setId( qResults.result.generatedKey );
 
 		return arguments.user;
 	}
@@ -841,4 +842,132 @@ component singleton accessors="true"{
 }
 ```
 
-Now let's verify our tests and adjust as necessary, but we should have a working registration now.
+Now let's verify our tests and adjust as necessary, but we should have a working registration now and jwt token creations.
+
+## Authentication
+
+Now that we have registration complete, let's focus on authentication for our API.
+
+```java
+story( "I want to be able to authenticate with a username/password and receive a JWT token", function(){
+
+} );
+
+story( "I want to be able to logout from the system using my JWT token", function(){
+    
+} );
+```
+
+### BDD
+
+Let's start with our BDD specs before we move to the implementation phase.  Let's start by generating the handler that will be in charge of the api's authentication.  Again we will focus on ColdBox Resources.
+
+```bash
+coldbox create handler name="sessions" actions="create,delete" directory=modules_app/api/modules_app/v1/handlers
+```
+
+Let's open the bdd test:
+
+```js
+```
+
+### Routing
+
+Ok, let's start our implementation by adding our login/logout routes.  We will be basing all our routes on ColdBox Resources (https://coldbox.ortusbooks.com/the-basics/routing/routing-dsl/resourceful-routes) as much as possible in order to make our handlers standardized and light-weight.
+
+Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and add our resources:
+
+```js
+component{
+
+    function configure(){
+
+		route( "/", "echo.index" );
+
+        resources( resource="registration", only="create" );
+        resources( resource="sessions", only="create,delete" );
+
+        route( "/:handler/:action" ).end();
+    }
+
+}
+```
+
+This will add all the necessary routing for the `sessions` resource under the `v1` module.  Issue a `coldbox reinit` and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer
+
+### Event Handler
+
+Now that we have our route, let's fill out our event handler for session login and logout.  Open the `sessions.cfc` in our `v1` module and let's code it out.  We will use the jwt services for these sections mostly.
+
+Also remember that our handler's MUST Inherit from our `BaseHandler` from our `api` module.
+
+```js
+/**
+ * My RESTFul Event Handler which inherits from the module `api`
+ */
+component extends="api.handlers.BaseHandler"{
+
+    /**
+     * Login to our system
+     */
+	function login( event, rc, prc ){
+		param rc.username = "";
+		param rc.password = "";
+	
+        prc.response
+            .setData( jwtAuth().attempt( rc.username, rc.password ) )
+            .addMessage( "Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes" );
+    }
+    
+    /**
+     * Logout of our system
+     */
+    function logout( event, rc, prc ){
+        jwtAuth().logout();
+        prc.response.addMessage( "Successfully logged out, token invalidated" );
+	}
+
+}
+```
+
+Wow, our handlers look so nice and tidy!  However, we still need to build out our User Service that will power all this goodness.
+
+### UserService
+
+In order for the jwt services and cbauth can authenticate and create tokens for us, we must adhere to the following interface (https://coldbox-security.ortusbooks.com/usage/authentication-services#user-services)
+
+```js
+interface{
+
+	/**
+	 * Verify if the incoming username/password are valid credentials.
+	 *
+	 * @username The username
+	 * @password The password
+	 */
+	boolean function isValidCredentials( required username, required password );
+
+	/**
+	 * Retrieve a user by username
+	 *
+	 * @return User that implements JWTSubject and/or IAuthUser
+	 */
+	function retrieveUserByUsername( required username );
+
+	/**
+	 * Retrieve a user by unique identifier
+	 *
+	 * @id The unique identifier
+	 *
+	 * @return User that implements JWTSubject and/or IAuthUser
+	 */
+	function retrieveUserById( required id );
+}
+```
+
+That's it.  The jwt services and cbauth will know how to put everything together for you.  So let's build the service out.
+
+```js
+
+
+```
