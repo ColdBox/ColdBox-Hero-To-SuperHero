@@ -14,19 +14,7 @@
 *	* eventArguments : The struct of args to pass to the event
 *	* renderResults : Render back the results of the event
 *******************************************************************************/
-component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
-
-	/*********************************** LIFE CYCLE Methods ***********************************/
-
-	function beforeAll(){
-		super.beforeAll();
-		// do your own stuff here
-	}
-
-	function afterAll(){
-		// do your own stuff here
-		super.afterAll();
-	}
+component extends="tests.resources.BaseIntegrationSpec"{
 
 /*********************************** BDD SUITES ***********************************/
 
@@ -47,12 +35,12 @@ component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
 			});
 
 			it( "can handle global exceptions", function(){
-				var event = execute( 
-					event 			= "v1:echo.onError", 
-					renderResults 	= true, 
+				var event = execute(
+					event 			= "v1:echo.onError",
+					renderResults 	= true,
 					eventArguments	= { exception={ message="unit test", detail="unit test", stacktrace="" } }
 				);
-				
+
 				var response = event.getPrivateValue( "response" );
 				expect(	response.getError() ).toBeTrue();
 				expect(	response.getStatusCode() ).toBe( 500 );

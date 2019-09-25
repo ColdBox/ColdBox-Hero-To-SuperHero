@@ -140,9 +140,209 @@ We will install several modules to assist us with the development of our API
   * `mementifier` - To convert our objects to native data structures for JSON exporting (arrays/structs) (https://www.forgebox.io/view/mementifier)
 
 ```bash
-install route-visualizer,bcrypt,mementifier,cbsecurity
+install route-visualizer --saveDev
+install bcrypt,mementifier,cbsecurity
 coldbox reinit
 ```
 
+## Adding our Datasource Globally
+
+Open `Application.cfc`  so we can add the global datasource we registered with the CFML Engine via  `.cfconfig.json`
+
+```js
+// App datasource
+this.datasource = "cms";
+```
+
+Let's do the same with the tets application: `/tests/Application.cfc`
+
+```js
+// App datasource
+this.datasource = "cms";
+```
+
+Try running the app again. If it runs, it works.  Or just issue a `testbox run`
 
 
+## Our Base Integration Testing Class
+
+Let's create a base testing class all our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`
+
+
+```js
+component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
+
+    // Load on first test
+    this.loadColdBox    = true;
+    // Never unload until the request dies
+    this.unloadColdBox  = false;
+
+    /**
+     * Run Before all tests
+     */
+    function beforeAll() {
+        super.beforeAll();
+        // Wire up the test object with dependencies
+        application.wirebox.autowire( this );
+    }
+
+    /**
+     * This function is tagged as an around each handler.  All the integration tests we build
+     * will be automatically rolled backed. No database corruption
+     * 
+     * @aroundEach
+     */
+    function wrapInTransaction( spec ) {
+        transaction action="begin" {
+            try {
+                arguments.spec.body();
+            } catch ( any e ){
+                rethrow;
+            } finally {
+                transaction action="rollback";
+            }
+        }
+    }
+
+}
+```
+
+Update the `tests/specs/integration/EchoTests.cfc` to inherit from this spec and verify it works. It should look like this:
+
+```js
+/*******************************************************************************
+*	Integration Test as BDD (CF10+ or Railo 4.1 Plus)
+*
+*	Extends the integration class: coldbox.system.testing.BaseTestCase
+*
+*	so you can test your ColdBox application headlessly. The 'appMapping' points by default to
+*	the '/root' mapping created in the test folder Application.cfc.  Please note that this
+*	Application.cfc must mimic the real one in your root, including ORM settings if needed.
+*
+*	The 'execute()' method is used to execute a ColdBox event, with the following arguments
+*	* event : the name of the event
+*	* private : if the event is private or not
+*	* prePostExempt : if the event needs to be exempt of pre post interceptors
+*	* eventArguments : The struct of args to pass to the event
+*	* renderResults : Render back the results of the event
+*******************************************************************************/
+component extends="tests.resources.BaseIntegrationSpec"{
+
+/*********************************** BDD SUITES ***********************************/
+
+	function run(){
+
+		describe( "My RESTFUl Service", function(){
+
+			beforeEach(function( currentSpec ){
+				// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+				setup();
+			});
+
+			it( "can handle invalid HTTP Calls", function(){
+				var event = execute( event="v1:echo.onInvalidHTTPMethod", renderResults = true );
+				var response = event.getPrivateValue( "response" );
+				expect(	response.getError() ).toBeTrue();
+				expect(	response.getStatusCode() ).toBe( 405 );
+			});
+
+			it( "can handle global exceptions", function(){
+				var event = execute(
+					event 			= "v1:echo.onError",
+					renderResults 	= true,
+					eventArguments	= { exception={ message="unit test", detail="unit test", stacktrace="" } }
+				);
+
+				var response = event.getPrivateValue( "response" );
+				expect(	response.getError() ).toBeTrue();
+				expect(	response.getStatusCode() ).toBe( 500 );
+			});
+
+			it( "can handle an echo", function(){
+				var event 		= this.request( "/api/v1/echo/index" );
+				var response 	= event.getPrivateValue( "response" );
+				expect(	response.getError() ).toBeFalse();
+				expect(	response.getData() ).toBe( "Welcome to my ColdBox RESTFul Service" );
+			});
+
+			it( "can handle missing actions", function(){
+				var event 		= this.request( "/api/v1/echo/bogus" );
+				var response 	= event.getPrivateValue( "response" );
+				expect(	response.getError() ).tobeTrue();
+				expect(	response.getStatusCode() ).toBe( 405 );
+			});
+
+
+		});
+
+	}
+
+}
+```
+
+## Security
+
+We will start by configuring `cbsecurity` so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.
+
+- Go over cbSecurity
+- Go over cbAuth
+- Go over JWT
+
+Open the `config/ColdBox.cfc` and locate the `moduleSettings`, we will be adding the following configuration for cbauth, cbsecurity and jwt. Please go over each configured setting below:
+
+```js
+moduleSettings = {
+
+    cbauth = {
+        // Which class will provide user information for authentication
+        userServiceClass : "UserService"
+    },
+
+    cbsecurity = {
+        // The global invalid authentication event or URI or URL to go if an invalid authentication occurs
+        "invalidAuthenticationEvent"	: "v1:Main.onAuthenticationFailure",
+        // Default Auhtentication Action: override or redirect when a user has not logged in
+        "defaultAuthenticationAction"	: "override",
+        // The global invalid authorization event or URI or URL to go if an invalid authorization occurs
+        "invalidAuthorizationEvent"		: "v1:Main.onAuthorizationFailure",
+        // Default Authorization Action: override or redirect when a user does not have enough permissions to access something
+        "defaultAuthorizationAction"	: "override",
+        // You can define your security rules here or externally via a source
+        "rules"							: [
+            // We will add them later
+        ],
+        // The validator is an object that will validate rules and annotations and provide feedback on either authentication or authorization issues.
+        "validator"						: "JWTService@cbsecurity",
+        // WireBox ID of the user service to use
+        "userService"             		: "UserService",
+        // Activate security rule visualizer, defaults to false by default
+        "enableSecurityVisualizer"		: true,
+        // JWT Settings
+        "jwt"                     		: {
+            // The jwt secret encoding key to use
+            "secretKey"               : getSystemSetting( "JWT_SECRET", "" ),
+            // by default it uses the authorization bearer header, but you can also pass a custom one as well or as an rc variable.
+            "customAuthHeader"        : "x-auth-token",
+            // The expiration in minutes for the jwt tokens
+            "expiration"              : 60,
+            // encryption algorithm to use, valid algorithms are: HS256, HS384, and HS512
+            "algorithm"               : "HS512",
+            // Which claims neds to be present on the jwt token or `TokenInvalidException` upon verification and decoding
+            "requiredClaims"          : [] ,
+            // The token storage settings
+            "tokenStorage"            : {
+                // enable or not, default is true
+                "enabled"       : true,
+                // A cache key prefix to use when storing the tokens
+                "keyPrefix"     : "cbjwt_",
+                // The driver to use: db, cachebox or a WireBox ID
+                "driver"        : "db",
+                // Driver specific properties
+                "properties"    : {
+                    "table" : "cbjwt"
+                }
+            }
+        }
+    }
+}
+```
