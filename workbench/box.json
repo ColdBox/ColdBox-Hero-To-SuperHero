@@ -1,0 +1,20 @@
+{
+    "name":"My Workbench",
+    "version":"0.0.0",
+    "installPaths":{
+        "mockdatacfc":"resources/seeder/mockdatacfc/"
+    },
+    "cfmigrations":{
+        "schema":"${DB_DATABASE}",
+        "connectionInfo":{
+            "password":"${DB_PASSWORD}",
+            "connectionString":"${DB_CONNECTIONSTRING}",
+            "class":"${DB_CLASS}",
+            "username":"${DB_USER}"
+        },
+        "defaultGrammar":"AutoDiscover"
+    },
+    "dependencies":{
+        "mockdatacfc":"^3.1.0+13"
+    }
+}

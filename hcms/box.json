@@ -1,0 +1,39 @@
+{
+    "name":"cms",
+    "version":"1.0.0",
+    "location":"",
+    "author":"You",
+    "slug":"cms",
+    "createPackageDirectory":false,
+    "type":"mvc",
+    "homepage":"https://github.com/coldbox-templates/rest-hmvc",
+    "documentation":"https://github.com/coldbox-templates/rest-hmvc",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/coldbox-templates/rest-hmvc"
+    },
+    "bugs":"https://github.com/coldbox-templates/rest-hmvc/issues",
+    "shortDescription":"A modular API RESTFul template",
+    "contributors":[],
+    "ignore":[],
+    "devDependencies":{
+        "relax":"^3.1.0",
+        "testbox":"^3.0.0",
+        "commandbox-dotenv":"*",
+        "commandbox-cfconfig":"*",
+        "commandbox-cfformat":"*"
+    },
+    "installPaths":{
+        "coldbox":"coldbox",
+        "relax":"modules/relax/",
+        "testbox":"testbox"
+    },
+    "dependencies":{
+        "coldbox":"^5.0.0",
+        "cbswagger":"^2.0.0"
+    },
+    "scripts":{},
+    "testbox":{
+        "runner":"http://localhost:42518/tests/runner.cfm"
+    }
+}
