@@ -346,3 +346,111 @@ moduleSettings = {
     }
 }
 ```
+
+Let's add the JWT Secret now, let's begin by generating a secret key. Go to CommandBox and let's generate one:
+
+```bash
+#generateSecretKey blowfish 256
+
+>/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
+```
+
+Copy the output of the key and paste it into the `.env` setting called `JWT_SECRET`
+
+```bash
+JWT_SECRET=/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
+```
+
+Now we need to reinit our server since we added a new secret. Also, CommandBox CLI doesn't know about it, since you just added it, so let's reload the shell as well.  Go to CommandBox:
+
+```
+// Reload the shell
+reload
+
+// restar the server
+restart
+```
+
+That's it!  Make sure your tests work: `testbox run`
+
+## Registration
+
+Let's focus now on the user registration requirement. This is the BDD story to complete:
+
+```java
+story( "I want to be able to register users in my system and assign them a JWT login token" );
+```
+
+Let's start by modeling our user object:
+
+### User.cfc
+
+Here are the properties we want to model
+
+* `id`
+* `name`
+* `email`
+* `username`
+* `password`
+* `createdDate:date`
+* `modifiedDate:date`
+
+We will create the model object, a basic compile unit test:
+
+```bash
+coldbox create model name="User"  properties="id,name,email,username,password,createdDate:date,modifiedDate:date"
+```
+
+Ahora, abramos el archivo y agreguemos inicializacion para las fechas, un metodo de utilidad para saber si el modelo es nuevo o viene de la base de datos `isLoaded()`, e instrucciones para el `mementifier` para saber como convertir este modelo a una represenacion nativa para Json.
+
+```java
+/**
+* I am a new Model Object
+*/
+component accessors="true"{
+	
+	// Properties
+	property name="id"           type="string";
+	property name="name"         type="string";
+	property name="email"        type="string";
+	property name="username"     type="string";
+	property name="password"     type="string";
+	property name="createdDate"  type="date";
+	property name="modifiedDate" type="date";
+	
+    this.memento = {
+		defaultIncludes = [ "id", "name", "email", "username", "createdDate", "modifiedDate" ],
+		neverInclude = [ "password" ]
+	};
+
+	/**
+	 * Constructor
+	 */
+	User function init(){
+
+		variables.createdDate = now();
+		variables.modifiedDate = now();
+		
+		return this;
+	}
+
+	boolean function isLoaded(){
+		return ( !isNull( variables.id ) && len( variables.id ) );
+	}
+
+}
+```
+
+Ahora abre la prueba: `/tests/specs/unit/UserTest.cfc`:
+
+```java
+describe( "Usuario", function(){
+			
+    it( "puede ser creado", function(){
+        expect( model ).toBeComponent();
+    });
+
+});
+```
+
+Corre tus tests!

@@ -94,6 +94,60 @@
 		interceptors = [
 		];
 
+		moduleSettings = {
+			cbauth = {
+				// Which class will provide user information for authentication
+				userServiceClass : "UserService"
+			},
+
+			cbsecurity = {
+				// The global invalid authentication event or URI or URL to go if an invalid authentication occurs
+				"invalidAuthenticationEvent"	: "v1:Main.onAuthenticationFailure",
+				// Default Auhtentication Action: override or redirect when a user has not logged in
+				"defaultAuthenticationAction"	: "override",
+				// The global invalid authorization event or URI or URL to go if an invalid authorization occurs
+				"invalidAuthorizationEvent"		: "v1:Main.onAuthorizationFailure",
+				// Default Authorization Action: override or redirect when a user does not have enough permissions to access something
+				"defaultAuthorizationAction"	: "override",
+				// You can define your security rules here or externally via a source
+				"rules"							: [
+					// We will add them later
+				],
+				// The validator is an object that will validate rules and annotations and provide feedback on either authentication or authorization issues.
+				"validator"						: "JWTService@cbsecurity",
+				// WireBox ID of the user service to use
+				"userService"             		: "UserService",
+				// Activate security rule visualizer, defaults to false by default
+				"enableSecurityVisualizer"		: true,
+				// JWT Settings
+				"jwt"                     		: {
+					// The jwt secret encoding key to use
+					"secretKey"               : getSystemSetting( "JWT_SECRET", "" ),
+					// by default it uses the authorization bearer header, but you can also pass a custom one as well or as an rc variable.
+					"customAuthHeader"        : "x-auth-token",
+					// The expiration in minutes for the jwt tokens
+					"expiration"              : 60,
+					// encryption algorithm to use, valid algorithms are: HS256, HS384, and HS512
+					"algorithm"               : "HS512",
+					// Which claims neds to be present on the jwt token or `TokenInvalidException` upon verification and decoding
+					"requiredClaims"          : [] ,
+					// The token storage settings
+					"tokenStorage"            : {
+						// enable or not, default is true
+						"enabled"       : true,
+						// A cache key prefix to use when storing the tokens
+						"keyPrefix"     : "cbjwt_",
+						// The driver to use: db, cachebox or a WireBox ID
+						"driver"        : "db",
+						// Driver specific properties
+						"properties"    : {
+							"table" : "cbjwt"
+						}
+					}
+				}
+			}
+		};
+
 		/*
 		// module setting overrides
 		moduleSettings = {
