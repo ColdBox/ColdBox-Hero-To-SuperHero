@@ -100,10 +100,47 @@ component extends="tests.resources.BaseIntegrationSpec"{
 				});
 			});
 
-			xit( "edit a content object", function(){
-				var event = execute( event="content.update", renderResults=true );
-				// expectations go here.
-				expect( false ).toBeTrue();
+			story( "I want to be able to update content objects", function(){
+				given( "valid incoming data", function(){
+					then( "it should update the content object", function(){
+						var event = put(
+							route = "/api/v1/content/Record-Slave-Crystal",
+							params = {
+								title         : "I just changed you!",
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : false
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						debug( response.getData() );
+
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getData().title ).toBe( "I just changed you!" );
+						expect( response.getData().id ).notToBeEmpty();
+					});
+				});
+
+				given( "an invalid slug", function(){
+					then( "it should throw a validation error", function(){
+						var event = put(
+							route = "/api/v1/content/bogus",
+							params = {
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+						expect( response.getStatusCode() ).toBe( 404 );
+					});
+				});
 			});
 
 			xit( "delete a content object", function(){

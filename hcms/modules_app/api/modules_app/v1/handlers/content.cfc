@@ -32,32 +32,53 @@ component extends="api.handlers.BaseHandler"{
 	}
 
 	/**
-	* show
+	* update
 	*/
-	function show( event, rc, prc ){
-		param rc.id = "";
+	function update( event, rc, prc ){
+		param rc.slug = "";
 
-		prc.oContent = contentService.findBySlug( rc.id );
+		prc.oContent = contentService.findBySlug( rc.slug );
 
 		if( !prc.oContent.isLoaded() ){
 			prc.response
 				.setError( true )
 				.setStatusCode( STATUS.NOT_FOUND )
 				.setStatusText( "Not Found" )
-				.addMessage( "The requested content object (#rc.id#) could not be found" );
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		prc.oContent = contentService.update(
+			validateOrFail(
+				populateModel( prc.oContent )
+					.setUser( jwtAuth().getUser() )
+			)
+		);
+
+		prc.response.setData( prc.oContent.getMemento() );
+	}
+
+	/**
+	* show
+	*/
+	function show( event, rc, prc ){
+		param rc.slug = "";
+
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if( !prc.oContent.isLoaded() ){
+			prc.response
+				.setError( true )
+				.setStatusCode( STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
 			return;
 		}
 
 		prc.response.setData(
 			prc.oContent.getMemento()
 		);
-	}
-
-	/**
-	* update
-	*/
-	function update( event, rc, prc ){
-		event.setView( "content/update" );
 	}
 
 	/**

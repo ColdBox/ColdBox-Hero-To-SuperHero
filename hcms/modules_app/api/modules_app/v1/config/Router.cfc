@@ -6,7 +6,7 @@ component{
 		route( "/echo/:action?" ).toHandler( "echo" );
 
 		resources( resource="registration", only="create" );
-		resources( "content" );
+		resources( resource="content", parameterName="slug" );
 
 		post( "/login", "auth.login" );
 		post( "/logout", "auth.logout" );

@@ -43,7 +43,7 @@ component singleton accessors="true"{
 				"title" 		= arguments.content.getTitle(),
 				"body" 			= arguments.content.getBody(),
 				"isPublished" 	= { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
-				"publishedDate" = { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+				"publishedDate" = { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp", null : !len( arguments.content.getPublishedDate() ) },
 				"createdDate" 	= { value : now(), cfsqltype : "timestamp" },
 				"modifiedDate" 	= { value : now(), cfsqltype : "timestamp" },
 				"FK_userId"		= arguments.content.getUser().getId()
@@ -51,6 +51,25 @@ component singleton accessors="true"{
 
 		// populate the id
 		arguments.content.setId( qResults.result.generatedKey );
+
+		return arguments.content;
+	}
+
+	/**
+	* update
+	*/
+	function update( required content ){
+		var qResults = qb.from( "content" )
+			.whereId( arguments.content.getId() )
+			.update( {
+				"slug" 			= arguments.content.getSlug(),
+				"title" 		= arguments.content.getTitle(),
+				"body" 			= arguments.content.getBody(),
+				"isPublished" 	= { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
+				"publishedDate" = { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+				"modifiedDate" 	= { value : now(), cfsqltype : "timestamp" },
+				"FK_userId"		= arguments.content.getUser().getId()
+			} );
 
 		return arguments.content;
 	}

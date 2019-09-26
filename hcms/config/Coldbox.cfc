@@ -76,7 +76,8 @@
 			// Root Logger
 			root = { levelmax="INFO", appenders="*" },
 			// Implicit Level Categories
-			info = [ "coldbox.system" ]
+			info = [ "coldbox.system" ],
+			debug = [ "qb" ]
 		};
 
 		//Layout Settings

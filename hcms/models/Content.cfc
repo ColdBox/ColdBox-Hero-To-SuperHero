@@ -21,7 +21,12 @@ component accessors="true"{
 	this.constraints = {
         slug    	: { required : true, udf : ( value, target ) => {
 			if( isNull( arguments.value ) ) return false;
-            return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
+			return qb.from( "content" )
+				.where( "slug", arguments.value )
+				.when( this.isLoaded(), ( q ) => {
+					arguments.q.whereNotIn( "id", this.getId() );
+				} )
+				.count() == 0;
 		}},
 		title       : { required : true },
 		body       	: { required : true },
