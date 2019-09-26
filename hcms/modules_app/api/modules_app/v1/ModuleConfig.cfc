@@ -74,7 +74,6 @@ component {
 
 		// module settings - stored in modules.name.settings
 		settings = {
-
 		};
 
 		// Layout Settings

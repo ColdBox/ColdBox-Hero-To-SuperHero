@@ -47,7 +47,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 			});
 
 			it( "can handle an echo", function(){
-				var event 		= this.request( "/api/v1/echo/index" );
+				var event 		= this.request( "/api/v1/echo" );
 				var response 	= event.getPrivateValue( "response" );
 				expect(	response.getError() ).toBeFalse();
 				expect(	response.getData() ).toBe( "Welcome to my ColdBox RESTFul Service" );

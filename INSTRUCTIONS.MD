@@ -141,7 +141,7 @@ Boom!  Our REST API is now online
 
 > Tip: `server log --follow` to see the console logs of your server, try it out. All logging messages will also appear here as well.  Great to have in a separate window.
 
-## BDD Tests
+## BDD
 
 Let's also discover the automated tests that were created for us.  Navigate to the following URL:
 http://localhost:42518/tests/runner.cfm and you will see the test results.  Check out the specs in `tests/specs` as well.
@@ -340,11 +340,11 @@ moduleSettings = {
 
     cbsecurity = {
         // The global invalid authentication event or URI or URL to go if an invalid authentication occurs
-        "invalidAuthenticationEvent"	: "v1:Main.onAuthenticationFailure",
+        "invalidAuthenticationEvent"	: "v1:Echo.onAuthenticationFailure",
         // Default Auhtentication Action: override or redirect when a user has not logged in
         "defaultAuthenticationAction"	: "override",
         // The global invalid authorization event or URI or URL to go if an invalid authorization occurs
-        "invalidAuthorizationEvent"		: "v1:Main.onAuthorizationFailure",
+        "invalidAuthorizationEvent"		: "v1:Echo.onAuthorizationFailure",
         // Default Authorization Action: override or redirect when a user does not have enough permissions to access something
         "defaultAuthorizationAction"	: "override",
         // You can define your security rules here or externally via a source
@@ -1176,3 +1176,136 @@ route( "/:anything", "echo.onInvalidRoute" );
 ```
 
 Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message.
+
+
+## Content Services
+
+Ok, we have all the building blocks for now focusing on our content stories:
+
+```js
+story( "In order to see content in the CMS you must be authenticated" );
+story( "I want to see content with different filtering options" )
+story( "I want to see a single content object via a nice slug" )
+```
+
+Ok, let's start by modeling our content object
+
+### Content.cfc
+
+We will be creating a `Content.cfc` that will store our headless content:
+
+* `id`
+* `slug`
+* `title`
+* `body`
+* `isPublished:boolean`
+* `publishedDate:date`
+* `createdDate:date`
+* `modifiedDate:date`
+* `user (many to one)`
+
+Ok, let's creat it via CommandBox
+
+```bash
+coldbox create model name="Content" properties="id,slug,title,body,isPublished:boolean,publishedDate:date,createdDate:date,modifiedDate:date,FK_userID,user"
+```
+
+Open up the object and the companion unit test.  Remember in our unit test, we just want quick verifications.
+
+* Initialize the content object
+* Add an `isLoaded()` to verify persistence
+* Add a `getUser()` to retrieve the relationship, so we will need to inject the `UserService`
+* Add the mementifier instructions
+* Add the validation constraints
+
+
+```js
+
+```
+
+Update your tests:
+
+```js
+describe( "Content Object", function(){
+
+	it( "can be created", function(){
+		expect( model ).toBeComponent();
+	});
+
+});
+```
+
+Verify we can compile by running your tests!
+
+### BDD
+
+Now that we have our model let's start with the stories and integration. We can create a nice ColdBox resource for our content: `resources( "content" )` and it will provide us with the following:
+
+* `GET:content.index` 			: Display all content objects
+* `POST:content.create` 		: Create a content object
+* `GET:content.show` 			: Display a single content
+* `PUT/PATCH:content.update` 	: Update a content object
+* `DELETE:content.delete` 		: Remove a content object
+
+```bash
+coldbox create handler name="content" actions="index,create,show,update,delete" directory=modules_app/api/modules_app/v1/handlers
+```
+
+Let's open up the specs and start building it out:
+
+```js
+
+```
+
+### Security
+
+Now that we have our handler generated, we will secure it using a rule. Open the `config/ColdBox.cfc` and add the following rule to the `cbsecurity.rules` array:
+
+```
+{
+	secureList 	: "v1:content"
+}
+```
+
+That's it!  Now any requests made to that secure pattern will be inspected by the JWT Validator and a bearer token must be valid to access it!  BOOM!
+
+You can also secure using annotations, we can get rid of the rule and then in our handler we can add the `secured` annotation to the `component` definition.  Same Approach.
+
+### Routing
+
+Let's add our routing as we explained above in our `v1` router.
+
+```js
+resources( "content" );
+```
+
+### Event Handler
+
+Now let's build out the handler:
+
+```js
+```
+
+
+### Content Services
+
+Ok, now we need to focus on our Content Services that will power the handler since we already created the Content object.
+
+Let's generate what we need:
+
+```js
+coldbox create model name="ContentService" persistence="singleton" methods="list,get,findBySlug"
+```
+
+Also open the unit test and do a quick compile test:
+
+```js
+
+```
+
+Now let's build it out:
+
+```js
+
+
+```

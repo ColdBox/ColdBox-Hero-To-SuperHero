@@ -102,16 +102,18 @@
 
 			cbsecurity = {
 				// The global invalid authentication event or URI or URL to go if an invalid authentication occurs
-				"invalidAuthenticationEvent"	: "v1:Main.onAuthenticationFailure",
+				"invalidAuthenticationEvent"	: "v1:Echo.onAuthenticationFailure",
 				// Default Auhtentication Action: override or redirect when a user has not logged in
 				"defaultAuthenticationAction"	: "override",
 				// The global invalid authorization event or URI or URL to go if an invalid authorization occurs
-				"invalidAuthorizationEvent"		: "v1:Main.onAuthorizationFailure",
+				"invalidAuthorizationEvent"		: "v1:Echo.onAuthorizationFailure",
 				// Default Authorization Action: override or redirect when a user does not have enough permissions to access something
 				"defaultAuthorizationAction"	: "override",
 				// You can define your security rules here or externally via a source
 				"rules"							: [
-					// We will add them later
+					{
+						secureList 	: "v1:content"
+					}
 				],
 				// The validator is an object that will validate rules and annotations and provide feedback on either authentication or authorization issues.
 				"validator"						: "JWTService@cbsecurity",
