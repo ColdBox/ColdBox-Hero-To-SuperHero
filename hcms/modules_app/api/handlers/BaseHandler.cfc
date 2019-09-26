@@ -384,22 +384,22 @@ component extends="coldbox.system.EventHandler"{
 		}
 	}
 
-	/**************************** RESTFUL UTILITIES ************************/
-
 	/**
-	 * Utility function for miscellaneous 404's
+	 * Resource Not Found
 	 */
-	private function routeNotFound( event, rc, prc ){
+	function onInvalidRoute( event, rc, prc ){
 
 		if( !structKeyExists( prc, "Response" ) ){
-			prc.response = getModel( "Response@api" );
+			prc.response = getModel( "Response" );
 		}
 
 		prc.response.setError( true )
 			.setStatusCode( STATUS.NOT_FOUND )
 			.setStatusText( "Not Found" )
-			.addMessage( "The object requested could not be found" );
+			.addMessage( "The resource requested (#event.getCurrentRoutedURL()#) could not be found" );
 	}
+
+	/**************************** RESTFUL UTILITIES ************************/
 
 	/**
 	 * Utility method for when an expectation of the request failes ( e.g. an expected paramter is not provided )

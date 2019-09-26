@@ -8,7 +8,11 @@ Please make sure you have a computer that is modern. No running windows 95, 7 or
 
 ## Windows PRO
 
-If you are in Windows you will need Windows PRO and not Windows Home.  We will be using Docker for our data services so you MUST be able to install and run docker containers.
+If you are in Windows you will need Windows PRO and not Windows Home in order for Docker Desktop to be installed.  We will be using Docker for our data services so you MUST be able to install and run docker containers.
+
+## [Postman](https://www.getpostman.com/)
+
+We will be leveraging postman for RESTFul testing.
 
 ## [Git](https://git-scm.com)
 

@@ -1159,3 +1159,20 @@ component singleton accessors="true"{
 ```
 
 That's it!  Go run your tests and make sure all the tests pass!  What have you learned?
+
+### Invalid Routes
+
+Ok, so what would happen if we try to execute `/api/v1/login` in the browser?  Go and try it!
+
+You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the `v1` api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Base Handler's `onInvalidRoute()` method.
+
+Open the `v1` router and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.
+
+```
+// Invalid Routes
+route( "/:anything", "echo.onInvalidRoute" );
+
+//route( "/:handler/:action" ).end();
+```
+
+Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message.

@@ -9,7 +9,10 @@ component{
 		post( "/login", "auth.login" );
 		post( "/logout", "auth.logout" );
 
-        route( "/:handler/:action" ).end();
+		// Invalid Routes
+		route( "/:anything", "echo.onInvalidRoute" );
+
+        //route( "/:handler/:action" ).end();
     }
 
 }

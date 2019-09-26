@@ -34,10 +34,10 @@
 			controllerDecorator			= "",
 
 			//Error/Exception Handling
-			invalidHTTPMethodHandler = "",
-			exceptionHandler		= "",
+			invalidHTTPMethodHandler 	= "",
+			exceptionHandler			= "",
 			invalidEventHandler			= "",
-			customErrorTemplate		= "",
+			customErrorTemplate			= "",
 
 			//Application Aspects
 			handlerCaching 			= false,
