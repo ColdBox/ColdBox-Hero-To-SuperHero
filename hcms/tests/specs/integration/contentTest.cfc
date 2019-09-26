@@ -143,10 +143,36 @@ component extends="tests.resources.BaseIntegrationSpec"{
 				});
 			});
 
-			xit( "delete a content object", function(){
-				var event = execute( event="content.delete", renderResults=true );
-				// expectations go here.
-				expect( false ).toBeTrue();
+			story( "I want to be able to remove content objects", function(){
+				given( "a valid incoming slug", function(){
+					then( "it should remove content object", function(){
+						var event = DELETE(
+							route = "/api/v1/content/Record-Slave-Crystal"
+						);
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						debug( response.getData() );
+
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getMessages().toString() ).toInclude( "Content deleted" );
+					});
+				});
+
+				given( "an invalid slug", function(){
+					then( "it should throw a validation error", function(){
+						var event = delete(
+							route = "/api/v1/content/bogus"
+						);
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+						expect( response.getStatusCode() ).toBe( 404 );
+					});
+				});
 			});
 
 		} );

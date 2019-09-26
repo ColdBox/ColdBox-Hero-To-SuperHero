@@ -7,7 +7,6 @@ component singleton accessors="true"{
 	property name="populator" 	inject="wirebox:populator";
 	property name="qb"          inject="provider:QueryBuilder@qb";
 
-
 	/**
 	 * Constructor
 	 */
@@ -70,6 +69,19 @@ component singleton accessors="true"{
 				"modifiedDate" 	= { value : now(), cfsqltype : "timestamp" },
 				"FK_userId"		= arguments.content.getUser().getId()
 			} );
+
+		return arguments.content;
+	}
+
+	/**
+	 * delete
+	 */
+	function delete( required content ){
+		var qResults = qb.from( "content" )
+			.whereId( arguments.content.getId() )
+			.delete();
+
+		arguments.content.setId( "" );
 
 		return arguments.content;
 	}

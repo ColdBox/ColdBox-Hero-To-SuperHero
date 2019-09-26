@@ -85,7 +85,23 @@ component extends="api.handlers.BaseHandler"{
 	* delete
 	*/
 	function delete( event, rc, prc ){
-		event.setView( "content/delete" );
+		param rc.slug = "";
+
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if( !prc.oContent.isLoaded() ){
+			prc.response
+				.setError( true )
+				.setStatusCode( STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		contentService.delete( prc.oContent );
+
+		prc.response.addMessage( "Content deleted!" );
 	}
 
 }

@@ -1818,3 +1818,101 @@ slug : { required : true, udf : ( value, target ) => {
 ```
 
 Check out the cool `when()` function. It allows us to switch up the SQL if the actual object has been persisted already. Now run your tests and we should be good now!
+
+
+## Removing Content
+
+```js
+story( "I want to be able to remove content objects" )
+```
+
+### BDD
+
+Update the spec with a new story and scenarios:`
+
+
+```js
+story( "I want to be able to remove content objects", function(){
+	given( "a valid incoming slug", function(){
+		then( "it should remove content object", function(){
+			var event = DELETE(
+				route = "/api/v1/content/Record-Slave-Crystal"
+			);
+
+			// expectations go here.
+			var response = event.getPrivateValue( "Response" );
+
+			debug( response.getData() );
+
+			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response.getMessages().toString() ).toInclude( "Content deleted" );
+		});
+	});
+
+	given( "an invalid slug", function(){
+		then( "it should throw a validation error", function(){
+			var event = delete(
+				route = "/api/v1/content/bogus"
+			);
+
+			// expectations go here.
+			var response = event.getPrivateValue( "Response" );
+
+			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+			expect( response.getStatusCode() ).toBe( 404 );
+		});
+	});
+});
+```
+
+Ok, now let's put it together!
+
+### Delete Action
+
+```js
+/**
+* delete
+*/
+function delete( event, rc, prc ){
+	param rc.slug = "";
+
+	prc.oContent = contentService.findBySlug( rc.slug );
+
+	if( !prc.oContent.isLoaded() ){
+		prc.response
+			.setError( true )
+			.setStatusCode( STATUS.NOT_FOUND )
+			.setStatusText( "Not Found" )
+			.addMessage( "The requested content object (#rc.slug#) could not be found" );
+		return;
+	}
+
+	// populate, validate and create
+	contentService.delete( prc.oContent );
+
+	prc.response.addMessages( "Content deleted!" );
+}
+```
+
+We have to also get the authenticated user to add it into the content.
+
+### Delete Services
+
+Now to the ugly (funky) SQL
+
+```js
+/**
+ * delete
+ */
+function delete( required content ){
+	var qResults = qb.from( "content" )
+		.whereId( arguments.content.getId() )
+		.delete();
+
+	arguments.content.setId( "" );
+
+	return arguments.content;
+}
+```
+
+Run your tests!
