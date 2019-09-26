@@ -7,7 +7,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 
 	function run(){
 
-		describe( "Content Services", function(){
+		describe( "Content Services: In order to interact with content in the CMS you must be authenticated", function(){
 
 			beforeEach(function( currentSpec ){
 				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
@@ -18,14 +18,15 @@ component extends="tests.resources.BaseIntegrationSpec"{
 			});
 
 			story( "I want to be able to see content with different options", function(){
-
 				it( "should display all content using the default options", function(){
 					var event = get( route = "/api/v1/content" );
 					var response = event.getPrivateValue( "Response" );
 					expect( response.getError() ).toBeFalse( response.getMessages().toString() );
 					expect( response.getData() ).toBeArray();
 				});
+			});
 
+			story( "I want to see a single content object via a nice slug", function(){
 				given( "a valid slug", function(){
 					then( "I should be able to display the content object", function(){
 						var testSlug = "Spoon-School-Staircase";
@@ -55,22 +56,49 @@ component extends="tests.resources.BaseIntegrationSpec"{
 			});
 
 			story( "I want to be able to create new content objects", function(){
-				given( "valid incoming data ", function(){
+				given( "valid incoming data", function(){
 					then( "it should create a new content object", function(){
 						var event = post(
 							route = "/api/v1/content",
 							params = {
-								slug : "my-new-test-#createUUID()#",
-								title : "I love BDD",
-								body : "I love BDD sooooooooooo much!"
+								slug          : "my-new-test-#createUUID()#",
+								title         : "I love BDD",
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
 							}
 						)
+
 						// expectations go here.
-						expect( false ).toBeTrue();
+						var response = event.getPrivateValue( "Response" );
+
+						debug( response.getData() );
+
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getData().title ).toBe( "I love BDD" );
+						expect( response.getData().id ).notToBeEmpty();
+					});
+				});
+
+				given( "invalid data", function(){
+					then( "it should throw a validation error", function(){
+						var event = post(
+							route = "/api/v1/content",
+							params = {
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+						expect( response.getStatusCode() ).toBe( 400 );
 					});
 				});
 			});
-
 
 			xit( "edit a content object", function(){
 				var event = execute( event="content.update", renderResults=true );
@@ -83,6 +111,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 				// expectations go here.
 				expect( false ).toBeTrue();
 			});
+
 		} );
 
 	}

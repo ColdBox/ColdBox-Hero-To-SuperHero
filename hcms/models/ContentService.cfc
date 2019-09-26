@@ -34,6 +34,28 @@ component singleton accessors="true"{
 	}
 
 	/**
+	* create
+	*/
+	function create( required content ){
+		var qResults = qb.from( "content" )
+			.insert( values = {
+				"slug" 			= arguments.content.getSlug(),
+				"title" 		= arguments.content.getTitle(),
+				"body" 			= arguments.content.getBody(),
+				"isPublished" 	= { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
+				"publishedDate" = { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+				"createdDate" 	= { value : now(), cfsqltype : "timestamp" },
+				"modifiedDate" 	= { value : now(), cfsqltype : "timestamp" },
+				"FK_userId"		= arguments.content.getUser().getId()
+			} );
+
+		// populate the id
+		arguments.content.setId( qResults.result.generatedKey );
+
+		return arguments.content;
+	}
+
+	/**
 	* get
 	*/
 	function get( required id ){

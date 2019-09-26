@@ -19,7 +19,16 @@ component extends="api.handlers.BaseHandler"{
 	* create
 	*/
 	function create( event, rc, prc ){
-		event.setView( "content/create" );
+
+		// populate, validate and create
+		prc.oContent = contentService.create(
+			validateOrFail(
+				populateModel( "Content" )
+					.setUser( jwtAuth().getUser() )
+			)
+		);
+
+		prc.response.setData( prc.oContent.getMemento() );
 	}
 
 	/**
@@ -57,7 +66,5 @@ component extends="api.handlers.BaseHandler"{
 	function delete( event, rc, prc ){
 		event.setView( "content/delete" );
 	}
-
-
 
 }

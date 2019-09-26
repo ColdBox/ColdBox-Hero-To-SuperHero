@@ -5,6 +5,7 @@ component accessors="true"{
 
 	// inject the user service
 	property name="userService" inject="UserService";
+	property name="qb"          inject="provider:QueryBuilder@qb";
 
 	// Properties
 	property name="id"            type="string";
@@ -19,15 +20,17 @@ component accessors="true"{
 
 	this.constraints = {
         slug    	: { required : true, udf : ( value, target ) => {
+			if( isNull( arguments.value ) ) return false;
             return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
 		}},
 		title       : { required : true },
 		body       	: { required : true },
-		FK_userID	: { required : true }
+		user		: { required : true }
 	};
 
 	this.memento = {
 		defaultIncludes = [
+			"id",
 			"slug",
 			"title",
 			"body",

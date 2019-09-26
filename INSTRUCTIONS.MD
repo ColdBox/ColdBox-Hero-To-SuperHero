@@ -465,6 +465,7 @@ component accessors="true"{
         name        : { required : true },
         email       : { required : true, type : "email" },
         username    : { required : true, udf : ( value, target ) => {
+			if( isNull( arguments.value ) ) return false;
             return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
         }},
         password    : { required : true }
@@ -1178,12 +1179,12 @@ route( "/:anything", "echo.onInvalidRoute" );
 Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message.
 
 
-## Content Services
+## Listing Content
 
-Ok, we have all the building blocks for now focusing on our content stories:
+Ok, we have all the building blocks for now focusing on our first content stories:
 
 ```js
-story( "In order to see content in the CMS you must be authenticated" );
+story( "In order to interact with content in the CMS you must be authenticated" );
 story( "I want to see content with different filtering options" )
 story( "I want to see a single content object via a nice slug" )
 ```
@@ -1218,9 +1219,84 @@ Open up the object and the companion unit test.  Remember in our unit test, we j
 * Add the mementifier instructions
 * Add the validation constraints
 
-
 ```js
+/**
+* I am a new Model Object
+*/
+component accessors="true"{
 
+	// inject the user service
+	property name="userService" inject="UserService";
+
+	// Properties
+	property name="id"            type="string";
+	property name="slug"          type="string";
+	property name="title"         type="string";
+	property name="body"          type="string";
+	property name="isPublished"   type="boolean";
+	property name="publishedDate" type="date";
+	property name="createdDate"   type="date";
+	property name="modifiedDate"  type="date";
+	property name="FK_userID"     type="string" default="";
+
+	this.constraints = {
+        slug    	: { required : true, udf : ( value, target ) => {
+			if( isNull( arguments.value ) ) return false;
+            return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
+		}},
+		title       : { required : true },
+		body       	: { required : true },
+		FK_userID	: { required : true }
+	};
+
+	this.memento = {
+		defaultIncludes = [
+			"slug",
+			"title",
+			"body",
+			"isPublished",
+			"publishedDate",
+			"createdDate",
+			"modifiedDate",
+			"user.name",
+			"user.email"
+		],
+		defaultExcludes = [
+			"FK_userID",
+			"user.id",
+			"user.username",
+			"user.modifiedDate",
+			"user.createdDate"
+		]
+	};
+
+	/**
+	 * Constructor
+	 */
+	Content function init(){
+		variables.createdDate 	= now();
+		variables.modifiedDate 	= now();
+		variables.isPublished 	= false;
+		variables.FK_userID 	= "";
+		return this;
+	}
+
+	boolean function isLoaded(){
+		return ( !isNull( variables.id ) && len( variables.id ) );
+	}
+
+	User function getUser(){
+		return variables.userService.retrieveUserById( variables.FK_userId );
+	}
+
+	Content function setUser( required user ){
+		if( user.isLoaded() ){
+			variables.FK_userId = arguments.user.getId();
+		}
+		return this;
+	}
+
+}
 ```
 
 Update your tests:
@@ -1254,7 +1330,55 @@ coldbox create handler name="content" actions="index,create,show,update,delete" 
 Let's open up the specs and start building it out:
 
 ```js
+describe( "Content Services: In order to interact with content in the CMS you must be authenticated", function(){
 
+	beforeEach(function( currentSpec ){
+		// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+		setup();
+		// Need to login
+		jwt = jwtService.attempt( "Milkshake10", "test" );
+		getRequestContext().setValue( "x-auth-token", jwt );
+	});
+
+	story( "I want to be able to see content with different options", function(){
+		it( "should display all content using the default options", function(){
+			var event = get( route = "/api/v1/content" );
+			var response = event.getPrivateValue( "Response" );
+			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response.getData() ).toBeArray();
+		});
+	});
+
+	story( "I want to see a single content object via a nice slug", function(){
+		given( "a valid slug", function(){
+			then( "I should be able to display the content object", function(){
+				var testSlug = "Spoon-School-Staircase";
+				var event = get( route = "/api/v1/content/#testSlug#" );
+				var response = event.getPrivateValue( "Response" );
+
+				debug( response.getMessages() );
+
+				expect( response.getError() ).toBeFalse();
+				expect( response.getData() ).toBeStruct();
+				expect( response.getData().slug ).toBe( testSlug );
+			});
+		});
+
+		given( "an invalid slug", function(){
+			then( "then we should get a 404", function(){
+				var testSlug = "invalid-bogus-object";
+				var event = get( route = "/api/v1/content/#testSlug#" );
+				var response = event.getPrivateValue( "Response" );
+
+				debug( response.getMessages() );
+
+				expect( response.getError() ).toBeTrue();
+				expect( response.getStatusCode() ).toBe( 404 );
+			});
+		});
+	});
+	
+} );
 ```
 
 ### Security
@@ -1281,15 +1405,75 @@ resources( "content" );
 
 ### Event Handler
 
-Now let's build out the handler:
+Now let's build out the handler that can satisfy our previous stories
 
 ```js
-```
+/**
+* I am a new handler
+*/
+component extends="api.handlers.BaseHandler"{
 
+	property name="contentService" inject="ContentService";
+
+	/**
+	* index
+	*/
+	function index( event, rc, prc ){
+		prc.response.setData(
+			contentService.list()
+				.map( ( item ) => { return item.getMemento(); } )
+		);
+	}
+
+	/**
+	* create
+	*/
+	function create( event, rc, prc ){
+		event.setView( "content/create" );
+	}
+
+	/**
+	* show
+	*/
+	function show( event, rc, prc ){
+		param rc.id = "";
+
+		prc.oContent = contentService.findBySlug( rc.id );
+
+		if( !prc.oContent.isLoaded() ){
+			prc.response
+				.setError( true )
+				.setStatusCode( STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.id#) could not be found" );
+			return;
+		}
+
+		prc.response.setData(
+			prc.oContent.getMemento()
+		);
+	}
+
+	/**
+	* update
+	*/
+	function update( event, rc, prc ){
+		event.setView( "content/update" );
+	}
+
+	/**
+	* delete
+	*/
+	function delete( event, rc, prc ){
+		event.setView( "content/delete" );
+	}
+
+}
+```
 
 ### Content Services
 
-Ok, now we need to focus on our Content Services that will power the handler since we already created the Content object.
+Ok, now we need to focus on our Content Services that will power the handler since we already created the Content object, so we need to implement the `findBySlug()` and the `list()` methods:
 
 Let's generate what we need:
 
@@ -1300,12 +1484,197 @@ coldbox create model name="ContentService" persistence="singleton" methods="list
 Also open the unit test and do a quick compile test:
 
 ```js
+describe( "ContentService Suite", function(){
 
+	it( "can be created", function(){
+		expect( model ).toBeComponent();
+	});
+
+});
 ```
 
 Now let's build it out:
 
 ```js
+/**
+* I am a new Model Object
+*/
+component singleton accessors="true"{
+
+	// Properties
+	property name="populator" 	inject="wirebox:populator";
+	property name="qb"          inject="provider:QueryBuilder@qb";
 
 
+	/**
+	 * Constructor
+	 */
+	ContentService function init(){
+		return this;
+	}
+
+	Content function new() provider="Content";
+
+	/**
+	* list
+	*/
+	array function list( orderBy="publishedDate", orderType="asc" ){
+		return qb
+			.from( "content" )
+			.orderBy( arguments.orderBy, arguments.orderType )
+			.get()
+			.map( ( content ) => {
+				return populator.populateFromStruct(
+					new(),
+					content
+				);
+			} );
+	}
+
+	/**
+	* get
+	*/
+	function get( required id ){
+		return populator.populateFromStruct(
+            new(),
+            qb.from( "content" ).where( "id" , arguments.id ).first()
+        );
+	}
+
+	/**
+	* Find by slug
+	*/
+	function findBySlug( required slug ){
+		return populator.populateFromStruct(
+            new(),
+            qb.from( "content" ).where( "slug" , arguments.slug ).first()
+        );
+	}
+
+
+}
 ```
+
+Ok, it seems we are done, let's run our tests and make sure we are listing all content and getting a single content.  
+
+**Extra Credit:** Leverage postman to test these endpoints. Remember you must get a jwt token first!
+
+
+
+## Creating Content
+
+Ok, we can list all and one piece of content, let's try creating one now.
+
+```js
+story( "I want to be able to create content objects" )
+```
+
+I don't have to do any more setup for security, resources or even handlers.  We have our resourceful handler already.  So let's delve into the BDD first.
+
+### BDD
+
+Update the spec with a new story and scenarios:`
+
+
+```js
+story( "I want to be able to create new content objects", function(){
+	given( "valid incoming data", function(){
+		then( "it should create a new content object", function(){
+			var event = post(
+				route = "/api/v1/content",
+				params = {
+					slug          : "my-new-test-#createUUID()#",
+					title         : "I love BDD",
+					body          : "I love BDD sooooooooooo much!",
+					isPublished   : true,
+					publishedDate : now()
+				}
+			)
+
+			// expectations go here.
+			var response = event.getPrivateValue( "Response" );
+
+			debug( response.getData() );
+
+			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response.getData().title ).toBe( "I love BDD" );
+			expect( response.getData().id ).notToBeEmpty();
+		});
+	});
+
+	given( "invalid data", function(){
+		then( "it should throw a validation error", function(){
+			var event = post(
+				route = "/api/v1/content",
+				params = {
+					body          : "I love BDD sooooooooooo much!",
+					isPublished   : true,
+					publishedDate : now()
+				}
+			)
+
+			// expectations go here.
+			var response = event.getPrivateValue( "Response" );
+
+			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+			expect( response.getStatusCode() ).toBe( 400 );
+		});
+	});
+});
+```
+
+Ok, now let's put it together!
+
+### Create Action
+
+```js
+/**
+* create
+*/
+function create( event, rc, prc ){
+
+	// populate, validate and create
+	prc.oContent = contentService.create(
+		validateOrFail(
+			populateModel( "Content" )
+				.setUser( jwtAuth().getUser() )
+		)
+	);
+
+	prc.response.setData( prc.oContent.getMemento() );
+}
+```
+
+We have to also get the authenticated user to add it into the content.
+
+### Create Services
+
+Now to the ugly (funky) SQL
+
+```js
+/**
+* create
+*/
+function create( required content ){
+	var qResults = qb.from( "content" )
+		.insert( values = {
+			"slug" 			= arguments.content.getSlug(),
+			"title" 		= arguments.content.getTitle(),
+			"body" 			= arguments.content.getBody(),
+			"isPublished" 	= { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
+			"publishedDate" = { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+			"createdDate" 	= { value : now(), cfsqltype : "timestamp" },
+			"modifiedDate" 	= { value : now(), cfsqltype : "timestamp" },
+			"FK_userId"		= arguments.content.getUser().getId()
+		} );
+
+	// populate the id
+	arguments.content.setId( qResults.result.generatedKey );
+
+	return arguments.content;
+}
+```
+
+Run your tests, validate and BOOM! Creation done! Next!
+
+

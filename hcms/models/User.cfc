@@ -20,6 +20,7 @@ component accessors="true"{
         name        : { required : true },
         email       : { required : true, type : "email" },
         username    : { required : true, udf : ( value, target ) => {
+			if( isNull( arguments.value ) ) return false;
             return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
         }},
         password    : { required : true }

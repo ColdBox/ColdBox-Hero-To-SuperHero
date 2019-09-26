@@ -31,7 +31,6 @@ component extends="coldbox.system.testing.BaseModelTest" model="models.ContentSe
 				expect( model ).toBeComponent();
 			});
 
-
 		});
 
 	}
