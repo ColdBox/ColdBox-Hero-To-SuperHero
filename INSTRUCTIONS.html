@@ -422,6 +422,7 @@ password: coldbox
 </ul>
 <pre class="hljs"><code><div>coldbox create app name=cms skeleton=rest-hmvc
 </div></code></pre>
+<p>Let's go over what is in this template.</p>
 <h2 id="updating-our-env-file">Updating our <code>.env</code> file</h2>
 <p>Update the environment file with the following information:</p>
 <pre class="hljs"><code><div><span class="hljs-comment"># ColdBox Environment</span>
@@ -495,7 +496,7 @@ S3_DOMAIN=amazonaws.com
 <blockquote>
 <p>Tip: <code>server log --follow</code> to see the console logs of your server, try it out. All logging messages will also appear here as well.  Great to have in a separate window.</p>
 </blockquote>
-<h2 id="bdd">BDD</h2>
+<h2 id="bdd-setup-and-test-harness">BDD Setup and Test Harness</h2>
 <p>Let's also discover the automated tests that were created for us.  Navigate to the following URL:
 http://localhost:42518/tests/runner.cfm and you will see the test results.  Check out the specs in <code>tests/specs</code> as well.</p>
 <p>Now let's try it via CommandBox CLI</p>
@@ -509,7 +510,7 @@ testbox run
 <pre class="hljs"><code><div>testbox watch
 </div></code></pre>
 <p>This will start a watcher so you can do your code changes and tests will be executed automatically for you.  Go break a test and check it out.</p>
-<h2 id="more-modules">More Modules</h2>
+<h2 id="application-modules">Application Modules</h2>
 <p>We will install several modules to assist us with the development of our API</p>
 <ul>
 <li><code>qb</code> - Fluent query builder for fancy queries (https://forgebox.io/view/qb)</li>
@@ -523,7 +524,7 @@ testbox run
 install cbvalidation,qb,bcrypt,mementifier,cbsecurity
 coldbox reinit
 </div></code></pre>
-<h2 id="adding-our-datasource-globally">Adding our Datasource Globally</h2>
+<h2 id="datasource-configuration">Datasource Configuration</h2>
 <p>Open <code>Application.cfc</code>  so we can add the global datasource we registered with the CFML Engine via  <code>.cfconfig.json</code></p>
 <pre class="hljs"><code><div><span class="hljs-comment">// App datasource</span>
 <span class="hljs-keyword">this</span>.datasource = <span class="hljs-string">"cms"</span>;
@@ -533,8 +534,8 @@ coldbox reinit
 <span class="hljs-keyword">this</span>.datasource = <span class="hljs-string">"cms"</span>;
 </div></code></pre>
 <p>Try running the app again. If it runs, it works.  Or just issue a <code>testbox run</code></p>
-<h2 id="our-base-integration-testing-class">Our Base Integration Testing Class</h2>
-<p>Let's create a base testing class all our integration tests will inherit from.  Place it under <code>tests/resources/BaseIntegrationSpec.cfc</code></p>
+<h2 id="base-integration-spec-class">Base Integration Spec Class</h2>
+<p>Let's create a base spec class all of our integration tests will inherit from.  Place it under <code>tests/resources/BaseIntegrationSpec.cfc</code></p>
 <pre class="hljs"><code><div>component extends=<span class="hljs-string">"coldbox.system.testing.BaseTestCase"</span> appMapping=<span class="hljs-string">"/root"</span>{
 
     <span class="hljs-comment">// Load on first test</span>
@@ -641,7 +642,7 @@ component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec
 
 }
 </div></code></pre>
-<h2 id="security">Security</h2>
+<h2 id="security-configuration">Security Configuration</h2>
 <p>We will start by configuring <code>cbsecurity</code> so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.</p>
 <ul>
 <li>Go over cbSecurity</li>
@@ -704,6 +705,7 @@ component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec
     }
 }
 </div></code></pre>
+<h3 id="jwt-secret-key">JWT Secret Key</h3>
 <p>Let's add the JWT Secret now, let's begin by generating a secret key. Go to CommandBox and let's generate one:</p>
 <pre class="hljs"><code><div><span class="hljs-comment">#generateSecretKey blowfish 256</span>
 
@@ -719,6 +721,8 @@ reload
 // restar the server
 restart
 </div></code></pre>
+<h3 id="securfity-visualizer">Securfity Visualizer</h3>
+<p>Go to http://127.0.0.1:42518/cbsecurity and you can see the security visualizer.  Super useful!</p>
 <p>That's it!  Make sure your tests work: <code>testbox run</code></p>
 <h2 id="registration">Registration</h2>
 <p>Let's focus now on the user registration requirement. This is the BDD story to complete:</p>
@@ -2004,6 +2008,19 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 }
 </div></code></pre>
 <p>Run your tests!</p>
+<h2 id="where-do-we-go-from-here">Where Do We Go From Here</h2>
+<p>We should be excited, exhausted, and amazed that we have started to build a headless CMS!  This is just the start, what else can we do? Here are some more ideas?</p>
+<ul>
+<li>Content Versioning</li>
+<li>Content Drafts</li>
+<li>Content Categories</li>
+<li>Move to an ORM (Hibernate or Quick)</li>
+<li>Allow creator and editor in content objects</li>
+<li>Pagination</li>
+<li>Search</li>
+<li>The list goes on!!!</li>
+</ul>
+<p>Happy Coding!</p>
 
 </body>
 </html>

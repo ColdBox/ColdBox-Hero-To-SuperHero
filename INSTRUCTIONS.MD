@@ -55,6 +55,8 @@ The following dependencies will be installed for you:
 coldbox create app name=cms skeleton=rest-hmvc
 ```
 
+Let's go over what is in this template.
+
 ## Updating our `.env` file
 
 Update the environment file with the following information:
@@ -141,7 +143,7 @@ Boom!  Our REST API is now online
 
 > Tip: `server log --follow` to see the console logs of your server, try it out. All logging messages will also appear here as well.  Great to have in a separate window.
 
-## BDD
+## BDD Setup and Test Harness
 
 Let's also discover the automated tests that were created for us.  Navigate to the following URL:
 http://localhost:42518/tests/runner.cfm and you will see the test results.  Check out the specs in `tests/specs` as well.
@@ -167,7 +169,7 @@ testbox watch
 
 This will start a watcher so you can do your code changes and tests will be executed automatically for you.  Go break a test and check it out.
 
-## More Modules
+## Application Modules
 
 We will install several modules to assist us with the development of our API
 
@@ -185,7 +187,7 @@ install cbvalidation,qb,bcrypt,mementifier,cbsecurity
 coldbox reinit
 ```
 
-## Adding our Datasource Globally
+## Datasource Configuration
 
 Open `Application.cfc`  so we can add the global datasource we registered with the CFML Engine via  `.cfconfig.json`
 
@@ -203,10 +205,9 @@ this.datasource = "cms";
 
 Try running the app again. If it runs, it works.  Or just issue a `testbox run`
 
+## Base Integration Spec Class
 
-## Our Base Integration Testing Class
-
-Let's create a base testing class all our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`
+Let's create a base spec class all of our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`
 
 
 ```js
@@ -320,7 +321,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 }
 ```
 
-## Security
+## Security Configuration
 
 We will start by configuring `cbsecurity` so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.
 
@@ -387,6 +388,8 @@ moduleSettings = {
 }
 ```
 
+### JWT Secret Key
+
 Let's add the JWT Secret now, let's begin by generating a secret key. Go to CommandBox and let's generate one:
 
 ```bash
@@ -410,6 +413,10 @@ reload
 // restar the server
 restart
 ```
+
+### Securfity Visualizer
+
+Go to http://127.0.0.1:42518/cbsecurity and you can see the security visualizer.  Super useful!
 
 That's it!  Make sure your tests work: `testbox run`
 
@@ -1916,3 +1923,18 @@ function delete( required content ){
 ```
 
 Run your tests!
+
+## Where Do We Go From Here
+
+We should be excited, exhausted, and amazed that we have started to build a headless CMS!  This is just the start, what else can we do? Here are some more ideas?
+
+- Content Versioning
+- Content Drafts
+- Content Categories
+- Move to an ORM (Hibernate or Quick)
+- Allow creator and editor in content objects
+- Pagination
+- Search
+- The list goes on!!!
+
+Happy Coding!
