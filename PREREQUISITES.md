@@ -4,28 +4,35 @@ Please have the following software on your computer before the workshop. If ever
 
 ## A Modern Computer
 
-Please make sure you have a computer that is modern. No running windows 95, 7 or something funky from the year 2000.  Make sure you have plenty of FREE RAM (at least 4gb) and with a modern processor (at least an i5).  Most of the hiccups in trainings are when people do not meet the appropriate requirements in their own machines.  We will be running CFML engines and docker containers, so make sure you can run them.
+Please make sure you have a computer that is modern. No running windows 95, 7 or something funky from the year 2000.  Make sure you have plenty of FREE RAM (at least 4gb) and with a modern processor (at least an `i5`).  Most of the hiccups in trainings are when people do not meet the appropriate requirements in their own machines.  We will be running CFML engines and docker containers, so make sure you can run them.
 
 ## Windows PRO
 
 If you are in Windows you will need Windows PRO and not Windows Home in order for Docker Desktop to be installed.  We will be using Docker for our data services so you MUST be able to install and run docker containers.
 
-## [Postman](https://www.getpostman.com/)
+> Ignore this if you are using WSL2 which is supported with docker as well.
 
-We will be leveraging postman for RESTFul testing.
+## RESTFul Client
+
+You will need a restful client for making requests. There are many, here are some:
+
+* [Postman](https://www.getpostman.com/)
+* [Insomnia](https://insomnia.rest/)
+* [Chrome REST](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo?hl=en-US)
+* [FireFox REST](https://addons.mozilla.org/en-US/firefox/addon/restclient/)
 
 ## [Git](https://git-scm.com)
 
 * https://git-scm.com
 
-## [Java](https://www.java.com/en/) (Version 8+)
+## [Java](https://www.java.com/en/) (Version 11+)
 
 This can be downloaded bundled with CommandBox if needed
 
 * https://www.java.com/en/
 * https://www.ortussolutions.com/products/commandbox
 
-## [CommandBox CLI](https://www.ortussolutions.com/products/commandbox#download) (Version 4.\*)
+## [CommandBox CLI](https://www.ortussolutions.com/products/commandbox#download) (Version 5.\*)
 
 * https://www.ortussolutions.com/products/commandbox#download
 
@@ -69,7 +76,7 @@ You can use any client you would like. Here are a few we like ourselves:
 * [Table Plus](https://tableplus.com/) (Mac,Windows, Free)
 * [Data Grip](https://www.jetbrains.com/datagrip/) (Cross Platform, Commercial / Free Trial)
 
-## IDE 
+## IDE
 
 We recommend the following IDEs for development for this workshop
 
@@ -95,9 +102,9 @@ If using Sublime, please install the following extensions:
 
 ## Useful Resources
 
-* ColdBox Api Docs: https://apidocs.ortussolutions.com/coldbox/5.6.2/index.html
+* ColdBox Api Docs: https://apidocs.ortussolutions.com/coldbox/6.0.0/index.html
 * ColdBox Docs: https://coldbox.ortusbooks.com
 * WireBox Docs: https://wirebox.ortusbooks.com
 * TestBox Docs: https://testbox.ortusbooks.com
-* TestBox Api Docs: https://apidocs.ortussolutions.com/testbox/3.1.0/index.html
+* TestBox Api Docs: https://apidocs.ortussolutions.com/testbox/4.2.0/index.html
 * Migrations: https://www.forgebox.io/view/commandbox-migrations

@@ -1205,7 +1205,8 @@ story( <span class="hljs-string">"I want to be able to logout from the system us
 
 						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-						debug( response.getStatusCode( <span class="hljs-number">500</span> ) );
+						expect( response.getStatusCode() ).toBe( <span class="hljs-number">500</span> );
+						debug( response.getStatusCode() );
 					});
 				});
 			} );
@@ -1375,7 +1376,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 }
 </div></code></pre>
 <p>That's it!  Go run your tests and make sure all the tests pass!  What have you learned?</p>
-<h3 id="invalid-routes">Invalid Routes</h3>
+<h2 id="invalid-routes">Invalid Routes</h2>
 <p>Ok, so what would happen if we try to execute <code>/api/v1/login</code> in the browser?  Go and try it!</p>
 <p>You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the <code>v1</code> api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Base Handler's <code>onInvalidRoute()</code> method.</p>
 <p>Open the <code>v1</code> router and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.</p>

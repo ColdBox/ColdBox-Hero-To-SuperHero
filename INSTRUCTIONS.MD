@@ -6,7 +6,7 @@
 
 Create a new application folder where we will build our app on, call it `hcms` and place the given docker compose file in the root and the workbench folder as well.
 
-```
+```bash
 hcms
  + docker-compose.yaml
  + workbench
@@ -14,13 +14,13 @@ hcms
 
 ## Starting the Database
 
-```
+```bash
 docker-compose up
 ```
 
 Now open up your favorite SQL tool and make sure you can connect with the following credentials:
 
-```
+```bash
 server: 127.0.0.1
 port: 3307
 database: cms
@@ -975,7 +975,8 @@ component extends="tests.resources.BaseIntegrationSpec"{
 
 						var response = event.getPrivateValue( "Response" );
 						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-						debug( response.getStatusCode( 500 ) );
+						expect( response.getStatusCode() ).toBe( 500 );
+						debug( response.getStatusCode() );
 					});
 				});
 			} );
@@ -1168,7 +1169,7 @@ component singleton accessors="true"{
 
 That's it!  Go run your tests and make sure all the tests pass!  What have you learned?
 
-### Invalid Routes
+## Invalid Routes
 
 Ok, so what would happen if we try to execute `/api/v1/login` in the browser?  Go and try it!
 
