@@ -30,19 +30,19 @@ password: coldbox
 
 Your database should be online and populated with mock data.
 
-> Tip: You can find the database export file here `/workbench/db/cms.sql`. You will also find the migrations we used and the seeder we used for populating the database.
+> Tip: You can find the database export file here `/workbench/db/cms.sql`. You will also find the migrations we used and the seeder we used for populating the database under `/workbench/resources`
 
 ## Global Dependencies
 
 Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, cfconfig for CFML portability (cfconfig - https://cfconfig.ortusbooks.com/):
 
 ```bash
-install commandbox-dotenv,commandbox-cfconfig
+install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat
 ```
 
 ## Creating our REST HMVC App
 
-We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our `rest-hmvc` template.  It will create a modular approach to our API so we will have versions and a pre-configured `Response` object and a `BaseHandler` for uniformity and data manipulation.
+We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our `rest-hmvc` template.  It will create a modular approach to our API based on ColdBox 6
 
 The following dependencies will be installed for you:
 
@@ -52,6 +52,7 @@ The following dependencies will be installed for you:
 * `modules/relax` - Module for documenting, exploring and testing our API (`development` dependency)
 
 ```bash
+mkdir hcms --cd
 coldbox create app name=cms skeleton=rest-hmvc
 ```
 
