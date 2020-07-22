@@ -146,7 +146,7 @@
 				// The route prefix to search.  Routes beginning with this prefix will be determined to be api routes
 				"routes"        : [ "api" ],
 				// Any routes to exclude
-				"excludeRoutes" : [],
+				"excludeRoutes" : [ "api/v1/:anything/" ],
 				// The default output format: json or yml
 				"defaultFormat" : "json",
 				// A convention route, relative to your app root, where request/response samples are stored ( e.g. resources/apidocs/responses/[module].[handler].[action].[HTTP Status Code].json )
@@ -154,13 +154,11 @@
 				// Information about your API
 				"info"          : {
 					// A title for your API
-					"title"          : "ColdBox REST-HMVC Template",
+					"title"       : "Hero to SuperHero Headless CMS",
 					// A description of your API
-					"description"    : "This API produces amazing results and data.",
-					// A terms of service URL for your API
-					"termsOfService" : "",
+					"description" : "A nice hmvc headless CMS",
 					// The contact email address
-					"contact"        : {
+					"contact"     : {
 						"name"  : "API Support",
 						"url"   : "https://www.swagger.io/support",
 						"email" : "info@ortussolutions.com"
@@ -174,7 +172,7 @@
 					"version" : "1.0.0"
 				},
 				// Tags
-				"tags"         : [],
+				"tags"         : [ ],
 				// https://swagger.io/specification/#externalDocumentationObject
 				"externalDocs" : {
 					"description" : "Find more info here",
@@ -187,7 +185,7 @@
 						"description" : "The main production server"
 					},
 					{
-						"url"         : "http://127.0.0.1:60299",
+						"url"         : "http://127.0.0.1:42518",
 						"description" : "The dev server"
 					}
 				],
