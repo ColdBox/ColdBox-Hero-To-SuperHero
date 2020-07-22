@@ -5,16 +5,17 @@
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 
 <style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
 body {
-	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
-	font-size: 14px;
-	padding: 0 12px;
-	line-height: 22px;
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
 	word-wrap: break-word;
 }
 
@@ -38,7 +39,6 @@ body {
 	background-color:#007acc;
 	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
 }
-
 
 body.scrollBeyondLastLine {
 	margin-bottom: calc(100vh - 22px);
@@ -71,12 +71,20 @@ body.showEditorSelection li.code-line:hover:before {
 	border-left: 3px solid rgba(0, 0, 0, 0.40);
 }
 
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
 .vscode-dark.showEditorSelection .code-active-line:before {
 	border-left: 3px solid rgba(255, 255, 255, 0.4);
 }
 
 .vscode-dark.showEditorSelection .code-line:hover:before {
 	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
 }
 
 .vscode-high-contrast.showEditorSelection .code-active-line:before {
@@ -87,14 +95,21 @@ body.showEditorSelection li.code-line:hover:before {
 	border-left: 3px solid rgba(255, 160, 0, 1);
 }
 
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
 img {
 	max-width: 100%;
 	max-height: 100%;
 }
 
 a {
-	color: #4080D0;
 	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 a:focus,
@@ -122,21 +137,6 @@ h1, h2, h3 {
 	font-weight: normal;
 }
 
-h1 code,
-h2 code,
-h3 code,
-h4 code,
-h5 code,
-h6 code {
-	font-size: inherit;
-	line-height: auto;
-}
-
-a:hover {
-	color: #4080D0;
-	text-decoration: underline;
-}
-
 table {
 	border-collapse: collapse;
 }
@@ -160,22 +160,18 @@ table > tbody > tr + tr > td {
 blockquote {
 	margin: 0 7px 0 5px;
 	padding: 0 16px 0 10px;
-	border-left: 5px solid;
+	border-left-width: 5px;
+	border-left-style: solid;
 }
 
 code {
 	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 14px;
-	line-height: 19px;
+	font-size: 1em;
+	line-height: 1.357em;
 }
 
 body.wordWrap pre {
 	white-space: pre-wrap;
-}
-
-.mac code {
-	font-size: 12px;
-	line-height: 18px;
 }
 
 pre:not(.hljs),
@@ -185,43 +181,22 @@ pre.hljs code > div {
 	overflow: auto;
 }
 
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
 /** Theming */
 
-.vscode-light,
-.vscode-light pre code {
-	color: rgb(30, 30, 30);
-}
-
-.vscode-dark,
-.vscode-dark pre code {
-	color: #DDD;
-}
-
-.vscode-high-contrast,
-.vscode-high-contrast pre code {
-	color: white;
-}
-
-.vscode-light code {
-	color: #A31515;
-}
-
-.vscode-dark code {
-	color: #D7BA7D;
-}
-
-.vscode-light pre:not(.hljs),
-.vscode-light code > div {
+.vscode-light pre {
 	background-color: rgba(220, 220, 220, 0.4);
 }
 
-.vscode-dark pre:not(.hljs),
-.vscode-dark code > div {
+.vscode-dark pre {
 	background-color: rgba(10, 10, 10, 0.4);
 }
 
-.vscode-high-contrast pre:not(.hljs),
-.vscode-high-contrast code > div {
+.vscode-high-contrast pre {
 	background-color: rgb(0, 0, 0);
 }
 
@@ -249,16 +224,6 @@ pre.hljs code > div {
 	border-color: rgba(255, 255, 255, 0.18);
 }
 
-.vscode-light blockquote,
-.vscode-dark blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.vscode-high-contrast blockquote {
-	background: transparent;
-	border-color: #fff;
-}
 </style>
 
 <style>
@@ -343,7 +308,8 @@ pre.hljs code > div {
  */
 
  body {
-	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
 }
 
 pre {
@@ -369,6 +335,11 @@ blockquote {
 	height: 1.4em;
 }
 
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
 /* for inline code */
 :not(pre):not(.hljs) > code {
 	color: #C9AE75; /* Change the old color so it seems less like an error */
@@ -383,8 +354,17 @@ blockquote {
 
 </style>
 
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
 <h1 id="steps-to-go-from-coldbox-hero-to-superhero">Steps to go from ColdBox Hero to SUPERHERO</h1>
 <p>(All commands assume we are in the <code>box</code> shell unless stated otherwise.)</p>
 <h2 id="create-app-folder">Create App Folder</h2>
@@ -405,22 +385,30 @@ password: coldbox
 </div></code></pre>
 <p>Your database should be online and populated with mock data.</p>
 <blockquote>
-<p>Tip: You can find the database export file here <code>/workbench/db/cms.sql</code>. You will also find the migrations we used and the seeder we used for populating the database.</p>
+<p>Tip: You can find the database export file here <code>/workbench/db/cms.sql</code>. You will also find the migrations we used and the seeder we used for populating the database under <code>/workbench/resources</code></p>
 </blockquote>
 <h2 id="global-dependencies">Global Dependencies</h2>
 <p>Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, cfconfig for CFML portability (cfconfig - https://cfconfig.ortusbooks.com/):</p>
-<pre class="hljs"><code><div>install commandbox-dotenv,commandbox-cfconfig
+<pre class="hljs"><code><div>install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat
 </div></code></pre>
 <h2 id="creating-our-rest-hmvc-app">Creating our REST HMVC App</h2>
-<p>We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our <code>rest-hmvc</code> template.  It will create a modular approach to our API so we will have versions and a pre-configured <code>Response</code> object and a <code>BaseHandler</code> for uniformity and data manipulation.</p>
+<p>We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our <code>rest-hmvc</code> template.  It will create a modular approach to our API based on ColdBox 6</p>
 <p>The following dependencies will be installed for you:</p>
 <ul>
 <li><code>coldbox</code> - Super HMVC Framework</li>
 <li><code>testbox</code> - BDD testing library (<code>development</code> dependency)</li>
+<li><code>modules/cbsecurity</code> - For securing your API</li>
+<li><code>modules/cbvalidation</code> - For validating your API</li>
+<li><code>modules/mementifier</code> - For marshalling objects to data</li>
+<li><code>modules/relax</code> - Module for documenting, exploring and testing our API (<code>development</code> dependency)
+<ul>
 <li><code>modules/cbSwagger</code> - Open API support for documenting our API</li>
-<li><code>modules/relax</code> - Module for documenting, exploring and testing our API (<code>development</code> dependency)</li>
 </ul>
-<pre class="hljs"><code><div>coldbox create app name=cms skeleton=rest-hmvc
+</li>
+<li><code>modules/route-visualizer</code> - For visualizing our routes</li>
+</ul>
+<pre class="hljs"><code><div>mkdir hcms --<span class="hljs-built_in">cd</span>
+coldbox create app name=cms skeleton=rest-hmvc
 </div></code></pre>
 <p>Let's go over what is in this template.</p>
 <h2 id="updating-our-env-file">Updating our <code>.env</code> file</h2>
@@ -448,7 +436,7 @@ S3_SECRET_KEY=
 S3_REGION=us-east-1
 S3_DOMAIN=amazonaws.com
 </div></code></pre>
-<p>This will allow for CommandBox and the servers we run have access to these environment settings.</p>
+<p>This will allow for CommandBox and the servers we run have access to these environment settings. Once you do changes on the <code>.env</code> file you will need to reload the shell or even the server for changes to take effect: <code>reload or server restart</code></p>
 <blockquote>
 <p>We will fill out the JWT Secret later on.</p>
 </blockquote>
@@ -488,6 +476,13 @@ S3_DOMAIN=amazonaws.com
 	}
 }
 </div></code></pre>
+<h2 id="automatic-formatting-goodness">Automatic Formatting Goodness</h2>
+<p>Let's add some automatic formatting goodness.  Open up your <code>box.json</code> and throw in this script:</p>
+<pre class="hljs"><code><div><span class="hljs-string">"scripts"</span>:{
+	<span class="hljs-string">"format:watch"</span> : <span class="hljs-string">"cfformat watch config,models,modules_app/api,tests/resources,tests/specs,*.cfc ./.cfformat.json"</span>
+},
+</div></code></pre>
+<p>Now you can run <code>run-script format:watch</code> and your code will format as you type.</p>
 <h2 id="start-it-up">Start it up!</h2>
 <p>Let's start our server up but let's configure it to use the <code>42518</code> port so we can all share URL's</p>
 <pre class="hljs"><code><div>server start port=42518
@@ -510,18 +505,16 @@ testbox run
 <pre class="hljs"><code><div>testbox watch
 </div></code></pre>
 <p>This will start a watcher so you can do your code changes and tests will be executed automatically for you.  Go break a test and check it out.</p>
+<blockquote>
+<p>Hint: Type <code>&lt;ctrl&gt;+&lt;c&gt;</code> to exit out of watch mode</p>
+</blockquote>
 <h2 id="application-modules">Application Modules</h2>
 <p>We will install several modules to assist us with the development of our API</p>
 <ul>
 <li><code>qb</code> - Fluent query builder for fancy queries (https://forgebox.io/view/qb)</li>
-<li><code>cbvalidation</code> - To provide server side validations (https://forgebox.io/view/cbValidation)</li>
 <li><code>bcrypt</code> - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)</li>
-<li><code>cbsecurity</code> - To secure our API and provide us with JWT Tokens (https://www.forgebox.io/view/cbsecurity)</li>
-<li><code>mementifier</code> - To convert our objects to native data structures for JSON exporting (arrays/structs) (https://www.forgebox.io/view/mementifier)</li>
-<li><code>route-visualizer</code> : Visualizer your routes (https://www.forgebox.io/view/route-visualizer)</li>
 </ul>
-<pre class="hljs"><code><div>install route-visualizer --saveDev
-install cbvalidation,qb,bcrypt,mementifier,cbsecurity
+<pre class="hljs"><code><div>install qb,bcrypt
 coldbox reinit
 </div></code></pre>
 <h2 id="datasource-configuration">Datasource Configuration</h2>
@@ -535,13 +528,28 @@ coldbox reinit
 </div></code></pre>
 <p>Try running the app again. If it runs, it works.  Or just issue a <code>testbox run</code></p>
 <h2 id="base-integration-spec-class">Base Integration Spec Class</h2>
-<p>Let's create a base spec class all of our integration tests will inherit from.  Place it under <code>tests/resources/BaseIntegrationSpec.cfc</code></p>
+<p>Let's create a base spec class all of our integration tests will inherit from.  Place it under <code>tests/resources/BaseIntegrationSpec.cfc</code>.  This resource will give us a few little reusable tidbits for testing:</p>
+<ul>
+<li>Only unload ColdBox once ALL tests has finalized</li>
+<li>Custom matcher for status codes (<code>toHaveStatus()</code>)</li>
+<li>Custom matcher for cbvalidation data (<code>toHaveInvalidData()</code>)</li>
+<li>A nice test reset method (<code>reset()</code>)</li>
+</ul>
 <pre class="hljs"><code><div>component extends=<span class="hljs-string">"coldbox.system.testing.BaseTestCase"</span> appMapping=<span class="hljs-string">"/root"</span>{
 
     <span class="hljs-comment">// Load on first test</span>
     <span class="hljs-keyword">this</span>.loadColdBox    = <span class="hljs-literal">true</span>;
     <span class="hljs-comment">// Never unload until the request dies</span>
-    <span class="hljs-keyword">this</span>.unloadColdBox  = <span class="hljs-literal">false</span>;
+	<span class="hljs-keyword">this</span>.unloadColdBox  = <span class="hljs-literal">false</span>;
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Fixture Data
+	 * --------------------------------------------------------------------------
+	 * Here is the global fixture data you can use
+	 */</span>
+
+	<span class="hljs-comment">/*********************************** LIFE CYCLE Methods ***********************************/</span>
 
     <span class="hljs-comment">/**
      * Run Before all tests
@@ -549,14 +557,108 @@ coldbox reinit
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beforeAll</span>(<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">super</span>.beforeAll();
         <span class="hljs-comment">// Wire up the test object with dependencies</span>
-        application.wirebox.autowire( <span class="hljs-keyword">this</span> );
-    }
+		application.wirebox.autowire( <span class="hljs-keyword">this</span> );
+
+		<span class="hljs-comment">// Add Custom Matchers</span>
+		addMatchers( {
+			<span class="hljs-attr">toHaveStatus</span> : <span class="hljs-function">(<span class="hljs-params"> expectation, args = {} </span>) =&gt;</span> {
+				<span class="hljs-comment">// handle both positional and named arguments</span>
+				param args.statusCode = <span class="hljs-string">""</span>;
+				<span class="hljs-keyword">if</span> ( structKeyExists( args, <span class="hljs-number">1</span> ) ) {
+					args.statusCode = args[ <span class="hljs-number">1</span> ];
+				}
+				param args.message = <span class="hljs-string">""</span>;
+				<span class="hljs-keyword">if</span> ( structKeyExists( args, <span class="hljs-number">2</span> ) ) {
+					args.message = args[ <span class="hljs-number">2</span> ];
+				}
+				<span class="hljs-keyword">if</span> ( !len( args.statusCode ) ) {
+					expectation.message = <span class="hljs-string">"No status code provided."</span>;
+					<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+				}
+				<span class="hljs-keyword">var</span> statusCode = expectation.actual.getStatusCode();
+				<span class="hljs-keyword">if</span> ( statusCode != args.statusCode ) {
+					expectation.message = <span class="hljs-string">"#args.message#. Received incorrect status code. Expected [#args.statusCode#]. Received [#statusCode#]."</span>;
+					debug( expectation.actual.getMemento() );
+					<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+				}
+				<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+			},
+			<span class="hljs-comment">// Verifies invalid cbValidation data</span>
+			<span class="hljs-attr">toHaveInvalidData</span> : <span class="hljs-function">(<span class="hljs-params"> expectation, args = {} </span>) =&gt;</span> {
+				param args.field = <span class="hljs-string">""</span>;
+				<span class="hljs-keyword">if</span> ( structKeyExists( args, <span class="hljs-number">1</span> ) ) {
+					args.field = args[ <span class="hljs-number">1</span> ];
+				}
+				param args.error = <span class="hljs-string">""</span>;
+				<span class="hljs-keyword">if</span> ( structKeyExists( args, <span class="hljs-number">2</span> ) ) {
+					args.error = args[ <span class="hljs-number">2</span> ];
+				}
+				param args.message = <span class="hljs-string">""</span>;
+				<span class="hljs-keyword">if</span> ( structKeyExists( args, <span class="hljs-number">3</span> ) ) {
+					args.message = args[ <span class="hljs-number">3</span> ];
+				}
+
+				<span class="hljs-comment">// If !400 then there is no invalid data</span>
+				<span class="hljs-keyword">if</span> ( expectation.actual.getStatusCode() != <span class="hljs-number">400</span> ) {
+					expectation.message = <span class="hljs-string">"#args.message#. Received incorrect status code. Expected [400]. Received [#expectation.actual.getStatusCode()#]."</span>;
+					debug( expectation.actual.getMemento() );
+					<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+				}
+				<span class="hljs-comment">// If no field passed, we just check that invalid data was found</span>
+				<span class="hljs-keyword">if</span> ( !len( args.field ) ) {
+					<span class="hljs-keyword">if</span> ( expectation.actual.getData().isEmpty() ) {
+						expectation.message = <span class="hljs-string">"#args.message#. Received incorrect status code. Expected [400]. Received [#expectation.actual.getStatusCode()#]."</span>;
+						debug( expectation.actual.getMemento() );
+						<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+					}
+					<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+				}
+				<span class="hljs-comment">// We have a field to check and it has data</span>
+				<span class="hljs-keyword">if</span> (
+					!structKeyExists(
+						expectation.actual.getData(),
+						args.field
+					) || expectation.actual.getData()[ args.field ].isEmpty()
+				) {
+					expectation.message = <span class="hljs-string">"#args.message#. The requested field [#args.field#] does not have any invalid data."</span>;
+					debug( expectation.actual.getMemento() );
+					<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+				}
+				<span class="hljs-comment">// Do we have any error messages to check?</span>
+				<span class="hljs-keyword">if</span> ( len( args.error ) ) {
+					<span class="hljs-keyword">try</span> {
+						expect(
+							expectation.actual.getData()[ args.field ]
+								.map( <span class="hljs-function">(<span class="hljs-params"> item </span>) =&gt;</span> item.message )
+								.toList()
+						).toInclude( args.error );
+					} <span class="hljs-keyword">catch</span> ( any e ) {
+						debug( expectation.actual.getMemento() );
+						rethrow;
+					}
+				}
+
+				<span class="hljs-comment">// We checked and it's all good!</span>
+				<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+			}
+		} );
+	}
+	
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">afterAll</span>(<span class="hljs-params"></span>)</span>{
+		<span class="hljs-keyword">super</span>.afterAll();
+	}
+
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">reset</span>(<span class="hljs-params"></span>)</span>{
+		application.cbController.getLoaderService().processShutdown();
+		structDelete( application, <span class="hljs-string">"wirebox"</span> );
+		structDelete( application, <span class="hljs-string">"cbController"</span> );
+	}
 
     <span class="hljs-comment">/**
      * This function is tagged as an around each handler.  All the integration tests we build
      * will be automatically rolled backed. No database corruption
-     * 
-     * @aroundEach
+     *
+     * <span class="hljs-doctag">@aroundEach</span>
      */</span>
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrapInTransaction</span>(<span class="hljs-params"> spec </span>) </span>{
         transaction action=<span class="hljs-string">"begin"</span> {
@@ -654,7 +756,7 @@ component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec
 
     cbauth = {
         <span class="hljs-comment">// Which class will provide user information for authentication</span>
-        userServiceClass : <span class="hljs-string">"UserService"</span>
+        <span class="hljs-attr">userServiceClass</span> : <span class="hljs-string">"UserService"</span>
     },
 
     cbsecurity = {
@@ -711,6 +813,7 @@ component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec
 
 &gt;/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
 </div></code></pre>
+<p>Please note that this is not necessary in the latest version of cbSecurity. cbSecurity will generate a new jwt secret each time the application expires and reloads. Which can also be nice to have.  You decide the approach!</p>
 <p>Copy the output of the key and paste it into the <code>.env</code> setting called <code>JWT_SECRET</code></p>
 <pre class="hljs"><code><div>JWT_SECRET=/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
 </div></code></pre>
@@ -728,9 +831,9 @@ restart
 <p>Let's focus now on the user registration requirement. This is the BDD story to complete:</p>
 <pre class="hljs"><code><div>story( <span class="hljs-string">"I want to be able to register users in my system and assign them a JWT token upon registration"</span> );
 </div></code></pre>
-<p>Let's start by modeling our user object:</p>
+<p>Let's start by modeling our user object, which our rest template has already pre-built for us: <code>models/Users.cfc</code></p>
 <h3 id="usercfc"><code>User.cfc</code></h3>
-<p>Here are the properties we want to model</p>
+<p>Here are the properties we want to model, so make the appropriate changes in the pre-built user object.</p>
 <ul>
 <li><code>id</code></li>
 <li><code>name</code></li>
@@ -744,13 +847,16 @@ restart
 <pre class="hljs"><code><div>coldbox create model name=<span class="hljs-string">"User"</span>  properties=<span class="hljs-string">"id,name,email,username,password,createdDate:date,modifiedDate:date"</span>
 </div></code></pre>
 <p>Let's open the file and add some initialization procedures and a utility method to know if the User object has been populated from the database or not: <code>isLoaded()</code>.  We will also add instructions for the <code>mementifier</code> module to know how to convert the object to JSON, and our validation constraints.</p>
-<pre class="hljs"><code><div><span class="hljs-comment">/**
-* I am a new Model Object
-*/</span>
-component accessors=<span class="hljs-string">"true"</span>{
-    
-    <span class="hljs-comment">// DI</span>
-    property name=<span class="hljs-string">"qb"</span> inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
+<pre class="hljs"><code><div>component accessors=<span class="hljs-string">"true"</span> {
+
+	<span class="hljs-comment">// DI</span>
+	property name=<span class="hljs-string">"qb"</span> inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Properties
+	 * --------------------------------------------------------------------------
+	 */</span>
 
 	<span class="hljs-comment">// Properties</span>
 	property name=<span class="hljs-string">"id"</span>           type=<span class="hljs-string">"string"</span>;
@@ -760,49 +866,113 @@ component accessors=<span class="hljs-string">"true"</span>{
 	property name=<span class="hljs-string">"password"</span>     type=<span class="hljs-string">"string"</span>;
 	property name=<span class="hljs-string">"createdDate"</span>  type=<span class="hljs-string">"date"</span>;
     property name=<span class="hljs-string">"modifiedDate"</span> type=<span class="hljs-string">"date"</span>;
-    
-    <span class="hljs-keyword">this</span>.constraints = {
-        <span class="hljs-attr">name</span>        : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> },
-        <span class="hljs-attr">email</span>       : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">type</span> : <span class="hljs-string">"email"</span> },
-        <span class="hljs-attr">username</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">udf</span> : <span class="hljs-function">(<span class="hljs-params"> value, target </span>) =&gt;</span> {
+	property name=<span class="hljs-string">"permissions"</span>  type=<span class="hljs-string">"array"</span>;
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Mementifier
+	 * --------------------------------------------------------------------------
+	 */</span>
+	<span class="hljs-keyword">this</span>.memento = {
+		<span class="hljs-attr">defaultIncludes</span> : [ <span class="hljs-string">"*"</span> ],
+		<span class="hljs-attr">defaultExcludes</span> : [],
+		<span class="hljs-attr">neverInclude</span>    : [ <span class="hljs-string">"password"</span> ]
+	};
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Validation
+	 * --------------------------------------------------------------------------
+	 */</span>
+	<span class="hljs-keyword">this</span>.constraints = {
+		<span class="hljs-attr">name</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> },
+		<span class="hljs-attr">email</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">type</span> : <span class="hljs-string">"email"</span> },
+		<span class="hljs-attr">username</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">udf</span> : <span class="hljs-function">(<span class="hljs-params"> value, target </span>) =&gt;</span> {
 			<span class="hljs-keyword">if</span>( isNull( <span class="hljs-built_in">arguments</span>.value ) ) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
             <span class="hljs-keyword">return</span> qb.from( <span class="hljs-string">"users"</span> ).where( <span class="hljs-string">"username"</span>, <span class="hljs-built_in">arguments</span>.value ).count() == <span class="hljs-number">0</span>;
         }},
         <span class="hljs-attr">password</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> }
-    };
-
-    <span class="hljs-keyword">this</span>.memento = {
-		defaultIncludes = [ <span class="hljs-string">"*"</span> ],
-		neverInclude = [ <span class="hljs-string">"password"</span> ]
 	};
 
 	<span class="hljs-comment">/**
 	 * Constructor
 	 */</span>
-	User <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>)</span>{
-
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>) </span>{
+		variables.permissions = [];
 		variables.createdDate = now();
 		variables.modifiedDate = now();
 
 		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
 	}
 
-	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isLoaded</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Authentication/Authorization Methods
+	 * --------------------------------------------------------------------------
+	 */</span>
+
+	<span class="hljs-comment">/**
+	 * Check if a user is loaded from the db or not
+	 */</span>
+	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isLoaded</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> ( !isNull( variables.id ) &amp;&amp; len( variables.id ) );
+	}
+
+	<span class="hljs-comment">/**
+	 * Verify if the user has one or more of the passed in permissions
+	 *
+	 * <span class="hljs-doctag">@permission </span>One or a list of permissions to check for access
+	 *
+	 */</span>
+	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">hasPermission</span>(<span class="hljs-params"> required permission </span>) </span>{
+		<span class="hljs-comment">// If no permissions, then it a default value of true comes in</span>
+		<span class="hljs-keyword">if</span> ( isBoolean( <span class="hljs-built_in">arguments</span>.permission ) &amp;&amp; <span class="hljs-built_in">arguments</span>.permission ) {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+		}
+
+		<span class="hljs-keyword">if</span> ( isSimpleValue( <span class="hljs-built_in">arguments</span>.permission ) ) {
+			<span class="hljs-built_in">arguments</span>.permission = listToArray( <span class="hljs-built_in">arguments</span>.permission );
+		}
+
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">arguments</span>.permission
+			.filter( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> item </span>) </span>{
+				<span class="hljs-keyword">return</span> ( variables.permissions.findNoCase( item ) );
+			} )
+			.len();
+	}
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * IJwtSubject Methods
+	 * --------------------------------------------------------------------------
+	 */</span>
+
+	<span class="hljs-comment">/**
+	 * A struct of custom claims to add to the JWT token
+	 */</span>
+	struct <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtCustomClaims</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">return</span> {};
+	}
+
+	<span class="hljs-comment">/**
+	 * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+	 */</span>
+	array <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtScopes</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">return</span> [];
 	}
 
 }
 </div></code></pre>
 <p>Now open the unit test: <code>/tests/specs/unit/UserTest.cfc</code> and update it to this:</p>
 <pre class="hljs"><code><div>describe( <span class="hljs-string">"A User"</span>, function(){
-			
+
     it( <span class="hljs-string">"can be created"</span>, function(){
         expect( model ).toBeComponent();
     });
 
 });
 </div></code></pre>
-<p>Run your tests!</p>
+<p>Run your tests! We have broken a few things, but we will get them sorted out soon.</p>
 <h3 id="authentication-and-jwtsubject">Authentication and JWTSubject</h3>
 <p>Since we will be using cbsecurity's authentication service (<strong>cbauth</strong>) and it's jwt services, let's make sure our User object adhers to those requirements by implementing the methods it asks us to do. We won't test them, since those will be tested by the integration portions.</p>
 <p><code>IAuthUser</code> - https://coldbox-security.ortusbooks.com/usage/authentication-services#user-interface</p>
@@ -846,14 +1016,16 @@ component accessors=<span class="hljs-string">"true"</span>{
 }
 </span></div></code></pre>
 <p>So our <code>User.cfc</code> will end up like this:</p>
-<pre class="hljs"><code><div><span class="hljs-comment">/**
-* I am a new Model Object
-*/</span>
-component accessors=<span class="hljs-string">"true"</span>{
+<pre class="hljs"><code><div>component accessors=<span class="hljs-string">"true"</span> {
 
 	<span class="hljs-comment">// DI</span>
-    property name=<span class="hljs-string">"auth"</span> inject=<span class="hljs-string">"authenticationService@cbauth"</span>;
-    property name=<span class="hljs-string">"qb"</span> inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
+	property name=<span class="hljs-string">"qb"</span> inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Properties
+	 * --------------------------------------------------------------------------
+	 */</span>
 
 	<span class="hljs-comment">// Properties</span>
 	property name=<span class="hljs-string">"id"</span>           type=<span class="hljs-string">"string"</span>;
@@ -862,219 +1034,395 @@ component accessors=<span class="hljs-string">"true"</span>{
 	property name=<span class="hljs-string">"username"</span>     type=<span class="hljs-string">"string"</span>;
 	property name=<span class="hljs-string">"password"</span>     type=<span class="hljs-string">"string"</span>;
 	property name=<span class="hljs-string">"createdDate"</span>  type=<span class="hljs-string">"date"</span>;
-	property name=<span class="hljs-string">"modifiedDate"</span> type=<span class="hljs-string">"date"</span>;
+    property name=<span class="hljs-string">"modifiedDate"</span> type=<span class="hljs-string">"date"</span>;
+	property name=<span class="hljs-string">"permissions"</span>  type=<span class="hljs-string">"array"</span>;
 
-    <span class="hljs-keyword">this</span>.constraints = {
-        <span class="hljs-attr">name</span>        : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> },
-        <span class="hljs-attr">email</span>       : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">type</span> : <span class="hljs-string">"email"</span> },
-        <span class="hljs-attr">username</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">udf</span> : <span class="hljs-function">(<span class="hljs-params"> value, target </span>) =&gt;</span> {
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Mementifier
+	 * --------------------------------------------------------------------------
+	 */</span>
+	<span class="hljs-keyword">this</span>.memento = {
+		<span class="hljs-attr">defaultIncludes</span> : [ <span class="hljs-string">"*"</span> ],
+		<span class="hljs-attr">defaultExcludes</span> : [],
+		<span class="hljs-attr">neverInclude</span>    : [ <span class="hljs-string">"password"</span> ]
+	};
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Validation
+	 * --------------------------------------------------------------------------
+	 */</span>
+	<span class="hljs-keyword">this</span>.constraints = {
+		<span class="hljs-attr">name</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> },
+		<span class="hljs-attr">email</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">type</span> : <span class="hljs-string">"email"</span> },
+		<span class="hljs-attr">username</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span>, <span class="hljs-attr">udf</span> : <span class="hljs-function">(<span class="hljs-params"> value, target </span>) =&gt;</span> {
+			<span class="hljs-keyword">if</span>( isNull( <span class="hljs-built_in">arguments</span>.value ) ) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
             <span class="hljs-keyword">return</span> qb.from( <span class="hljs-string">"users"</span> ).where( <span class="hljs-string">"username"</span>, <span class="hljs-built_in">arguments</span>.value ).count() == <span class="hljs-number">0</span>;
         }},
         <span class="hljs-attr">password</span>    : { <span class="hljs-attr">required</span> : <span class="hljs-literal">true</span> }
-    };
-
-    <span class="hljs-keyword">this</span>.memento = {
-		defaultIncludes = [ <span class="hljs-string">"*"</span> ],
-		neverInclude = [ <span class="hljs-string">"password"</span> ]
 	};
 
 	<span class="hljs-comment">/**
 	 * Constructor
 	 */</span>
-	User <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>)</span>{
-
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>) </span>{
+		variables.permissions = [];
 		variables.createdDate = now();
 		variables.modifiedDate = now();
 
 		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
 	}
 
-	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isLoaded</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * Authentication/Authorization Methods
+	 * --------------------------------------------------------------------------
+	 */</span>
+
+	<span class="hljs-comment">/**
+	 * Check if a user is loaded from the db or not
+	 */</span>
+	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isLoaded</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> ( !isNull( variables.id ) &amp;&amp; len( variables.id ) );
 	}
 
 	<span class="hljs-comment">/**
-     * A struct of custom claims to add to the JWT token
-     */</span>
-    struct <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtCustomClaims</span>(<span class="hljs-params"></span>)</span>{
+	 * Verify if the user has one or more of the passed in permissions
+	 *
+	 * <span class="hljs-doctag">@permission </span>One or a list of permissions to check for access
+	 *
+	 */</span>
+	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">hasPermission</span>(<span class="hljs-params"> required permission </span>) </span>{
+		<span class="hljs-comment">// If no permissions, then it a default value of true comes in</span>
+		<span class="hljs-keyword">if</span> ( isBoolean( <span class="hljs-built_in">arguments</span>.permission ) &amp;&amp; <span class="hljs-built_in">arguments</span>.permission ) {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+		}
+
+		<span class="hljs-keyword">if</span> ( isSimpleValue( <span class="hljs-built_in">arguments</span>.permission ) ) {
+			<span class="hljs-built_in">arguments</span>.permission = listToArray( <span class="hljs-built_in">arguments</span>.permission );
+		}
+
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">arguments</span>.permission
+			.filter( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> item </span>) </span>{
+				<span class="hljs-keyword">return</span> ( variables.permissions.findNoCase( item ) );
+			} )
+			.len();
+	}
+
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * IJwtSubject Methods
+	 * --------------------------------------------------------------------------
+	 */</span>
+
+	<span class="hljs-comment">/**
+	 * A struct of custom claims to add to the JWT token
+	 */</span>
+	struct <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtCustomClaims</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> {};
 	}
 
-    <span class="hljs-comment">/**
-     * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
-     */</span>
-	array <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtScopes</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-comment">/**
+	 * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+	 */</span>
+	array <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getJwtScopes</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> [];
 	}
 
-    <span class="hljs-comment">/**
-     * Verify if the user has one or more of the passed in permissions
-     *
-     * @permission One or a list of permissions to check for access
-     *
-     */</span>
-    boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">hasPermission</span>(<span class="hljs-params"> required permission </span>)</span>{
-		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-	}
-
-    <span class="hljs-comment">/**
-     * Shortcut to verify it the user is logged in or not.
-     */</span>
-    boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isLoggedIn</span>(<span class="hljs-params"></span>)</span>{
-		<span class="hljs-keyword">return</span> auth.isLoggedIn();
-	}
-
 }
 </div></code></pre>
-<p>Run your tests again and see if it compiles.</p>
 <h3 id="bdd-integration">BDD Integration</h3>
-<p>Now that our model is complete and satisfies the cbsecurity requirements for authentication and jwt services let's focus on the actual registration. We will create our BDD spec first to write down our requirements.  We will then rprceed to create the implementation.</p>
-<pre class="hljs"><code><div>coldbox create handler name=<span class="hljs-string">"registration"</span> actions=<span class="hljs-string">"create"</span> directory=modules_app/api/modules_app/v1/handlers
-</div></code></pre>
-<p>The BDD test will be created here: <code>/tests/specs/integration/registrationTest.cfc</code> and we will start here:</p>
+<p>Now that our model is complete and satisfies the <strong>cbsecurity</strong> requirements for authentication and jwt services let's focus on the actual registration. We will create our BDD spec first to write down our requirements.  We will then proceed to create the implementation.</p>
+<p>Our template comes with a handler for authentication and an integration test as well:</p>
+<ul>
+<li><code>modules_app/api/modules_app/v1/handlers/Auth.cfc</code></li>
+<li><code>tests/specs/integration/AuthTests.cfc</code></li>
+</ul>
+<p>Let's open our test and modify it a bit by making sure it inherits from our base class, remove some boilerplate and also update it for our new model.  Also, let's comment out the stories pre-generated for us so we can focus only on the registration story (Use the <code>x</code> prefix)</p>
+<p>It should end up like this:</p>
 <pre class="hljs"><code><div>component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec"</span>{
 
-	property name=<span class="hljs-string">"qb"</span> inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
+	property name=<span class="hljs-string">"jwtService"</span> inject=<span class="hljs-string">"provider:JwtService@cbsecurity"</span>;
+	property name=<span class="hljs-string">"cbauth"</span>     inject=<span class="hljs-string">"provider:authenticationService@cbauth"</span>;
 
 	<span class="hljs-comment">/*********************************** BDD SUITES ***********************************/</span>
 
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>)</span>{
-
-		story( <span class="hljs-string">"I want to be able to register users in my system and assign them a JWT token upon registration"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-
-			beforeEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> currentSpec </span>)</span>{
-				<span class="hljs-comment">// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>) </span>{
+		describe( <span class="hljs-string">"RESTFul Authentication"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+			beforeEach( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> currentSpec </span>) </span>{
+				<span class="hljs-comment">// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.</span>
 				setup();
-			});
 
-			given( <span class="hljs-string">"valid registration data and the username is available"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-				then( <span class="hljs-string">"I will be able to register my new user and get an access token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-					<span class="hljs-comment">// Test user doesn't exist</span>
-					expect(
-						qb.from( <span class="hljs-string">"users"</span> )
-							.where( <span class="hljs-string">"username"</span>, <span class="hljs-string">"testadmin"</span> )
-							.count()
-					).toBe( <span class="hljs-number">0</span> );
+				<span class="hljs-comment">// Make sure nothing is logged in to start our calls</span>
+				cbauth.logout();
+				jwtService.getTokenStorage().clearAll();
+			} );
 
-					<span class="hljs-keyword">var</span> event = post( <span class="hljs-string">"/api/v1/registration"</span>, {
-						<span class="hljs-string">"name"</span>					= <span class="hljs-string">"Your Name"</span>,
-						<span class="hljs-string">"email"</span>                	= <span class="hljs-string">"testadmin@ortussolutions.com"</span>,
-						<span class="hljs-string">"username"</span>             	= <span class="hljs-string">"testadmin"</span>,
-						<span class="hljs-string">"password"</span>             	= <span class="hljs-string">"testadmin"</span>
+			xstory( <span class="hljs-string">"I want to authenticate a user and receive a JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"a valid email and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I will be authenticated and will receive the JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Use a user in the seeded db</span>
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/login"</span>,
+							params = {
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"admin@coldbox.org"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"admin"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getData() ).toBeString();
+
+						debug( response.getData() );
+
+						<span class="hljs-keyword">var</span> decoded = jwtService.decode( response.getData() );
+						expect( decoded.sub ).toBe( <span class="hljs-number">1</span> );
+						expect( decoded.exp ).toBeGTE( dateAdd( <span class="hljs-string">"h"</span>, <span class="hljs-number">1</span>, decoded.iat ) );
 					} );
-					<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"response"</span> );
+				} );
+				given( <span class="hljs-string">"invalid email and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I will receive a 401 exception "</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/login"</span>,
+							params = {
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"invalid"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"invalid"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( response.getError() ).toBeTrue();
+						expect( response.getStatusCode() ).toBe( <span class="hljs-number">401</span> );
+					} );
+				} );
+			} );
 
-					expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-					expect( response.getData().token ).notToBeEmpty();
-					expect( response.getData().user.id ).toBeNumeric();
-					expect( response.getData().user.name ).toBe( <span class="hljs-string">"Your Name"</span> );
+			story( <span class="hljs-string">"I want to register into the system"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"valid registration details"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should register, log in and get a token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Use a user in the seeded db</span>
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/register"</span>,
+							params = {
+								<span class="hljs-attr">name</span>    : <span class="hljs-string">"luis Majano"</span>,
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"lmajano@coldbox.org"</span>,
+								<span class="hljs-attr">username</span> : <span class="hljs-string">"lmajano"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"lmajano"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						
+						debug( response.getData() );
+						
+						expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
+						expect( response.getData() ).toHaveKey( <span class="hljs-string">"token,user"</span> );
+	
+						<span class="hljs-keyword">var</span> decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+						expect( decoded.exp ).toBeGTE( dateAdd( <span class="hljs-string">"h"</span>, <span class="hljs-number">1</span>, decoded.iat ) );
+					} );
+				} );
+				given( <span class="hljs-string">"invalid registration details"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should get an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/register"</span>,
+							params = {
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"invalid"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"invalid"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( event.getResponse() ).toHaveStatus( <span class="hljs-number">400</span> );
+					} );
+				} );
+				xgiven( <span class="hljs-string">"valid registration data but with a non-unique username"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+					then( <span class="hljs-string">"a validation message should be sent to the user with an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
 
-                    debug( response.getData() );
-					<span class="hljs-comment">// data = { user:struct, token:jwt token }</span>
+					});
+				} );
+			} );
 
-				});
-			});
+			xstory( <span class="hljs-string">"I want to be able to logout from the system using my JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"a valid incoming jwt token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"my token should become invalidated and I will be logged out"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Log in first to get a valid token to logout with</span>
+						<span class="hljs-keyword">var</span> token   = jwtService.attempt( <span class="hljs-string">"admin@coldbox.org"</span>, <span class="hljs-string">"admin"</span> );
+						<span class="hljs-keyword">var</span> payload = jwtService.decode( token );
+						expect( cbauth.isLoggedIn() ).toBeTrue();
 
-		});
+						<span class="hljs-comment">// Now Logout</span>
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post( route = <span class="hljs-string">"/api/v1/logout"</span>, params = { <span class="hljs-string">"x-auth-token"</span> : token } );
 
-	}
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getStatusCode() ).toBe( <span class="hljs-number">200</span> );
+						expect( cbauth.isLoggedIn() ).toBeFalse();
+					} );
+				} );
+				given( <span class="hljs-string">"an invalid incoming jwt token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should see an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Now Logout</span>
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post( route = <span class="hljs-string">"/api/v1/logout"</span>, params = { <span class="hljs-string">"x-auth-token"</span> : <span class="hljs-string">"123"</span> } );
 
-}
-</div></code></pre>
-<p>Run it, of course it will fail!</p>
-<h3 id="routing">Routing</h3>
-<p>Ok, let's start our implementation by adding our registration routes.  We will be basing all our routes on ColdBox Resources (https://coldbox.ortusbooks.com/the-basics/routing/routing-dsl/resourceful-routes) as much as possible in order to make our handlers standardized and light-weight.</p>
-<p>Open the <code>v1</code> module's router: <code>modules_app/api/modules_app/v1/config/Router.cfc</code> and add our resources:</p>
-<pre class="hljs"><code><div>component{
-
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">configure</span>(<span class="hljs-params"></span>)</span>{
-
-		route( <span class="hljs-string">"/"</span>, <span class="hljs-string">"echo.index"</span> );
-
-		resources( resource=<span class="hljs-string">"registration"</span>, only=<span class="hljs-string">"create"</span> );
-
-        route( <span class="hljs-string">"/:handler/:action"</span> ).end();
-    }
-
-}
-</div></code></pre>
-<p>This will add all the necessary routing for the <code>registration</code> resource under the <code>v1</code> module.  Issue a <code>coldbox reinit</code> and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer</p>
-<h3 id="event-handler">Event Handler</h3>
-<p>Now that we have our route, let's fill out our event handler for registration.  Open the <code>registration.cfc</code> in our <code>v1</code> module and let's code it out.  We will need to populate a new user object from incoming <code>rc</code> data, validate it, create it and then tell the cbsecurity's jwt services to create a token for the user.  Also remember that our handler's MUST Inherit from our <code>BaseHandler</code> from our <code>api</code> module.</p>
-<pre class="hljs"><code><div><span class="hljs-comment">/**
- * My RESTFul Event Handler which inherits from the module `api`
- */</span>
-component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
-
-	<span class="hljs-comment">// DI</span>
-	property name=<span class="hljs-string">"userService"</span>	inject=<span class="hljs-string">"UserService"</span>;
-
-	<span class="hljs-comment">/**
-	 * Register a new user in our system
-	 */</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">create</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
-		<span class="hljs-comment">// populate, validate and create</span>
-		prc.oUser = userService.create(
-			validateOrFail( populateModel( <span class="hljs-string">"User"</span> ) )
-		);
-
-		<span class="hljs-comment">// Respond back with user rep and token</span>
-		prc.response.setData( {
-			<span class="hljs-string">"user"</span> 	: prc.oUser.getMemento(),
-			<span class="hljs-string">"token"</span>	: jwtAuth().fromUser( prc.oUser )
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+						debug( response.getStatusCode( <span class="hljs-number">500</span> ) );
+					} );
+				} );
+			} );
 		} );
 	}
 
 }
 </div></code></pre>
+<p>Run it, it will run but some things are failing now, since we where basically mocking things before. So we will be fixing each story one by one until our entire auth procedures are done with.</p>
+<h3 id="routing">Routing</h3>
+<p>Open the <code>v1</code> module's router: <code>modules_app/api/modules_app/v1/config/Router.cfc</code> and add our routing or verify that we have all of our necessary routes:</p>
+<pre class="hljs"><code><div>component{
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">configure</span>(<span class="hljs-params"></span>)</span>{
+
+		<span class="hljs-comment">// API Echo</span>
+		<span class="hljs-keyword">get</span>( "/", "Echo.index" );
+
+		// API Authentication Routes
+		post( "/login", "Auth.login" );
+		post( "/logout", "Auth.logout" );
+		post( "/register", "Auth.register" );
+
+		// API Secured Routes
+		<span class="hljs-keyword">get</span>( "/whoami", "Echo.whoami" );
+
+		route( "/:handler/:action" ).end();
+    }
+
+}
+</div></code></pre>
+<p>Issue a <code>coldbox reinit</code> and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer</p>
+<h3 id="event-handler">Event Handler</h3>
+<p>Now that we have our route, let's fill out our event handler for registration only.  Open the <code>auth.cfc</code> in our <code>v1</code> module and let's code it out.  We will need to populate a new user object from incoming <code>rc</code> data, validate it, create it and then tell the cbsecurity's jwt services to create a token for the user.  Also remember that our handler's MUST Inherit from our <code>coldbox.system.RestHandler</code>, which is new in ColdBox 6.</p>
+<ul>
+<li>Investigate RestHandler and what you get.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment">/**
+ * Register a new user in the system
+ *
+ * <span class="hljs-doctag">@x</span>-route (POST) /api/v1/register
+ * <span class="hljs-doctag">@requestBody </span>~api/v1/auth/register/requestBody.json
+ * <span class="hljs-doctag">@response</span>-default ~api/v1/auth/register/responses.json##200
+ * <span class="hljs-doctag">@response</span>-400 ~api/v1/auth/register/responses.json##400
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">register</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
+	param rc.fname    = <span class="hljs-string">""</span>;
+	param rc.lname    = <span class="hljs-string">""</span>;
+	param rc.email    = <span class="hljs-string">""</span>;
+	param rc.password = <span class="hljs-string">""</span>;
+
+	<span class="hljs-comment">// Populate, Validate, Create a new user</span>
+	prc.oUser = userService.create( validateOrFail( populateModel( <span class="hljs-string">"User"</span> ) ) );
+
+	<span class="hljs-comment">// Log them in if it was created!</span>
+	event
+		.getResponse()
+		.setData( {
+			<span class="hljs-string">"token"</span> : jwtAuth().fromuser( prc.oUser ),
+			<span class="hljs-string">"user"</span>  : prc.oUser.getMemento()
+		} )
+		.addMessage(
+			<span class="hljs-string">"User registered correctly and Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"</span>
+		);
+}
+</div></code></pre>
 <p>Once we write up this code, two new scenarios should pop up in your head:</p>
-<pre class="hljs"><code><div>given( <span class="hljs-string">"invalid registration data"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-    then( <span class="hljs-string">"a validation message should be sent to the user with a 400 error code"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+<pre class="hljs"><code><div>given( <span class="hljs-string">"invalid registration details"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+	then( <span class="hljs-string">"I should get an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
 
     });
 } );
 given( <span class="hljs-string">"valid registration data but with a non-unique username"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-    then( <span class="hljs-string">"a validation message should be sent to the user with a 400 error code"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+    then( <span class="hljs-string">"a validation message should be sent to the user with an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
 
     });
 } );
 </div></code></pre>
-<p>You will have to fill these out on your own!</p>
+<p>You will have to fill these out on your own! Let's do it!</p>
 <h3 id="user-services">User Services</h3>
-<p>Since we must use a <code>UserService</code> in our handler, then I guess we need to build it.  How? Well, we know we need to add a <code>create()</code> method:</p>
-<p>Let's generate the model alongside its unit test.</p>
-<pre class="hljs"><code><div>coldbox create model name=<span class="hljs-string">"UserService"</span> persistence=<span class="hljs-string">"singleton"</span> methods=<span class="hljs-string">"create"</span>
+<p>Since we must use a <code>UserService</code> in our handler, then I guess we need to build it.  How? Well, we know we need to add a <code>create()</code> method, but our template already generated one for us.  It is using mocks, so let's update it so we can actually use the database.</p>
+<blockquote>
+<p>Also note that we have a unit test for the UserService: <code>tests/specs/unit/UserServiceTest.cfc</code></p>
+</blockquote>
+<p>Here is the unit test pre-generated for us, which is enough for us to continue upon. We are not building any hard-core algorithms or anything to test in isolation.</p>
+<pre class="hljs"><code><div>component extends=<span class="hljs-string">"coldbox.system.testing.BaseTestCase"</span> {
+
+	<span class="hljs-comment">/*********************************** LIFE CYCLE Methods ***********************************/</span>
+
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">beforeAll</span>(<span class="hljs-params"></span>) </span>{
+		structDelete( application, <span class="hljs-string">"cbController"</span> );
+		structDelete( application, <span class="hljs-string">"wirebox"</span> );
+		<span class="hljs-keyword">super</span>.beforeAll();
+	}
+
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">afterAll</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-keyword">super</span>.afterAll();
+	}
+
+	<span class="hljs-comment">/*********************************** BDD SUITES ***********************************/</span>
+
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>) </span>{
+		describe( <span class="hljs-string">"UserService"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+			beforeEach( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> currentSpec </span>) </span>{
+				setup();
+				model = getInstance( <span class="hljs-string">"UserService"</span> );
+			} );
+
+			it( <span class="hljs-string">"can be created"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				expect( model ).toBeComponent();
+			} );
+
+		} );
+	}
+
+}
 </div></code></pre>
-<p>Open the unit test <code>tests/specs/unit/UserServiceTest.cfc</code> and just do a compile time test, the rest will be covered by the integration tests.</p>
-<pre class="hljs"><code><div>describe( <span class="hljs-string">"UserService"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-    it( <span class="hljs-string">"can be created"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-        expect( model ).toBeComponent();
-    });
-});
-</div></code></pre>
-<p>Now let's do the code implementations for the service:</p>
+<p>Here is the code for the <code>UserService</code> using our new model approach and the methods we need to update for now:</p>
+<ul>
+<li><code>init()</code></li>
+<li><code>create()</code></li>
+</ul>
 <pre class="hljs"><code><div><span class="hljs-comment">/**
 * User Services
 */</span>
-component singleton accessors=<span class="hljs-string">"true"</span>{
+component accessors=<span class="hljs-string">"true"</span> singleton {
 
-	<span class="hljs-comment">// Properties</span>
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * DI
+	 * --------------------------------------------------------------------------
+	 */</span>
+	property name=<span class="hljs-string">"populator"</span> 	inject=<span class="hljs-string">"wirebox:populator"</span>;
 	property name=<span class="hljs-string">"bcrypt"</span>      inject=<span class="hljs-string">"@BCrypt"</span>;
 	property name=<span class="hljs-string">"qb"</span>          inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
 
 	<span class="hljs-comment">/**
 	 * Constructor
 	 */</span>
-	UserService <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
 	}
 
+	<span class="hljs-comment">/**
+	 * Construct a new user object via WireBox
+	 */</span>
 	User <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">new</span>(<span class="hljs-params"></span>) <span class="hljs-title">provider</span>="<span class="hljs-title">User</span>";
 
 	/**
-	* <span class="hljs-title">create</span>
-	*/
-	<span class="hljs-title">function</span> <span class="hljs-title">create</span>(<span class="hljs-params"> required user </span>)</span>{
+	 * <span class="hljs-title">Create</span> <span class="hljs-title">a</span> <span class="hljs-title">new</span> <span class="hljs-title">user</span> <span class="hljs-title">in</span> <span class="hljs-title">the</span> <span class="hljs-title">system</span>
+	 *
+	 * @<span class="hljs-title">user</span> <span class="hljs-title">The</span> <span class="hljs-title">user</span> <span class="hljs-title">to</span> <span class="hljs-title">create</span>
+	 *
+	 * @<span class="hljs-title">return</span> <span class="hljs-title">The</span> <span class="hljs-title">created</span> <span class="hljs-title">user</span>
+	 */
+	<span class="hljs-title">User</span> <span class="hljs-title">function</span> <span class="hljs-title">create</span>(<span class="hljs-params"> required user </span>) </span>{
 		<span class="hljs-keyword">var</span> qResults = qb.from( <span class="hljs-string">"users"</span> )
 			.insert( values = {
 				<span class="hljs-string">"name"</span> 		= <span class="hljs-built_in">arguments</span>.user.getName(),
@@ -1088,12 +1436,15 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 		<span class="hljs-keyword">return</span> <span class="hljs-built_in">arguments</span>.user;
 	}
-
 }
 </div></code></pre>
-<p>Now let's verify our tests and adjust as necessary, but we should have a working registration now and jwt token creations.</p>
+<p>Now let's verify our tests and adjust as necessary, but we should have a working registration now and jwt token creations.  Also, check out your database, a new table <code>cbjwt</code> has been created for you!</p>
+<p>Question, why doesn't the table have any data on it?</p>
+<blockquote>
+<p>Go into the base integration test and remove the <code>aroundEach</code> annotation from the <code>wrapInTransaction()</code> method, run the tests, and check out the database now. Run again, the data persists.  So be careful, decide and move on. Clear the db data if you like.</p>
+</blockquote>
 <h2 id="authentication">Authentication</h2>
-<p>Now that we have registration complete, let's focus on authentication for our API.  Here are two stories to start with:</p>
+<p>Now that we have registration complete, let's focus on authentication for our API.  Here are two stories to start with which can be found already in our auth spec.</p>
 <pre class="hljs"><code><div>story( <span class="hljs-string">"I want to be able to authenticate with a username/password and receive a JWT token"</span>, function(){
 
 } );
@@ -1103,171 +1454,243 @@ story( <span class="hljs-string">"I want to be able to logout from the system us
 } );
 </div></code></pre>
 <h3 id="bdd">BDD</h3>
-<p>Let's start with our BDD specs before we move to the implementation phase.  Let's start by generating the handler that will be in charge of the api's authentication.</p>
-<pre class="hljs"><code><div>coldbox create handler name=<span class="hljs-string">"auth"</span> actions=<span class="hljs-string">"login,logout"</span> directory=modules_app/api/modules_app/v1/handlers
-</div></code></pre>
-<p>Let's open the bdd test that got generated and let's plan out how it should look like:</p>
-<pre class="hljs"><code><div>component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec"</span>{
+<p>Let's start with our BDD specs before we move to the implementation phase. Let's open the <code>AuthTests</code> spec and revise our login/logout tests so they use our new model and matchers:</p>
+<pre class="hljs"><code><div>component extends=<span class="hljs-string">"tests.resources.BaseIntegrationSpec"</span> {
 
 	property name=<span class="hljs-string">"jwtService"</span> inject=<span class="hljs-string">"provider:JwtService@cbsecurity"</span>;
-	property name=<span class="hljs-string">"cbauth"</span> inject=<span class="hljs-string">"provider:authenticationService@cbauth"</span>;
+	property name=<span class="hljs-string">"cbauth"</span>     inject=<span class="hljs-string">"provider:authenticationService@cbauth"</span>;
 
 	<span class="hljs-comment">/*********************************** BDD SUITES ***********************************/</span>
 
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>)</span>{
-
-		describe( <span class="hljs-string">"Authentication Specs"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-
-			beforeEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> currentSpec </span>)</span>{
-				<span class="hljs-comment">// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">run</span>(<span class="hljs-params"></span>) </span>{
+		describe( <span class="hljs-string">"RESTFul Authentication"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+			beforeEach( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"> currentSpec </span>) </span>{
+				<span class="hljs-comment">// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.</span>
 				setup();
 
 				<span class="hljs-comment">// Make sure nothing is logged in to start our calls</span>
 				cbauth.logout();
 				jwtService.getTokenStorage().clearAll();
-			});
+			} );
 
-			story( <span class="hljs-string">"I want to authenticate a user via username/password and receive a JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-
-				given( <span class="hljs-string">"a valid username and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-					then( <span class="hljs-string">"I will be authenticated and will receive the JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+			story( <span class="hljs-string">"I want to authenticate a user and receive a JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"a valid username and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I will be authenticated and will receive the JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
 						<span class="hljs-comment">// Use a user in the seeded db</span>
-						<span class="hljs-keyword">var</span> event = post(
-							route = <span class="hljs-string">"/api/v1/login"</span>,
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/login"</span>,
 							params = {
-								username = <span class="hljs-string">"Milkshake10"</span>,
-								password = <span class="hljs-string">"test"</span>
+								<span class="hljs-attr">username</span> : <span class="hljs-string">"Milkshake10"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"test"</span>
 							}
 						);
 						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
-						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getData() ).toBeString();
+						debug( response.getData() );
+
+						expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
+						expect( response.getData() ).toHaveKey( <span class="hljs-string">"token,user"</span> );
+
+						<span class="hljs-keyword">var</span> decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( <span class="hljs-number">10</span> );
+						expect( decoded.exp ).toBeGTE( dateAdd( <span class="hljs-string">"h"</span>, <span class="hljs-number">1</span>, decoded.iat ) );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+					} );
+				} );
+				given( <span class="hljs-string">"invalid email and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I will receive a 401 exception "</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/login"</span>,
+							params = {
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"invalid"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"invalid"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
+						expect( response ).toHaveStatus( <span class="hljs-number">401</span> );
+					} );
+				} );
+			} );
+
+			story( <span class="hljs-string">"I want to register into the system"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"valid registration details"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should register, log in and get a token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Use a user in the seeded db</span>
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/register"</span>,
+							params = {
+								<span class="hljs-attr">name</span>     : <span class="hljs-string">"luis Majano"</span>,
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"lmajano@coldbox.org"</span>,
+								<span class="hljs-attr">username</span> : <span class="hljs-string">"lmajano"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"lmajano"</span>
+							}
+						);
+						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 
 						debug( response.getData() );
 
-						<span class="hljs-keyword">var</span> decoded = jwtService.decode( response.getData() );
-						expect( decoded.sub ).toBe( <span class="hljs-number">10</span> );
-						expect( decoded.exp ).toBeGTE( dateAdd( <span class="hljs-string">"h"</span>, <span class="hljs-number">1</span>, decoded.iat ) );
-					});
-				});
+						expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
+						expect( response.getData() ).toHaveKey( <span class="hljs-string">"token,user"</span> );
 
-				given( <span class="hljs-string">"invalid username and password"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-					then( <span class="hljs-string">"I will receive a 401 invalid credentials exception "</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-						<span class="hljs-keyword">var</span> event = post(
-							route = <span class="hljs-string">"/api/v1/login"</span>,
+						<span class="hljs-keyword">var</span> decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+						expect( decoded.exp ).toBeGTE( dateAdd( <span class="hljs-string">"h"</span>, <span class="hljs-number">1</span>, decoded.iat ) );
+					} );
+				} );
+				given( <span class="hljs-string">"invalid registration details"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should get an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post(
+							route  = <span class="hljs-string">"/api/v1/register"</span>,
 							params = {
-								username = <span class="hljs-string">"invalid"</span>,
-								password = <span class="hljs-string">"invalid"</span>
+								<span class="hljs-attr">email</span>    : <span class="hljs-string">"invalid"</span>,
+								<span class="hljs-attr">password</span> : <span class="hljs-string">"invalid"</span>
 							}
 						);
 						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
-						expect( response.getError() ).toBeTrue();
-						expect( response.getStatusCode() ).toBe( <span class="hljs-number">401</span> );
-					});
-				});
+						expect( event.getResponse() ).toHaveStatus( <span class="hljs-number">400</span> );
+					} );
+				} );
+				xgiven( <span class="hljs-string">"valid registration data but with a non-unique username"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"a validation message should be sent to the user with an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					} );
+				} );
+			} );
 
-			});
-
-			story( <span class="hljs-string">"I want to be able to logout from the system using my JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-
-				given( <span class="hljs-string">"a valid incoming jwt token and I issue a logout"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-					then( <span class="hljs-string">"my token should become invalidated and I will be logged out"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-
-						<span class="hljs-comment">// Log in</span>
-						<span class="hljs-keyword">var</span> token = jwtService.attempt( <span class="hljs-string">"Milkshake10"</span>, <span class="hljs-string">"test"</span> );
+			story( <span class="hljs-string">"I want to be able to logout from the system using my JWT token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+				given( <span class="hljs-string">"a valid incoming jwt token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"my token should become invalidated and I will be logged out"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+						<span class="hljs-comment">// Log in first to get a valid token to logout with</span>
+						<span class="hljs-keyword">var</span> token   = jwtService.attempt( <span class="hljs-string">"Milkshake10"</span>, <span class="hljs-string">"test"</span> );
 						<span class="hljs-keyword">var</span> payload = jwtService.decode( token );
 						expect( cbauth.isLoggedIn() ).toBeTrue();
 
 						<span class="hljs-comment">// Now Logout</span>
-						<span class="hljs-keyword">var</span> event = post(
-							route = <span class="hljs-string">"/api/v1/logout"</span>,
-							params = {
-								<span class="hljs-string">"x-auth-token"</span> : token
-							}
-						);
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post( route = <span class="hljs-string">"/api/v1/logout"</span>, params = { <span class="hljs-string">"x-auth-token"</span> : token } );
 
 						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
-						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getStatusCode() ).toBe( <span class="hljs-number">200</span> );
+						expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
 						expect( cbauth.isLoggedIn() ).toBeFalse();
-					});
-				});
-
-				given( <span class="hljs-string">"an invalid incoming jwt token and I issue a logout"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
-					then( <span class="hljs-string">"I should see an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+					} );
+				} );
+				given( <span class="hljs-string">"an invalid incoming jwt token"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+					then( <span class="hljs-string">"I should see an error message"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
 						<span class="hljs-comment">// Now Logout</span>
-						<span class="hljs-keyword">var</span> event = post(
-							route = <span class="hljs-string">"/api/v1/logout"</span>,
-							params = {
-								<span class="hljs-string">"x-auth-token"</span> : <span class="hljs-string">"123"</span>
-							}
-						);
+						<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">this</span>.post( route = <span class="hljs-string">"/api/v1/logout"</span>, params = { <span class="hljs-string">"x-auth-token"</span> : <span class="hljs-string">"123"</span> } );
 
 						<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-						expect( response.getStatusCode() ).toBe( <span class="hljs-number">500</span> );
-						debug( response.getStatusCode() );
-					});
-				});
+						expect( response ).toHaveStatus( <span class="hljs-number">500</span> );
+					} );
+				} );
 			} );
-
-		});
-
+		} );
 	}
 
 }
 </div></code></pre>
 <h3 id="routing">Routing</h3>
-<p>Ok, let's start our implementation by adding our login/logout routes.</p>
-<p>Open the <code>v1</code> module's router: <code>modules_app/api/modules_app/v1/config/Router.cfc</code> and add our login/logout routes:</p>
-<pre class="hljs"><code><div>component{
+<p>Open the <code>v1</code> module's router: <code>modules_app/api/modules_app/v1/config/Router.cfc</code> and make sure our login/logout routes are there:</p>
+<pre class="hljs"><code><div>component {
 
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">configure</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">configure</span>(<span class="hljs-params"></span>) </span>{
+		<span class="hljs-comment">// API Echo</span>
+		<span class="hljs-keyword">get</span>( "/", "Echo.index" );
 
-		route( <span class="hljs-string">"/"</span>, <span class="hljs-string">"echo.index"</span> );
+		// API Authentication Routes
+		post( "/login", "Auth.login" );
+		post( "/logout", "Auth.logout" );
+		post( "/register", "Auth.register" );
 
-		resources( resource=<span class="hljs-string">"registration"</span>, only=<span class="hljs-string">"create"</span> );
-		
-		post( <span class="hljs-string">"/login"</span>, <span class="hljs-string">"auth.login"</span> );
-		post( <span class="hljs-string">"/logout"</span>, <span class="hljs-string">"auth.logout"</span> );
+		// API Secured Routes
+		<span class="hljs-keyword">get</span>( "/whoami", "Echo.whoami" );
 
-        route( <span class="hljs-string">"/:handler/:action"</span> ).end();
-    }
+
+		route( "/:handler/:action" ).end();
+	}
 
 }
+
 </div></code></pre>
 <p>Issue a <code>coldbox reinit</code> and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer</p>
 <h3 id="event-handler">Event Handler</h3>
-<p>Now that we have our route, let's fill out our event handler for a user login and logout.  Open the <code>auth.cfc</code> in our <code>v1</code> module and let's code it out.  We will use the jwt services for these sections mostly and you will be surprised at how little code you need to write.</p>
-<p>Also remember that our handler's MUST Inherit from our <code>BaseHandler</code> from our <code>api</code> module.</p>
+<p>Let's go back to our <code>auth</code> handler and finalize the login/logout actions.</p>
 <pre class="hljs"><code><div><span class="hljs-comment">/**
-* I am a new handler
-*/</span>
-component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
+ * Authentication Handler
+ */</span>
+component extends=<span class="hljs-string">"coldbox.system.RestHandler"</span> {
+
+	<span class="hljs-comment">// Injection</span>
+	property name=<span class="hljs-string">"userService"</span> inject=<span class="hljs-string">"UserService"</span>;
 
 	<span class="hljs-comment">/**
-     * Login to our system
-     */</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">login</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
+	 * Login a user into the application
+	 *
+	 * @x-route (POST) /api/v1/login
+	 * @requestBody ~api/v1/auth/login/requestBody.json
+	 * @response-default ~api/v1/auth/login/responses.json##200
+	 * @response-401 ~api/v1/auth/login/responses.json##401
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">login</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
 		param rc.username = <span class="hljs-string">""</span>;
 		param rc.password = <span class="hljs-string">""</span>;
 
-        prc.response
-            .setData( jwtAuth().attempt( rc.username, rc.password ) )
-            .addMessage( <span class="hljs-string">"Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"</span> );
-    }
+		prc.token = jwtAuth().attempt( rc.username, rc.password );
 
-    <span class="hljs-comment">/**
-     * Logout of our system
-     */</span>
-    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">logout</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
-        jwtAuth().logout();
-        prc.response.addMessage( <span class="hljs-string">"Successfully logged out, token invalidated"</span> );
+		prc.response
+			.setData( {
+				<span class="hljs-string">"token"</span> : prc.token,
+				<span class="hljs-string">"user"</span>  : cbSecure()
+					.getAuthService()
+					.getUser()
+					.getMemento()
+			} )
+			.addMessage( <span class="hljs-string">"Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"</span> );
+	}
+
+	<span class="hljs-comment">/**
+	 * Register a new user in the system
+	 *
+	 * <span class="hljs-doctag">@x</span>-route (POST) /api/v1/register
+	 * <span class="hljs-doctag">@requestBody </span>~api/v1/auth/register/requestBody.json
+	 * <span class="hljs-doctag">@response</span>-default ~api/v1/auth/register/responses.json##200
+	 * <span class="hljs-doctag">@response</span>-400 ~api/v1/auth/register/responses.json##400
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">register</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
+		param rc.fname    = <span class="hljs-string">""</span>;
+		param rc.lname    = <span class="hljs-string">""</span>;
+		param rc.email    = <span class="hljs-string">""</span>;
+		param rc.password = <span class="hljs-string">""</span>;
+
+		<span class="hljs-comment">// Populate, Validate, Create a new user</span>
+		prc.oUser = userService.create( validateOrFail( populateModel( <span class="hljs-string">"User"</span> ) ) );
+
+		<span class="hljs-comment">// Log them in if it was created!</span>
+		event
+			.getResponse()
+			.setData( {
+				<span class="hljs-string">"token"</span> : jwtAuth().fromuser( prc.oUser ),
+				<span class="hljs-string">"user"</span>  : prc.oUser.getMemento()
+			} )
+			.addMessage(
+				<span class="hljs-string">"User registered correctly and Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"</span>
+			);
+	}
+
+	<span class="hljs-comment">/**
+	 * Logout a user
+	 *
+	 * <span class="hljs-doctag">@x</span>-route (POST) /api/v1/logout
+	 * <span class="hljs-doctag">@security </span>bearerAuth,ApiKeyAuth
+	 * <span class="hljs-doctag">@response</span>-default ~api/v1/auth/logout/responses.json##200
+	 * <span class="hljs-doctag">@response</span>-500 ~api/v1/auth/logout/responses.json##500
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">logout</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
+		jwtAuth().logout();
+		event.getResponse().addMessage( <span class="hljs-string">"Successfully logged out"</span> )
 	}
 
 }
 </div></code></pre>
-<p>Wow, our handlers look so nice and tidy!  However, we still need to build out our User Service that will power all this goodness.</p>
+<p>Wow, our handlers look so nice and tidy and with strange documentation!  However, we still need to build out our User Service that will power all this goodness.</p>
 <p>Please check out all of the jwt service methods, there are tons of them and really helpful!</p>
 <p>https://coldbox-security.ortusbooks.com/jwt/jwt-services</p>
 <h3 id="userservice">UserService</h3>
@@ -1277,8 +1700,8 @@ component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
 	<span class="hljs-comment">/**
 	 * Verify if the incoming username/password are valid credentials.
 	 *
-	 * @username The username
-	 * @password The password
+	 * <span class="hljs-doctag">@username </span>The username
+	 * <span class="hljs-doctag">@password </span>The password
 	 */</span>
 	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isValidCredentials</span>(<span class="hljs-params"> required username, required password </span>);
 
@@ -1301,36 +1724,49 @@ component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
 </span></div></code></pre>
 <p>That's it.  The jwt services and cbauth will know how to put everything together for you.  So let's build the service out.</p>
 <pre class="hljs"><code><div><span class="hljs-comment">/**
-* I am a new Model Object
-*/</span>
-component singleton accessors=<span class="hljs-string">"true"</span>{
+ * User Services
+ */</span>
+component accessors=<span class="hljs-string">"true"</span> singleton {
 
-	<span class="hljs-comment">// Properties</span>
-	property name=<span class="hljs-string">"bcrypt"</span>      inject=<span class="hljs-string">"@BCrypt"</span>;
-	property name=<span class="hljs-string">"auth"</span>        inject=<span class="hljs-string">"authenticationService@cbauth"</span>;
-	property name=<span class="hljs-string">"qb"</span>          inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
-    property name=<span class="hljs-string">"populator"</span> 	inject=<span class="hljs-string">"wirebox:populator"</span>;
+	<span class="hljs-comment">/**
+	 * --------------------------------------------------------------------------
+	 * DI
+	 * --------------------------------------------------------------------------
+	 */</span>
+	property name=<span class="hljs-string">"populator"</span> inject=<span class="hljs-string">"wirebox:populator"</span>;
+	property name=<span class="hljs-string">"bcrypt"</span>    inject=<span class="hljs-string">"@BCrypt"</span>;
+	property name=<span class="hljs-string">"qb"</span>        inject=<span class="hljs-string">"provider:QueryBuilder@qb"</span>;
 
 	<span class="hljs-comment">/**
 	 * Constructor
 	 */</span>
-	UserService <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>)</span>{
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>) </span>{
 		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
 	}
 
+	<span class="hljs-comment">/**
+	 * Construct a new user object via WireBox
+	 */</span>
 	User <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">new</span>(<span class="hljs-params"></span>) <span class="hljs-title">provider</span>="<span class="hljs-title">User</span>";
 
 	/**
-	* <span class="hljs-title">create</span>
-	*/
-	<span class="hljs-title">function</span> <span class="hljs-title">create</span>(<span class="hljs-params"> required user </span>)</span>{
-		<span class="hljs-keyword">var</span> qResults = qb.from( <span class="hljs-string">"users"</span> )
-			.insert( values = {
-				<span class="hljs-string">"name"</span> 		= <span class="hljs-built_in">arguments</span>.user.getName(),
-				<span class="hljs-string">"email"</span> 	= <span class="hljs-built_in">arguments</span>.user.getEmail(),
-				<span class="hljs-string">"username"</span> 	= <span class="hljs-built_in">arguments</span>.user.getUsername(),
-				<span class="hljs-string">"password"</span> 	= bcrypt.hashPassword( <span class="hljs-built_in">arguments</span>.user.getPassword() )
-			} );
+	 * <span class="hljs-title">Create</span> <span class="hljs-title">a</span> <span class="hljs-title">new</span> <span class="hljs-title">user</span> <span class="hljs-title">in</span> <span class="hljs-title">the</span> <span class="hljs-title">system</span>
+	 *
+	 * @<span class="hljs-title">user</span> <span class="hljs-title">The</span> <span class="hljs-title">user</span> <span class="hljs-title">to</span> <span class="hljs-title">create</span>
+	 *
+	 * @<span class="hljs-title">return</span> <span class="hljs-title">The</span> <span class="hljs-title">created</span> <span class="hljs-title">user</span>
+	 */
+	<span class="hljs-title">User</span> <span class="hljs-title">function</span> <span class="hljs-title">create</span>(<span class="hljs-params"> required user </span>) </span>{
+		<span class="hljs-keyword">var</span> qResults = qb
+			.from( <span class="hljs-string">"users"</span> )
+			.insert(
+				values = {
+					<span class="hljs-string">"name"</span>     : <span class="hljs-built_in">arguments</span>.user.getName(),
+					<span class="hljs-string">"email"</span>    : <span class="hljs-built_in">arguments</span>.user.getEmail(),
+					<span class="hljs-string">"username"</span> : <span class="hljs-built_in">arguments</span>.user.getUsername(),
+					<span class="hljs-string">"password"</span> : bcrypt.hashPassword( <span class="hljs-built_in">arguments</span>.user.getPassword() )
+				}
+			);
 
 		<span class="hljs-comment">// populate the id</span>
 		<span class="hljs-built_in">arguments</span>.user.setId( qResults.result.generatedKey );
@@ -1339,53 +1775,171 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 	}
 
 	<span class="hljs-comment">/**
-	* isValidCredentials
-	*/</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isValidCredentials</span>(<span class="hljs-params"> required username, required password </span>)</span>{
-		<span class="hljs-keyword">var</span> oUser = retrieveUserByUsername( <span class="hljs-built_in">arguments</span>.username );
-		<span class="hljs-keyword">if</span>( !oUser.isLoaded() ){ <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; }
+	 * Verify if the incoming username/password are valid credentials.
+	 *
+	 * <span class="hljs-doctag">@username </span>The username
+	 * <span class="hljs-doctag">@password </span>The password
+	 */</span>
+	boolean <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isValidCredentials</span>(<span class="hljs-params"> required username, required password </span>) </span>{
+		<span class="hljs-keyword">var</span> oTarget = retrieveUserByUsername( <span class="hljs-built_in">arguments</span>.username );
+		<span class="hljs-keyword">if</span> ( !oTarget.isLoaded() ) {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+		}
 
-		<span class="hljs-keyword">try</span>{
-			<span class="hljs-keyword">return</span> bcrypt.checkPassword( <span class="hljs-built_in">arguments</span>.password, oUser.getPassword() );
-		} <span class="hljs-keyword">catch</span>( any e ){
+		<span class="hljs-comment">// Check Password Here: Remember to use bcrypt</span>
+		<span class="hljs-keyword">try</span> {
+			<span class="hljs-keyword">return</span> variables.bcrypt.checkPassword( <span class="hljs-built_in">arguments</span>.password, oTarget.getPassword() );
+		} <span class="hljs-keyword">catch</span> ( any e ) {
 			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
 		}
 	}
 
 	<span class="hljs-comment">/**
-	* retrieveUserByUsername
-	*/</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">retrieveUserByUsername</span>(<span class="hljs-params"> required username </span>)</span>{
+	 * Retrieve a user by username
+	 *
+	 * <span class="hljs-doctag">@return </span>User that implements JWTSubject and/or IAuthUser
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">retrieveUserByUsername</span>(<span class="hljs-params"> required username </span>) </span>{
 		<span class="hljs-keyword">return</span> populator.populateFromStruct(
-            <span class="hljs-keyword">new</span>(),
-            qb.from( <span class="hljs-string">"users"</span> ).where( <span class="hljs-string">"username"</span> , <span class="hljs-built_in">arguments</span>.username ).first()
-        );
+			<span class="hljs-keyword">new</span> (),
+			qb.from( <span class="hljs-string">"users"</span> )
+				.where( <span class="hljs-string">"username"</span>, <span class="hljs-built_in">arguments</span>.username )
+				.first()
+		);
 	}
 
 	<span class="hljs-comment">/**
-	* retrieveUserById
-	*/</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">retrieveUserById</span>(<span class="hljs-params"> required id </span>)</span>{
+	 * Retrieve a user by unique identifier
+	 *
+	 * <span class="hljs-doctag">@id </span>The unique identifier
+	 *
+	 * <span class="hljs-doctag">@return </span>User that implements JWTSubject and/or IAuthUser
+	 */</span>
+	User <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">retrieveUserById</span>(<span class="hljs-params"> required id </span>) </span>{
 		<span class="hljs-keyword">return</span> populator.populateFromStruct(
-            <span class="hljs-keyword">new</span>(),
-            qb.from( <span class="hljs-string">"users"</span> ).where( <span class="hljs-string">"id"</span> , <span class="hljs-built_in">arguments</span>.id ).first()
-        );
+			<span class="hljs-keyword">new</span> (),
+			qb.from( <span class="hljs-string">"users"</span> )
+				.where( <span class="hljs-string">"id"</span>, <span class="hljs-built_in">arguments</span>.id )
+				.first()
+		);
 	}
-
 
 }
 </div></code></pre>
 <p>That's it!  Go run your tests and make sure all the tests pass!  What have you learned?</p>
 <h2 id="invalid-routes">Invalid Routes</h2>
-<p>Ok, so what would happen if we try to execute <code>/api/v1/login</code> in the browser?  Go and try it!</p>
-<p>You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the <code>v1</code> api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Base Handler's <code>onInvalidRoute()</code> method.</p>
+<p>Ok, so what would happen if we try to execute <code>/api/v1/bogus</code> in the browser?  Go and try it!</p>
+<p>You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the <code>v1</code> api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Rest Handler's <code>onInvalidRoute()</code> method.</p>
 <p>Open the <code>v1</code> router and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.</p>
 <pre class="hljs"><code><div>// Invalid Routes
 route( &quot;/:anything&quot;, &quot;echo.onInvalidRoute&quot; );
 
 //route( &quot;/:handler/:action&quot; ).end();
 </div></code></pre>
-<p>Issue a nice <code>coldbox reinit</code> and hit the route again or any invalid route and you should see a nice API return 404 message.</p>
+<p>Issue a nice <code>coldbox reinit</code> and hit the route again or any invalid route and you should see a nice API return 404 message. Now, this is great, but we lost something? Anybody can guess?</p>
+<blockquote>
+<p>We lost all of our convention based routing which was below it.  This means, that we must register all the routes we want.</p>
+</blockquote>
+<h2 id="swagger">Swagger</h2>
+<p>Ok, before we go any further building stuff out, let's go over the weird documentation in our handlers.  Go open one and try to decipher it? We are using cbswagger directives so we can document our API.  Go to http://127.0.0.1:42518/cbswagger and see the json created for you.  Copy it and go to https://editor.swagger.io/ and paste it in.</p>
+<p>WOW! Our API is fully documented! What magic unicorn is this!</p>
+<ul>
+<li>https://www.forgebox.io/view/cbswagger</li>
+<li>https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md</li>
+</ul>
+<h3 id="customize-it">Customize It</h3>
+<p>Open your <code>config/ColdBox.cfc</code> and  under the <code>moduleSettings</code> there is a <code>cbSwagger</code> section. Let's update it a bit to match what we are building:</p>
+<pre class="hljs"><code><div>cbswagger : {
+	<span class="hljs-comment">// The route prefix to search.  Routes beginning with this prefix will be determined to be api routes</span>
+	<span class="hljs-string">"routes"</span>        : [ <span class="hljs-string">"api"</span> ],
+	<span class="hljs-comment">// Any routes to exclude</span>
+	<span class="hljs-string">"excludeRoutes"</span> : [ <span class="hljs-string">"api/v1/:anything/"</span> ],
+	<span class="hljs-comment">// The default output format: json or yml</span>
+	<span class="hljs-string">"defaultFormat"</span> : <span class="hljs-string">"json"</span>,
+	<span class="hljs-comment">// A convention route, relative to your app root, where request/response samples are stored ( e.g. resources/apidocs/responses/[module].[handler].[action].[HTTP Status Code].json )</span>
+	<span class="hljs-string">"samplesPath"</span>   : <span class="hljs-string">"resources/apidocs"</span>,
+	<span class="hljs-comment">// Information about your API</span>
+	<span class="hljs-string">"info"</span>          : {
+		<span class="hljs-comment">// A title for your API</span>
+		<span class="hljs-string">"title"</span>       : <span class="hljs-string">"Hero to SuperHero Headless CMS"</span>,
+		<span class="hljs-comment">// A description of your API</span>
+		<span class="hljs-string">"description"</span> : <span class="hljs-string">"A nice hmvc headless CMS"</span>,
+		<span class="hljs-comment">// The contact email address</span>
+		<span class="hljs-string">"contact"</span>     : {
+			<span class="hljs-string">"name"</span>  : <span class="hljs-string">"API Support"</span>,
+			<span class="hljs-string">"url"</span>   : <span class="hljs-string">"https://www.swagger.io/support"</span>,
+			<span class="hljs-string">"email"</span> : <span class="hljs-string">"info@ortussolutions.com"</span>
+		},
+		<span class="hljs-comment">// A url to the License of your API</span>
+		<span class="hljs-string">"license"</span> : {
+			<span class="hljs-string">"name"</span> : <span class="hljs-string">"Apache 2.0"</span>,
+			<span class="hljs-string">"url"</span>  : <span class="hljs-string">"https://www.apache.org/licenses/LICENSE-2.0.html"</span>
+		},
+		<span class="hljs-comment">// The version of your API</span>
+		<span class="hljs-string">"version"</span> : <span class="hljs-string">"1.0.0"</span>
+	},
+	<span class="hljs-comment">// Tags</span>
+	<span class="hljs-string">"tags"</span>         : [ ],
+	<span class="hljs-comment">// https://swagger.io/specification/#externalDocumentationObject</span>
+	<span class="hljs-string">"externalDocs"</span> : {
+		<span class="hljs-string">"description"</span> : <span class="hljs-string">"Find more info here"</span>,
+		<span class="hljs-string">"url"</span>         : <span class="hljs-string">"https://blog.readme.io/an-example-filled-guide-to-swagger-3-2/"</span>
+	},
+	<span class="hljs-comment">// https://swagger.io/specification/#serverObject</span>
+	<span class="hljs-string">"servers"</span> : [
+		{
+			<span class="hljs-string">"url"</span>         : <span class="hljs-string">"https://mysite.com/v1"</span>,
+			<span class="hljs-string">"description"</span> : <span class="hljs-string">"The main production server"</span>
+		},
+		{
+			<span class="hljs-string">"url"</span>         : <span class="hljs-string">"http://127.0.0.1:42518"</span>,
+			<span class="hljs-string">"description"</span> : <span class="hljs-string">"The dev server"</span>
+		}
+	],
+	<span class="hljs-comment">// An element to hold various schemas for the specification.</span>
+	<span class="hljs-comment">// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#componentsObject</span>
+	<span class="hljs-string">"components"</span> : {
+		<span class="hljs-comment">// Define your security schemes here</span>
+		<span class="hljs-comment">// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securitySchemeObject</span>
+		<span class="hljs-string">"securitySchemes"</span> : {
+			<span class="hljs-string">"ApiKeyAuth"</span> : {
+				<span class="hljs-string">"type"</span>        : <span class="hljs-string">"apiKey"</span>,
+				<span class="hljs-string">"description"</span> : <span class="hljs-string">"User your JWT as an Api Key for security"</span>,
+				<span class="hljs-string">"name"</span>        : <span class="hljs-string">"x-api-key"</span>,
+				<span class="hljs-string">"in"</span>          : <span class="hljs-string">"header"</span>
+			},
+			<span class="hljs-string">"bearerAuth"</span> : {
+				<span class="hljs-string">"type"</span>         : <span class="hljs-string">"http"</span>,
+				<span class="hljs-string">"scheme"</span>       : <span class="hljs-string">"bearer"</span>,
+				<span class="hljs-string">"bearerFormat"</span> : <span class="hljs-string">"JWT"</span>
+			}
+		}
+	}
+
+	<span class="hljs-comment">// A default declaration of Security Requirement Objects to be used across the API.</span>
+	<span class="hljs-comment">// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securityRequirementObject</span>
+	<span class="hljs-comment">// Only one of these requirements needs to be satisfied to authorize a request.</span>
+	<span class="hljs-comment">// Individual operations may set their own requirements with `@security`</span>
+	<span class="hljs-comment">// "security" : [</span>
+	<span class="hljs-comment">//	{ "APIKey" : [] },</span>
+	<span class="hljs-comment">//	{ "UserSecurity" : [] }</span>
+	<span class="hljs-comment">// ]</span>
+},
+</div></code></pre>
+<h3 id="resources">Resources</h3>
+<p>You can also find all the resources we generated previously from our app template in the <code>resources/apidocs</code> folder. You will find here global schemas, and our routing by convention.  Let's explore them and update them accordingly since our model changed.</p>
+<ul>
+<li>Update all resources to match our new API structure.</li>
+</ul>
+<h3 id="fix-our-error-on-swaggerhub">Fix our Error on SwaggerHub</h3>
+<p>You might see an error on top specifying the <code>{anything}</code> route we added. In all reality, this is an internal route, so we don't need it documented, so open your <code>config/Coldbox.cfc</code> and look for the <code>excludedRoutes</code> in the <code>cbSwagger</code> module settings:</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// Any routes to exclude</span>
+<span class="hljs-string">"excludeRoutes"</span> : [ <span class="hljs-string">"api/v1/:anything/"</span>],
+</div></code></pre>
+<p>Regenerate the swagger doc and we have our internal routing removed! Voila!</p>
+<h3 id="postman-automation">PostMan Automation</h3>
+<p>Let's do one more mystical trick.  Copy the swagger json and open Postman. Look for the import and import our cbwagger.</p>
+<p>WOW!  We know have imported all of our API into Postman for testing and even more sweet documentation!</p>
 <h2 id="listing-content">Listing Content</h2>
 <p>Ok, we have all the building blocks for now focusing on our first content stories:</p>
 <pre class="hljs"><code><div>story( <span class="hljs-string">"In order to interact with content in the CMS you must be authenticated"</span> );
@@ -1531,7 +2085,7 @@ component accessors=<span class="hljs-string">"true"</span>{
 		it( <span class="hljs-string">"should display all content using the default options"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
 			<span class="hljs-keyword">var</span> event = <span class="hljs-keyword">get</span>( route = "/api/v1/content" );
 			var response = event.getPrivateValue( "Response" );
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( 200 );
 			expect( response.getData() ).toBeArray();
 		});
 	});
@@ -1545,7 +2099,7 @@ component accessors=<span class="hljs-string">"true"</span>{
 
 				debug( response.getMessages() );
 
-				expect( response.getError() ).toBeFalse();
+				expect( response ).toHaveStatus( 200 );
 				expect( response.getData() ).toBeStruct();
 				expect( response.getData().slug ).toBe( testSlug );
 			});
@@ -1559,8 +2113,7 @@ component accessors=<span class="hljs-string">"true"</span>{
 
 				debug( response.getMessages() );
 
-				expect( response.getError() ).toBeTrue();
-				expect( response.getStatusCode() ).toBe( 404 );
+				expect( response ).toHaveStatus( 404 );
 			});
 		});
 	});
@@ -1585,17 +2138,20 @@ component accessors=<span class="hljs-string">"true"</span>{
 <pre class="hljs"><code><div><span class="hljs-comment">/**
 * I am a new handler
 */</span>
-component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
+component extends=<span class="hljs-string">"coldbox.system.RestHandler"</span> {
 
 	property name=<span class="hljs-string">"contentService"</span> inject=<span class="hljs-string">"ContentService"</span>;
 
 	<span class="hljs-comment">/**
-	* index
-	*/</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
+	 * index
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
 		prc.response.setData(
-			contentService.list()
-				.map( <span class="hljs-function">(<span class="hljs-params"> item </span>) =&gt;</span> { <span class="hljs-keyword">return</span> item.getMemento(); } )
+			contentService
+				.list()
+				.map( <span class="hljs-function">(<span class="hljs-params"> item </span>) =&gt;</span> {
+					<span class="hljs-keyword">return</span> item.getMemento();
+				} )
 		);
 	}
 
@@ -1607,25 +2163,23 @@ component extends=<span class="hljs-string">"api.handlers.BaseHandler"</span>{
 	}
 
 	<span class="hljs-comment">/**
-	* show
-	*/</span>
-	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
+	 * show
+	 */</span>
+	<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
 		param rc.slug = <span class="hljs-string">""</span>;
 
 		prc.oContent = contentService.findBySlug( rc.slug );
 
-		<span class="hljs-keyword">if</span>( !prc.oContent.isLoaded() ){
+		<span class="hljs-keyword">if</span> ( !prc.oContent.isLoaded() ) {
 			prc.response
 				.setError( <span class="hljs-literal">true</span> )
-				.setStatusCode( STATUS.NOT_FOUND )
+				.setStatusCode( event.STATUS.NOT_FOUND )
 				.setStatusText( <span class="hljs-string">"Not Found"</span> )
 				.addMessage( <span class="hljs-string">"The requested content object (#rc.slug#) could not be found"</span> );
 			<span class="hljs-keyword">return</span>;
 		}
 
-		prc.response.setData(
-			prc.oContent.getMemento()
-		);
+		prc.response.setData( prc.oContent.getMemento() );
 	}
 
 	<span class="hljs-comment">/**
@@ -1745,7 +2299,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
 			expect( response.getData().title ).toBe( <span class="hljs-string">"I love BDD"</span> );
 			expect( response.getData().id ).notToBeEmpty();
 		});
@@ -1765,8 +2319,8 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 			<span class="hljs-comment">// expectations go here.</span>
 			<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( <span class="hljs-number">400</span> );
+			expect( response ).toHaveStatus( <span class="hljs-number">400</span> );
+			expect( response ).toHaveInvalidData( <span class="hljs-string">"slug"</span>, <span class="hljs-string">"is required"</span> );
 		});
 	});
 });
@@ -1780,10 +2334,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 	<span class="hljs-comment">// populate, validate and create</span>
 	prc.oContent = contentService.create(
-		validateOrFail(
-			populateModel( <span class="hljs-string">"Content"</span> )
-				.setUser( jwtAuth().getUser() )
-		)
+		validateOrFail( populateModel( <span class="hljs-string">"Content"</span> ).setUser( jwtAuth().getUser() ) )
 	);
 
 	prc.response.setData( prc.oContent.getMemento() );
@@ -1838,7 +2389,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
 			expect( response.getData().title ).toBe( <span class="hljs-string">"I just changed you!"</span> );
 			expect( response.getData().id ).notToBeEmpty();
 		});
@@ -1858,8 +2409,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 			<span class="hljs-comment">// expectations go here.</span>
 			<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( <span class="hljs-number">404</span> );
+			expect( response ).toHaveStatus( <span class="hljs-number">404</span> );
 		});
 	});
 });
@@ -1867,17 +2417,17 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 <p>Ok, now let's put it together!</p>
 <h3 id="update-action">Update Action</h3>
 <pre class="hljs"><code><div><span class="hljs-comment">/**
-* update
-*/</span>
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params"> event, rc, prc </span>)</span>{
+ * update
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span>(<span class="hljs-params"> event, rc, prc </span>) </span>{
 	param rc.slug = <span class="hljs-string">""</span>;
 
 	prc.oContent = contentService.findBySlug( rc.slug );
 
-	<span class="hljs-keyword">if</span>( !prc.oContent.isLoaded() ){
+	<span class="hljs-keyword">if</span> ( !prc.oContent.isLoaded() ) {
 		prc.response
 			.setError( <span class="hljs-literal">true</span> )
-			.setStatusCode( STATUS.NOT_FOUND )
+			.setStatusCode( event.STATUS.NOT_FOUND )
 			.setStatusText( <span class="hljs-string">"Not Found"</span> )
 			.addMessage( <span class="hljs-string">"The requested content object (#rc.slug#) could not be found"</span> );
 		<span class="hljs-keyword">return</span>;
@@ -1885,10 +2435,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 	<span class="hljs-comment">// populate, validate and create</span>
 	prc.oContent = contentService.update(
-		validateOrFail(
-			populateModel( prc.oContent )
-				.setUser( jwtAuth().getUser() )
-		)
+		validateOrFail( populateModel( prc.oContent ).setUser( jwtAuth().getUser() ) )
 	);
 
 	prc.response.setData( prc.oContent.getMemento() );
@@ -1947,7 +2494,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( <span class="hljs-number">200</span> );
 			expect( response.getMessages().toString() ).toInclude( <span class="hljs-string">"Content deleted"</span> );
 		});
 	});
@@ -1961,8 +2508,7 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 			<span class="hljs-comment">// expectations go here.</span>
 			<span class="hljs-keyword">var</span> response = event.getPrivateValue( <span class="hljs-string">"Response"</span> );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( <span class="hljs-number">404</span> );
+			expect( response ).toHaveStatus( <span class="hljs-number">404</span> );
 		});
 	});
 });
@@ -1977,10 +2523,10 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 
 	prc.oContent = contentService.findBySlug( rc.slug );
 
-	<span class="hljs-keyword">if</span>( !prc.oContent.isLoaded() ){
+	<span class="hljs-keyword">if</span> ( !prc.oContent.isLoaded() ) {
 		prc.response
 			.setError( <span class="hljs-literal">true</span> )
-			.setStatusCode( STATUS.NOT_FOUND )
+			.setStatusCode( event.STATUS.NOT_FOUND )
 			.setStatusText( <span class="hljs-string">"Not Found"</span> )
 			.addMessage( <span class="hljs-string">"The requested content object (#rc.slug#) could not be found"</span> );
 		<span class="hljs-keyword">return</span>;
@@ -1989,10 +2535,9 @@ component singleton accessors=<span class="hljs-string">"true"</span>{
 	<span class="hljs-comment">// populate, validate and create</span>
 	contentService.delete( prc.oContent );
 
-	prc.response.addMessages( <span class="hljs-string">"Content deleted!"</span> );
+	prc.response.addMessage( <span class="hljs-string">"Content deleted!"</span> );
 }
 </div></code></pre>
-<p>We have to also get the authenticated user to add it into the content.</p>
 <h3 id="delete-services">Delete Services</h3>
 <p>Now to the ugly (funky) SQL</p>
 <pre class="hljs"><code><div><span class="hljs-comment">/**
