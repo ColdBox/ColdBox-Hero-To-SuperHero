@@ -48,8 +48,12 @@ The following dependencies will be installed for you:
 
 * `coldbox` - Super HMVC Framework
 * `testbox` - BDD testing library (`development` dependency)
-* `modules/cbSwagger` - Open API support for documenting our API
+* `modules/cbsecurity` - For securing your API
+* `modules/cbvalidation` - For validating your API
+* `modules/mementifier` - For marshalling objects to data
 * `modules/relax` - Module for documenting, exploring and testing our API (`development` dependency)
+  * `modules/cbSwagger` - Open API support for documenting our API
+* `modules/route-visualizer` - For visualizing our routes
 
 ```bash
 mkdir hcms --cd
@@ -87,7 +91,7 @@ S3_REGION=us-east-1
 S3_DOMAIN=amazonaws.com
 ```
 
-This will allow for CommandBox and the servers we run have access to these environment settings.
+This will allow for CommandBox and the servers we run have access to these environment settings. Once you do changes on the `.env` file you will need to reload the shell or even the server for changes to take effect: `reload or server restart`
 
 > We will fill out the JWT Secret later on.
 
@@ -131,6 +135,17 @@ Let's review our `.cfconfig.json` file.
 }
 ```
 
+## Automatic Formatting Goodness
+
+Let's add some automatic formatting goodness.  Open up your `box.json` and throw in this script:
+
+```js
+"scripts":{
+	"format:watch" : "cfformat watch config,models,modules_app/api,tests/resources,tests/specs,*.cfc ./.cfformat.json"
+},
+```
+
+Now you can run `run-script format:watch` and your code will format as you type.
 
 ## Start it up!
 
@@ -164,27 +179,23 @@ testbox run
 
 Cool.  Now we can test our stuff without leaving the editor.  Let's make this even more cooler.  
 
-```
+```sh
 testbox watch
 ```
 
 This will start a watcher so you can do your code changes and tests will be executed automatically for you.  Go break a test and check it out.
 
+> Hint: Type `<ctrl>+<c>` to exit out of watch mode
+
 ## Application Modules
 
 We will install several modules to assist us with the development of our API
 
- * `qb` - Fluent query builder for fancy queries (https://forgebox.io/view/qb)
- * `cbvalidation` - To provide server side validations (https://forgebox.io/view/cbValidation)
- * `bcrypt` - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)
- * `cbsecurity` - To secure our API and provide us with JWT Tokens (https://www.forgebox.io/view/cbsecurity)
- * `mementifier` - To convert our objects to native data structures for JSON exporting (arrays/structs) (https://www.forgebox.io/view/mementifier)
- * `route-visualizer` : Visualizer your routes (https://www.forgebox.io/view/route-visualizer)
+* `qb` - Fluent query builder for fancy queries (https://forgebox.io/view/qb)
+* `bcrypt` - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)
   
-
 ```bash
-install route-visualizer --saveDev
-install cbvalidation,qb,bcrypt,mementifier,cbsecurity
+install qb,bcrypt
 coldbox reinit
 ```
 
@@ -208,8 +219,12 @@ Try running the app again. If it runs, it works.  Or just issue a `testbox run`
 
 ## Base Integration Spec Class
 
-Let's create a base spec class all of our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`
+Let's create a base spec class all of our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`.  This resource will give us a few little reusable tidbits for testing:
 
+* Only unload ColdBox once ALL tests has finalized
+* Custom matcher for status codes (`toHaveStatus()`)
+* Custom matcher for cbvalidation data (`toHaveInvalidData()`)
+* A nice test reset method (`reset()`)
 
 ```js
 component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
@@ -217,7 +232,16 @@ component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
     // Load on first test
     this.loadColdBox    = true;
     // Never unload until the request dies
-    this.unloadColdBox  = false;
+	this.unloadColdBox  = false;
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Fixture Data
+	 * --------------------------------------------------------------------------
+	 * Here is the global fixture data you can use
+	 */
+
+	/*********************************** LIFE CYCLE Methods ***********************************/
 
     /**
      * Run Before all tests
@@ -225,13 +249,107 @@ component extends="coldbox.system.testing.BaseTestCase" appMapping="/root"{
     function beforeAll() {
         super.beforeAll();
         // Wire up the test object with dependencies
-        application.wirebox.autowire( this );
-    }
+		application.wirebox.autowire( this );
+
+		// Add Custom Matchers
+		addMatchers( {
+			toHaveStatus : ( expectation, args = {} ) => {
+				// handle both positional and named arguments
+				param args.statusCode = "";
+				if ( structKeyExists( args, 1 ) ) {
+					args.statusCode = args[ 1 ];
+				}
+				param args.message = "";
+				if ( structKeyExists( args, 2 ) ) {
+					args.message = args[ 2 ];
+				}
+				if ( !len( args.statusCode ) ) {
+					expectation.message = "No status code provided.";
+					return false;
+				}
+				var statusCode = expectation.actual.getStatusCode();
+				if ( statusCode != args.statusCode ) {
+					expectation.message = "#args.message#. Received incorrect status code. Expected [#args.statusCode#]. Received [#statusCode#].";
+					debug( expectation.actual.getMemento() );
+					return false;
+				}
+				return true;
+			},
+			// Verifies invalid cbValidation data
+			toHaveInvalidData : ( expectation, args = {} ) => {
+				param args.field = "";
+				if ( structKeyExists( args, 1 ) ) {
+					args.field = args[ 1 ];
+				}
+				param args.error = "";
+				if ( structKeyExists( args, 2 ) ) {
+					args.error = args[ 2 ];
+				}
+				param args.message = "";
+				if ( structKeyExists( args, 3 ) ) {
+					args.message = args[ 3 ];
+				}
+
+				// If !400 then there is no invalid data
+				if ( expectation.actual.getStatusCode() != 400 ) {
+					expectation.message = "#args.message#. Received incorrect status code. Expected [400]. Received [#expectation.actual.getStatusCode()#].";
+					debug( expectation.actual.getMemento() );
+					return false;
+				}
+				// If no field passed, we just check that invalid data was found
+				if ( !len( args.field ) ) {
+					if ( expectation.actual.getData().isEmpty() ) {
+						expectation.message = "#args.message#. Received incorrect status code. Expected [400]. Received [#expectation.actual.getStatusCode()#].";
+						debug( expectation.actual.getMemento() );
+						return false;
+					}
+					return true;
+				}
+				// We have a field to check and it has data
+				if (
+					!structKeyExists(
+						expectation.actual.getData(),
+						args.field
+					) || expectation.actual.getData()[ args.field ].isEmpty()
+				) {
+					expectation.message = "#args.message#. The requested field [#args.field#] does not have any invalid data.";
+					debug( expectation.actual.getMemento() );
+					return false;
+				}
+				// Do we have any error messages to check?
+				if ( len( args.error ) ) {
+					try {
+						expect(
+							expectation.actual.getData()[ args.field ]
+								.map( ( item ) => item.message )
+								.toList()
+						).toInclude( args.error );
+					} catch ( any e ) {
+						debug( expectation.actual.getMemento() );
+						rethrow;
+					}
+				}
+
+				// We checked and it's all good!
+				return true;
+			}
+		} );
+	}
+	
+	function afterAll(){
+		super.afterAll();
+	}
+
+	function reset(){
+		application.cbController.getLoaderService().processShutdown();
+		structDelete( application, "wirebox" );
+		structDelete( application, "cbController" );
+	}
 
     /**
      * This function is tagged as an around each handler.  All the integration tests we build
      * will be automatically rolled backed. No database corruption
-     * 
+     *
      * @aroundEach
      */
     function wrapInTransaction( spec ) {
@@ -326,9 +444,9 @@ component extends="tests.resources.BaseIntegrationSpec"{
 
 We will start by configuring `cbsecurity` so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.
 
-- Go over cbSecurity
-- Go over cbAuth
-- Go over JWT
+* Go over cbSecurity
+* Go over cbAuth
+* Go over JWT
 
 Open the `config/ColdBox.cfc` and locate the `moduleSettings`, we will be adding the following configuration for cbauth, cbsecurity and jwt. Please go over each configured setting below:
 
@@ -399,6 +517,8 @@ Let's add the JWT Secret now, let's begin by generating a secret key. Go to Comm
 >/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
 ```
 
+Please note that this is not necessary in the latest version of cbSecurity. cbSecurity will generate a new jwt secret each time the application expires and reloads. Which can also be nice to have.  You decide the approach!
+
 Copy the output of the key and paste it into the `.env` setting called `JWT_SECRET`
 
 ```bash
@@ -407,7 +527,7 @@ JWT_SECRET=/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
 
 Now we need to reinit our server since we added a new secret. Also, CommandBox CLI doesn't know about it, since you just added it, so let's reload the shell as well.  Go to CommandBox:
 
-```
+```bash
 // Reload the shell
 reload
 
@@ -429,11 +549,11 @@ Let's focus now on the user registration requirement. This is the BDD story to c
 story( "I want to be able to register users in my system and assign them a JWT token upon registration" );
 ```
 
-Let's start by modeling our user object:
+Let's start by modeling our user object, which our rest template has already pre-built for us: `models/Users.cfc`
 
 ### `User.cfc`
 
-Here are the properties we want to model
+Here are the properties we want to model, so make the appropriate changes in the pre-built user object.
 
 * `id`
 * `name`
@@ -452,13 +572,16 @@ coldbox create model name="User"  properties="id,name,email,username,password,cr
 Let's open the file and add some initialization procedures and a utility method to know if the User object has been populated from the database or not: `isLoaded()`.  We will also add instructions for the `mementifier` module to know how to convert the object to JSON, and our validation constraints.
 
 ```js
-/**
-* I am a new Model Object
-*/
-component accessors="true"{
-    
-    // DI
-    property name="qb" inject="provider:QueryBuilder@qb";
+component accessors="true" {
+
+	// DI
+	property name="qb" inject="provider:QueryBuilder@qb";
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Properties
+	 * --------------------------------------------------------------------------
+	 */
 
 	// Properties
 	property name="id"           type="string";
@@ -468,35 +591,99 @@ component accessors="true"{
 	property name="password"     type="string";
 	property name="createdDate"  type="date";
     property name="modifiedDate" type="date";
-    
-    this.constraints = {
-        name        : { required : true },
-        email       : { required : true, type : "email" },
-        username    : { required : true, udf : ( value, target ) => {
+	property name="permissions"  type="array";
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Mementifier
+	 * --------------------------------------------------------------------------
+	 */
+	this.memento = {
+		defaultIncludes : [ "*" ],
+		defaultExcludes : [],
+		neverInclude    : [ "password" ]
+	};
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Validation
+	 * --------------------------------------------------------------------------
+	 */
+	this.constraints = {
+		name    : { required : true },
+		email    : { required : true, type : "email" },
+		username    : { required : true, udf : ( value, target ) => {
 			if( isNull( arguments.value ) ) return false;
             return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
         }},
         password    : { required : true }
-    };
-
-    this.memento = {
-		defaultIncludes = [ "*" ],
-		neverInclude = [ "password" ]
 	};
 
 	/**
 	 * Constructor
 	 */
-	User function init(){
-
+	function init() {
+		variables.permissions = [];
 		variables.createdDate = now();
 		variables.modifiedDate = now();
 
 		return this;
 	}
 
-	boolean function isLoaded(){
+	/**
+	 * --------------------------------------------------------------------------
+	 * Authentication/Authorization Methods
+	 * --------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Check if a user is loaded from the db or not
+	 */
+	boolean function isLoaded() {
 		return ( !isNull( variables.id ) && len( variables.id ) );
+	}
+
+	/**
+	 * Verify if the user has one or more of the passed in permissions
+	 *
+	 * @permission One or a list of permissions to check for access
+	 *
+	 */
+	boolean function hasPermission( required permission ) {
+		// If no permissions, then it a default value of true comes in
+		if ( isBoolean( arguments.permission ) && arguments.permission ) {
+			return true;
+		}
+
+		if ( isSimpleValue( arguments.permission ) ) {
+			arguments.permission = listToArray( arguments.permission );
+		}
+
+		return arguments.permission
+			.filter( function( item ) {
+				return ( variables.permissions.findNoCase( item ) );
+			} )
+			.len();
+	}
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * IJwtSubject Methods
+	 * --------------------------------------------------------------------------
+	 */
+
+	/**
+	 * A struct of custom claims to add to the JWT token
+	 */
+	struct function getJwtCustomClaims() {
+		return {};
+	}
+
+	/**
+	 * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+	 */
+	array function getJwtScopes() {
+		return [];
 	}
 
 }
@@ -506,7 +693,7 @@ Now open the unit test: `/tests/specs/unit/UserTest.cfc` and update it to this:
 
 ```java
 describe( "A User", function(){
-			
+
     it( "can be created", function(){
         expect( model ).toBeComponent();
     });
@@ -514,7 +701,7 @@ describe( "A User", function(){
 });
 ```
 
-Run your tests!
+Run your tests! We have broken a few things, but we will get them sorted out soon.
 
 ### Authentication and JWTSubject
 
@@ -571,14 +758,16 @@ interface{
 So our `User.cfc` will end up like this:
 
 ```js
-/**
-* I am a new Model Object
-*/
-component accessors="true"{
+component accessors="true" {
 
 	// DI
-    property name="auth" inject="authenticationService@cbauth";
-    property name="qb" inject="provider:QueryBuilder@qb";
+	property name="qb" inject="provider:QueryBuilder@qb";
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Properties
+	 * --------------------------------------------------------------------------
+	 */
 
 	// Properties
 	property name="id"           type="string";
@@ -587,253 +776,420 @@ component accessors="true"{
 	property name="username"     type="string";
 	property name="password"     type="string";
 	property name="createdDate"  type="date";
-	property name="modifiedDate" type="date";
+    property name="modifiedDate" type="date";
+	property name="permissions"  type="array";
 
-    this.constraints = {
-        name        : { required : true },
-        email       : { required : true, type : "email" },
-        username    : { required : true, udf : ( value, target ) => {
+	/**
+	 * --------------------------------------------------------------------------
+	 * Mementifier
+	 * --------------------------------------------------------------------------
+	 */
+	this.memento = {
+		defaultIncludes : [ "*" ],
+		defaultExcludes : [],
+		neverInclude    : [ "password" ]
+	};
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * Validation
+	 * --------------------------------------------------------------------------
+	 */
+	this.constraints = {
+		name    : { required : true },
+		email    : { required : true, type : "email" },
+		username    : { required : true, udf : ( value, target ) => {
+			if( isNull( arguments.value ) ) return false;
             return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
         }},
         password    : { required : true }
-    };
-
-    this.memento = {
-		defaultIncludes = [ "*" ],
-		neverInclude = [ "password" ]
 	};
 
 	/**
 	 * Constructor
 	 */
-	User function init(){
-
+	function init() {
+		variables.permissions = [];
 		variables.createdDate = now();
 		variables.modifiedDate = now();
 
 		return this;
 	}
 
-	boolean function isLoaded(){
+	/**
+	 * --------------------------------------------------------------------------
+	 * Authentication/Authorization Methods
+	 * --------------------------------------------------------------------------
+	 */
+
+	/**
+	 * Check if a user is loaded from the db or not
+	 */
+	boolean function isLoaded() {
 		return ( !isNull( variables.id ) && len( variables.id ) );
 	}
 
 	/**
-     * A struct of custom claims to add to the JWT token
-     */
-    struct function getJwtCustomClaims(){
+	 * Verify if the user has one or more of the passed in permissions
+	 *
+	 * @permission One or a list of permissions to check for access
+	 *
+	 */
+	boolean function hasPermission( required permission ) {
+		// If no permissions, then it a default value of true comes in
+		if ( isBoolean( arguments.permission ) && arguments.permission ) {
+			return true;
+		}
+
+		if ( isSimpleValue( arguments.permission ) ) {
+			arguments.permission = listToArray( arguments.permission );
+		}
+
+		return arguments.permission
+			.filter( function( item ) {
+				return ( variables.permissions.findNoCase( item ) );
+			} )
+			.len();
+	}
+
+	/**
+	 * --------------------------------------------------------------------------
+	 * IJwtSubject Methods
+	 * --------------------------------------------------------------------------
+	 */
+
+	/**
+	 * A struct of custom claims to add to the JWT token
+	 */
+	struct function getJwtCustomClaims() {
 		return {};
 	}
 
-    /**
-     * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
-     */
-	array function getJwtScopes(){
+	/**
+	 * This function returns an array of all the scopes that should be attached to the JWT token that will be used for authorization.
+	 */
+	array function getJwtScopes() {
 		return [];
-	}
-
-    /**
-     * Verify if the user has one or more of the passed in permissions
-     *
-     * @permission One or a list of permissions to check for access
-     *
-     */
-    boolean function hasPermission( required permission ){
-		return true;
-	}
-
-    /**
-     * Shortcut to verify it the user is logged in or not.
-     */
-    boolean function isLoggedIn(){
-		return auth.isLoggedIn();
 	}
 
 }
 ```
 
-Run your tests again and see if it compiles.
-
 ### BDD Integration
 
-Now that our model is complete and satisfies the cbsecurity requirements for authentication and jwt services let's focus on the actual registration. We will create our BDD spec first to write down our requirements.  We will then rprceed to create the implementation.
+Now that our model is complete and satisfies the **cbsecurity** requirements for authentication and jwt services let's focus on the actual registration. We will create our BDD spec first to write down our requirements.  We will then proceed to create the implementation.
 
-```bash
-coldbox create handler name="registration" actions="create" directory=modules_app/api/modules_app/v1/handlers
-```
+Our template comes with a handler for authentication and an integration test as well:
 
-The BDD test will be created here: `/tests/specs/integration/registrationTest.cfc` and we will start here:
+* `modules_app/api/modules_app/v1/handlers/Auth.cfc`
+* `tests/specs/integration/AuthTests.cfc`
+
+Let's open our test and modify it a bit by making sure it inherits from our base class, remove some boilerplate and also update it for our new model.  Also, let's comment out the stories pre-generated for us so we can focus only on the registration story (Use the `x` prefix)
+
+It should end up like this:
 
 ```js
 component extends="tests.resources.BaseIntegrationSpec"{
 
-	property name="qb" inject="provider:QueryBuilder@qb";
+	property name="jwtService" inject="provider:JwtService@cbsecurity";
+	property name="cbauth"     inject="provider:authenticationService@cbauth";
 
 	/*********************************** BDD SUITES ***********************************/
 
-	function run(){
-
-		story( "I want to be able to register users in my system and assign them a JWT token upon registration", function(){
-
-			beforeEach(function( currentSpec ){
-				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+	function run() {
+		describe( "RESTFul Authentication", function() {
+			beforeEach( function( currentSpec ) {
+				// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
 				setup();
-			});
 
-			given( "valid registration data and the username is available", function(){
-				then( "I will be able to register my new user and get an access token", function(){
-					// Test user doesn't exist
-					expect(
-						qb.from( "users" )
-							.where( "username", "testadmin" )
-							.count()
-					).toBe( 0 );
+				// Make sure nothing is logged in to start our calls
+				cbauth.logout();
+				jwtService.getTokenStorage().clearAll();
+			} );
 
-					var event = post( "/api/v1/registration", {
-						"name"					= "Your Name",
-						"email"                	= "testadmin@ortussolutions.com",
-						"username"             	= "testadmin",
-						"password"             	= "testadmin"
+			xstory( "I want to authenticate a user and receive a JWT token", function() {
+				given( "a valid email and password", function() {
+					then( "I will be authenticated and will receive the JWT token", function() {
+						// Use a user in the seeded db
+						var event = this.post(
+							route  = "/api/v1/login",
+							params = {
+								email    : "admin@coldbox.org",
+								password : "admin"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getData() ).toBeString();
+
+						debug( response.getData() );
+
+						var decoded = jwtService.decode( response.getData() );
+						expect( decoded.sub ).toBe( 1 );
+						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
 					} );
-					var response = event.getPrivateValue( "response" );
+				} );
+				given( "invalid email and password", function() {
+					then( "I will receive a 401 exception ", function() {
+						var event = this.post(
+							route  = "/api/v1/login",
+							params = {
+								email    : "invalid",
+								password : "invalid"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
+						expect( response.getError() ).toBeTrue();
+						expect( response.getStatusCode() ).toBe( 401 );
+					} );
+				} );
+			} );
 
-					expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-					expect( response.getData().token ).notToBeEmpty();
-					expect( response.getData().user.id ).toBeNumeric();
-					expect( response.getData().user.name ).toBe( "Your Name" );
+			story( "I want to register into the system", function() {
+				given( "valid registration details", function() {
+					then( "I should register, log in and get a token", function() {
+						// Use a user in the seeded db
+						var event = this.post(
+							route  = "/api/v1/register",
+							params = {
+								name    : "luis Majano",
+								email    : "lmajano@coldbox.org",
+								username : "lmajano",
+								password : "lmajano"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
+						
+						debug( response.getData() );
+						
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData() ).toHaveKey( "token,user" );
+	
+						var decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
+					} );
+				} );
+				given( "invalid registration details", function() {
+					then( "I should get an error message", function() {
+						var event = this.post(
+							route  = "/api/v1/register",
+							params = {
+								email    : "invalid",
+								password : "invalid"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
+						expect( event.getResponse() ).toHaveStatus( 400 );
+					} );
+				} );
+				xgiven( "valid registration data but with a non-unique username", function(){
+					then( "a validation message should be sent to the user with an error message", function(){
 
-                    debug( response.getData() );
-					// data = { user:struct, token:jwt token }
+					});
+				} );
+			} );
 
-				});
-			});
+			xstory( "I want to be able to logout from the system using my JWT token", function() {
+				given( "a valid incoming jwt token", function() {
+					then( "my token should become invalidated and I will be logged out", function() {
+						// Log in first to get a valid token to logout with
+						var token   = jwtService.attempt( "admin@coldbox.org", "admin" );
+						var payload = jwtService.decode( token );
+						expect( cbauth.isLoggedIn() ).toBeTrue();
 
-		});
+						// Now Logout
+						var event = this.post( route = "/api/v1/logout", params = { "x-auth-token" : token } );
 
-	}
+						var response = event.getPrivateValue( "Response" );
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getStatusCode() ).toBe( 200 );
+						expect( cbauth.isLoggedIn() ).toBeFalse();
+					} );
+				} );
+				given( "an invalid incoming jwt token", function() {
+					then( "I should see an error message", function() {
+						// Now Logout
+						var event = this.post( route = "/api/v1/logout", params = { "x-auth-token" : "123" } );
 
-}
-```
-
-Run it, of course it will fail!
-
-### Routing
-
-Ok, let's start our implementation by adding our registration routes.  We will be basing all our routes on ColdBox Resources (https://coldbox.ortusbooks.com/the-basics/routing/routing-dsl/resourceful-routes) as much as possible in order to make our handlers standardized and light-weight.
-
-Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and add our resources:
-
-```js
-component{
-
-    function configure(){
-
-		route( "/", "echo.index" );
-
-		resources( resource="registration", only="create" );
-
-        route( "/:handler/:action" ).end();
-    }
-
-}
-```
-
-This will add all the necessary routing for the `registration` resource under the `v1` module.  Issue a `coldbox reinit` and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer
-
-### Event Handler
-
-Now that we have our route, let's fill out our event handler for registration.  Open the `registration.cfc` in our `v1` module and let's code it out.  We will need to populate a new user object from incoming `rc` data, validate it, create it and then tell the cbsecurity's jwt services to create a token for the user.  Also remember that our handler's MUST Inherit from our `BaseHandler` from our `api` module.
-
-```js
-/**
- * My RESTFul Event Handler which inherits from the module `api`
- */
-component extends="api.handlers.BaseHandler"{
-
-	// DI
-	property name="userService"	inject="UserService";
-
-	/**
-	 * Register a new user in our system
-	 */
-	function create( event, rc, prc ){
-		// populate, validate and create
-		prc.oUser = userService.create(
-			validateOrFail( populateModel( "User" ) )
-		);
-
-		// Respond back with user rep and token
-		prc.response.setData( {
-			"user" 	: prc.oUser.getMemento(),
-			"token"	: jwtAuth().fromUser( prc.oUser )
+						var response = event.getPrivateValue( "Response" );
+						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
+						debug( response.getStatusCode( 500 ) );
+					} );
+				} );
+			} );
 		} );
 	}
 
 }
 ```
 
+Run it, it will run but some things are failing now, since we where basically mocking things before. So we will be fixing each story one by one until our entire auth procedures are done with.
+
+### Routing
+
+Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and add our routing or verify that we have all of our necessary routes:
+
+```js
+component{
+
+    function configure(){
+
+		// API Echo
+		get( "/", "Echo.index" );
+
+		// API Authentication Routes
+		post( "/login", "Auth.login" );
+		post( "/logout", "Auth.logout" );
+		post( "/register", "Auth.register" );
+
+		// API Secured Routes
+		get( "/whoami", "Echo.whoami" );
+
+		route( "/:handler/:action" ).end();
+    }
+
+}
+```
+
+Issue a `coldbox reinit` and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer
+
+### Event Handler
+
+Now that we have our route, let's fill out our event handler for registration only.  Open the `auth.cfc` in our `v1` module and let's code it out.  We will need to populate a new user object from incoming `rc` data, validate it, create it and then tell the cbsecurity's jwt services to create a token for the user.  Also remember that our handler's MUST Inherit from our `coldbox.system.RestHandler`, which is new in ColdBox 6.  
+
+* Investigate RestHandler and what you get.
+
+```js
+/**
+ * Register a new user in the system
+ *
+ * @x-route (POST) /api/v1/register
+ * @requestBody ~api/v1/auth/register/requestBody.json
+ * @response-default ~api/v1/auth/register/responses.json##200
+ * @response-400 ~api/v1/auth/register/responses.json##400
+ */
+function register( event, rc, prc ) {
+	param rc.fname    = "";
+	param rc.lname    = "";
+	param rc.email    = "";
+	param rc.password = "";
+
+	// Populate, Validate, Create a new user
+	prc.oUser = userService.create( validateOrFail( populateModel( "User" ) ) );
+
+	// Log them in if it was created!
+	event
+		.getResponse()
+		.setData( {
+			"token" : jwtAuth().fromuser( prc.oUser ),
+			"user"  : prc.oUser.getMemento()
+		} )
+		.addMessage(
+			"User registered correctly and Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"
+		);
+}
+```
+
 Once we write up this code, two new scenarios should pop up in your head:
 
 ```js
-given( "invalid registration data", function(){
-    then( "a validation message should be sent to the user with a 400 error code", function(){
+given( "invalid registration details", function() {
+	then( "I should get an error message", function() {
 
     });
 } );
 given( "valid registration data but with a non-unique username", function(){
-    then( "a validation message should be sent to the user with a 400 error code", function(){
+    then( "a validation message should be sent to the user with an error message", function(){
 
     });
 } );
 ```
 
-You will have to fill these out on your own!  
+You will have to fill these out on your own! Let's do it!
 
 ### User Services
 
-Since we must use a `UserService` in our handler, then I guess we need to build it.  How? Well, we know we need to add a `create()` method:
+Since we must use a `UserService` in our handler, then I guess we need to build it.  How? Well, we know we need to add a `create()` method, but our template already generated one for us.  It is using mocks, so let's update it so we can actually use the database.
 
-Let's generate the model alongside its unit test.
+> Also note that we have a unit test for the UserService: `tests/specs/unit/UserServiceTest.cfc`
 
-```bash
-coldbox create model name="UserService" persistence="singleton" methods="create"
-```
-
-Open the unit test `tests/specs/unit/UserServiceTest.cfc` and just do a compile time test, the rest will be covered by the integration tests.
+Here is the unit test pre-generated for us, which is enough for us to continue upon. We are not building any hard-core algorithms or anything to test in isolation.
 
 ```js
-describe( "UserService", function(){
-    it( "can be created", function(){
-        expect( model ).toBeComponent();
-    });
-});
+component extends="coldbox.system.testing.BaseTestCase" {
+
+	/*********************************** LIFE CYCLE Methods ***********************************/
+
+	function beforeAll() {
+		structDelete( application, "cbController" );
+		structDelete( application, "wirebox" );
+		super.beforeAll();
+	}
+
+	function afterAll() {
+		super.afterAll();
+	}
+
+	/*********************************** BDD SUITES ***********************************/
+
+	function run() {
+		describe( "UserService", function() {
+			beforeEach( function( currentSpec ) {
+				setup();
+				model = getInstance( "UserService" );
+			} );
+
+			it( "can be created", function() {
+				expect( model ).toBeComponent();
+			} );
+
+		} );
+	}
+
+}
 ```
 
-Now let's do the code implementations for the service:
+Here is the code for the `UserService` using our new model approach and the methods we need to update for now:
+
+* `init()`
+* `create()`
 
 ```js
 /**
 * User Services
 */
-component singleton accessors="true"{
+component accessors="true" singleton {
 
-	// Properties
+	/**
+	 * --------------------------------------------------------------------------
+	 * DI
+	 * --------------------------------------------------------------------------
+	 */
+	property name="populator" 	inject="wirebox:populator";
 	property name="bcrypt"      inject="@BCrypt";
 	property name="qb"          inject="provider:QueryBuilder@qb";
 
 	/**
 	 * Constructor
 	 */
-	UserService function init(){
+	function init() {
 		return this;
 	}
 
+	/**
+	 * Construct a new user object via WireBox
+	 */
 	User function new() provider="User";
 
 	/**
-	* create
-	*/
-	function create( required user ){
+	 * Create a new user in the system
+	 *
+	 * @user The user to create
+	 *
+	 * @return The created user
+	 */
+	User function create( required user ) {
 		var qResults = qb.from( "users" )
 			.insert( values = {
 				"name" 		= arguments.user.getName(),
@@ -847,15 +1203,18 @@ component singleton accessors="true"{
 
 		return arguments.user;
 	}
-
 }
 ```
 
-Now let's verify our tests and adjust as necessary, but we should have a working registration now and jwt token creations.
+Now let's verify our tests and adjust as necessary, but we should have a working registration now and jwt token creations.  Also, check out your database, a new table `cbjwt` has been created for you!
+
+Question, why doesn't the table have any data on it?
+
+> Go into the base integration test and remove the `aroundEach` annotation from the `wrapInTransaction()` method, run the tests, and check out the database now. Run again, the data persists.  So be careful, decide and move on. Clear the db data if you like.
 
 ## Authentication
 
-Now that we have registration complete, let's focus on authentication for our API.  Here are two stories to start with:
+Now that we have registration complete, let's focus on authentication for our API.  Here are two stories to start with which can be found already in our auth spec.
 
 ```java
 story( "I want to be able to authenticate with a username/password and receive a JWT token", function(){
@@ -869,121 +1228,137 @@ story( "I want to be able to logout from the system using my JWT token", functio
 
 ### BDD
 
-Let's start with our BDD specs before we move to the implementation phase.  Let's start by generating the handler that will be in charge of the api's authentication.
-
-```bash
-coldbox create handler name="auth" actions="login,logout" directory=modules_app/api/modules_app/v1/handlers
-```
-
-Let's open the bdd test that got generated and let's plan out how it should look like:
+Let's start with our BDD specs before we move to the implementation phase. Let's open the `AuthTests` spec and revise our login/logout tests so they use our new model and matchers:
 
 ```js
-component extends="tests.resources.BaseIntegrationSpec"{
+component extends="tests.resources.BaseIntegrationSpec" {
 
 	property name="jwtService" inject="provider:JwtService@cbsecurity";
-	property name="cbauth" inject="provider:authenticationService@cbauth";
+	property name="cbauth"     inject="provider:authenticationService@cbauth";
 
 	/*********************************** BDD SUITES ***********************************/
 
-	function run(){
-
-		describe( "Authentication Specs", function(){
-
-			beforeEach(function( currentSpec ){
-				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+	function run() {
+		describe( "RESTFul Authentication", function() {
+			beforeEach( function( currentSpec ) {
+				// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
 				setup();
 
 				// Make sure nothing is logged in to start our calls
 				cbauth.logout();
 				jwtService.getTokenStorage().clearAll();
-			});
+			} );
 
-			story( "I want to authenticate a user via username/password and receive a JWT token", function(){
-
-				given( "a valid username and password", function(){
-					then( "I will be authenticated and will receive the JWT token", function(){
+			story( "I want to authenticate a user and receive a JWT token", function() {
+				given( "a valid username and password", function() {
+					then( "I will be authenticated and will receive the JWT token", function() {
 						// Use a user in the seeded db
-						var event = post(
-							route = "/api/v1/login",
+						var event = this.post(
+							route  = "/api/v1/login",
 							params = {
-								username = "Milkshake10",
-								password = "test"
+								username : "Milkshake10",
+								password : "test"
 							}
 						);
 						var response = event.getPrivateValue( "Response" );
-						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getData() ).toBeString();
+						debug( response.getData() );
+
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData() ).toHaveKey( "token,user" );
+
+						var decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( 10 );
+						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+					} );
+				} );
+				given( "invalid email and password", function() {
+					then( "I will receive a 401 exception ", function() {
+						var event = this.post(
+							route  = "/api/v1/login",
+							params = {
+								email    : "invalid",
+								password : "invalid"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
+						expect( response ).toHaveStatus( 401 );
+					} );
+				} );
+			} );
+
+			story( "I want to register into the system", function() {
+				given( "valid registration details", function() {
+					then( "I should register, log in and get a token", function() {
+						// Use a user in the seeded db
+						var event = this.post(
+							route  = "/api/v1/register",
+							params = {
+								name     : "luis Majano",
+								email    : "lmajano@coldbox.org",
+								username : "lmajano",
+								password : "lmajano"
+							}
+						);
+						var response = event.getPrivateValue( "Response" );
 
 						debug( response.getData() );
 
-						var decoded = jwtService.decode( response.getData() );
-						expect( decoded.sub ).toBe( 10 );
-						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
-					});
-				});
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData() ).toHaveKey( "token,user" );
 
-				given( "invalid username and password", function(){
-					then( "I will receive a 401 invalid credentials exception ", function(){
-						var event = post(
-							route = "/api/v1/login",
+						var decoded = jwtService.decode( response.getData().token );
+						expect( decoded.sub ).toBe( response.getData().user.id );
+						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
+					} );
+				} );
+				given( "invalid registration details", function() {
+					then( "I should get an error message", function() {
+						var event = this.post(
+							route  = "/api/v1/register",
 							params = {
-								username = "invalid",
-								password = "invalid"
+								email    : "invalid",
+								password : "invalid"
 							}
 						);
 						var response = event.getPrivateValue( "Response" );
-						expect( response.getError() ).toBeTrue();
-						expect( response.getStatusCode() ).toBe( 401 );
-					});
-				});
+						expect( event.getResponse() ).toHaveStatus( 400 );
+					} );
+				} );
+				xgiven( "valid registration data but with a non-unique username", function() {
+					then( "a validation message should be sent to the user with an error message", function() {
+					} );
+				} );
+			} );
 
-			});
-
-			story( "I want to be able to logout from the system using my JWT token", function(){
-
-				given( "a valid incoming jwt token and I issue a logout", function(){
-					then( "my token should become invalidated and I will be logged out", function(){
-
-						// Log in
-						var token = jwtService.attempt( "Milkshake10", "test" );
+			story( "I want to be able to logout from the system using my JWT token", function() {
+				given( "a valid incoming jwt token", function() {
+					then( "my token should become invalidated and I will be logged out", function() {
+						// Log in first to get a valid token to logout with
+						var token   = jwtService.attempt( "Milkshake10", "test" );
 						var payload = jwtService.decode( token );
 						expect( cbauth.isLoggedIn() ).toBeTrue();
 
 						// Now Logout
-						var event = post(
-							route = "/api/v1/logout",
-							params = {
-								"x-auth-token" : token
-							}
-						);
+						var event = this.post( route = "/api/v1/logout", params = { "x-auth-token" : token } );
 
 						var response = event.getPrivateValue( "Response" );
-						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getStatusCode() ).toBe( 200 );
+						expect( response ).toHaveStatus( 200 );
 						expect( cbauth.isLoggedIn() ).toBeFalse();
-					});
-				});
-
-				given( "an invalid incoming jwt token and I issue a logout", function(){
-					then( "I should see an error message", function(){
+					} );
+				} );
+				given( "an invalid incoming jwt token", function() {
+					then( "I should see an error message", function() {
 						// Now Logout
-						var event = post(
-							route = "/api/v1/logout",
-							params = {
-								"x-auth-token" : "123"
-							}
-						);
+						var event = this.post( route = "/api/v1/logout", params = { "x-auth-token" : "123" } );
 
 						var response = event.getPrivateValue( "Response" );
 						expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-						expect( response.getStatusCode() ).toBe( 500 );
-						debug( response.getStatusCode() );
-					});
-				});
+						expect( response ).toHaveStatus( 500 );
+					} );
+				} );
 			} );
-
-		});
-
+		} );
 	}
 
 }
@@ -991,66 +1366,117 @@ component extends="tests.resources.BaseIntegrationSpec"{
 
 ### Routing
 
-Ok, let's start our implementation by adding our login/logout routes.
-
-Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and add our login/logout routes:
+Open the `v1` module's router: `modules_app/api/modules_app/v1/config/Router.cfc` and make sure our login/logout routes are there:
 
 ```js
-component{
+component {
 
-    function configure(){
+	function configure() {
+		// API Echo
+		get( "/", "Echo.index" );
 
-		route( "/", "echo.index" );
+		// API Authentication Routes
+		post( "/login", "Auth.login" );
+		post( "/logout", "Auth.logout" );
+		post( "/register", "Auth.register" );
 
-		resources( resource="registration", only="create" );
-		
-		post( "/login", "auth.login" );
-		post( "/logout", "auth.logout" );
+		// API Secured Routes
+		get( "/whoami", "Echo.whoami" );
 
-        route( "/:handler/:action" ).end();
-    }
+
+		route( "/:handler/:action" ).end();
+	}
 
 }
+
 ```
 
 Issue a `coldbox reinit` and check out the Route Visualizer: http://127.0.0.1:42518/route-visualizer
 
 ### Event Handler
 
-Now that we have our route, let's fill out our event handler for a user login and logout.  Open the `auth.cfc` in our `v1` module and let's code it out.  We will use the jwt services for these sections mostly and you will be surprised at how little code you need to write.
-
-Also remember that our handler's MUST Inherit from our `BaseHandler` from our `api` module.
+Let's go back to our `auth` handler and finalize the login/logout actions.
 
 ```js
 /**
-* I am a new handler
-*/
-component extends="api.handlers.BaseHandler"{
+ * Authentication Handler
+ */
+component extends="coldbox.system.RestHandler" {
+
+	// Injection
+	property name="userService" inject="UserService";
 
 	/**
-     * Login to our system
-     */
-	function login( event, rc, prc ){
+	 * Login a user into the application
+	 *
+	 * @x-route (POST) /api/v1/login
+	 * @requestBody ~api/v1/auth/login/requestBody.json
+	 * @response-default ~api/v1/auth/login/responses.json##200
+	 * @response-401 ~api/v1/auth/login/responses.json##401
+	 */
+	function login( event, rc, prc ) {
 		param rc.username = "";
 		param rc.password = "";
 
-        prc.response
-            .setData( jwtAuth().attempt( rc.username, rc.password ) )
-            .addMessage( "Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes" );
-    }
+		prc.token = jwtAuth().attempt( rc.username, rc.password );
 
-    /**
-     * Logout of our system
-     */
-    function logout( event, rc, prc ){
-        jwtAuth().logout();
-        prc.response.addMessage( "Successfully logged out, token invalidated" );
+		prc.response
+			.setData( {
+				"token" : prc.token,
+				"user"  : cbSecure()
+					.getAuthService()
+					.getUser()
+					.getMemento()
+			} )
+			.addMessage( "Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes" );
+	}
+
+	/**
+	 * Register a new user in the system
+	 *
+	 * @x-route (POST) /api/v1/register
+	 * @requestBody ~api/v1/auth/register/requestBody.json
+	 * @response-default ~api/v1/auth/register/responses.json##200
+	 * @response-400 ~api/v1/auth/register/responses.json##400
+	 */
+	function register( event, rc, prc ) {
+		param rc.fname    = "";
+		param rc.lname    = "";
+		param rc.email    = "";
+		param rc.password = "";
+
+		// Populate, Validate, Create a new user
+		prc.oUser = userService.create( validateOrFail( populateModel( "User" ) ) );
+
+		// Log them in if it was created!
+		event
+			.getResponse()
+			.setData( {
+				"token" : jwtAuth().fromuser( prc.oUser ),
+				"user"  : prc.oUser.getMemento()
+			} )
+			.addMessage(
+				"User registered correctly and Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"
+			);
+	}
+
+	/**
+	 * Logout a user
+	 *
+	 * @x-route (POST) /api/v1/logout
+	 * @security bearerAuth,ApiKeyAuth
+	 * @response-default ~api/v1/auth/logout/responses.json##200
+	 * @response-500 ~api/v1/auth/logout/responses.json##500
+	 */
+	function logout( event, rc, prc ) {
+		jwtAuth().logout();
+		event.getResponse().addMessage( "Successfully logged out" )
 	}
 
 }
 ```
 
-Wow, our handlers look so nice and tidy!  However, we still need to build out our User Service that will power all this goodness.
+Wow, our handlers look so nice and tidy and with strange documentation!  However, we still need to build out our User Service that will power all this goodness.
 
 Please check out all of the jwt service methods, there are tons of them and really helpful!
 
@@ -1093,36 +1519,49 @@ That's it.  The jwt services and cbauth will know how to put everything together
 
 ```js
 /**
-* I am a new Model Object
-*/
-component singleton accessors="true"{
+ * User Services
+ */
+component accessors="true" singleton {
 
-	// Properties
-	property name="bcrypt"      inject="@BCrypt";
-	property name="auth"        inject="authenticationService@cbauth";
-	property name="qb"          inject="provider:QueryBuilder@qb";
-    property name="populator" 	inject="wirebox:populator";
+	/**
+	 * --------------------------------------------------------------------------
+	 * DI
+	 * --------------------------------------------------------------------------
+	 */
+	property name="populator" inject="wirebox:populator";
+	property name="bcrypt"    inject="@BCrypt";
+	property name="qb"        inject="provider:QueryBuilder@qb";
 
 	/**
 	 * Constructor
 	 */
-	UserService function init(){
+	function init() {
 		return this;
 	}
 
+	/**
+	 * Construct a new user object via WireBox
+	 */
 	User function new() provider="User";
 
 	/**
-	* create
-	*/
-	function create( required user ){
-		var qResults = qb.from( "users" )
-			.insert( values = {
-				"name" 		= arguments.user.getName(),
-				"email" 	= arguments.user.getEmail(),
-				"username" 	= arguments.user.getUsername(),
-				"password" 	= bcrypt.hashPassword( arguments.user.getPassword() )
-			} );
+	 * Create a new user in the system
+	 *
+	 * @user The user to create
+	 *
+	 * @return The created user
+	 */
+	User function create( required user ) {
+		var qResults = qb
+			.from( "users" )
+			.insert(
+				values = {
+					"name"     : arguments.user.getName(),
+					"email"    : arguments.user.getEmail(),
+					"username" : arguments.user.getUsername(),
+					"password" : bcrypt.hashPassword( arguments.user.getPassword() )
+				}
+			);
 
 		// populate the id
 		arguments.user.setId( qResults.result.generatedKey );
@@ -1131,39 +1570,54 @@ component singleton accessors="true"{
 	}
 
 	/**
-	* isValidCredentials
-	*/
-	function isValidCredentials( required username, required password ){
-		var oUser = retrieveUserByUsername( arguments.username );
-		if( !oUser.isLoaded() ){ return false; }
+	 * Verify if the incoming username/password are valid credentials.
+	 *
+	 * @username The username
+	 * @password The password
+	 */
+	boolean function isValidCredentials( required username, required password ) {
+		var oTarget = retrieveUserByUsername( arguments.username );
+		if ( !oTarget.isLoaded() ) {
+			return false;
+		}
 
-		try{
-			return bcrypt.checkPassword( arguments.password, oUser.getPassword() );
-		} catch( any e ){
+		// Check Password Here: Remember to use bcrypt
+		try {
+			return variables.bcrypt.checkPassword( arguments.password, oTarget.getPassword() );
+		} catch ( any e ) {
 			return false;
 		}
 	}
 
 	/**
-	* retrieveUserByUsername
-	*/
-	function retrieveUserByUsername( required username ){
+	 * Retrieve a user by username
+	 *
+	 * @return User that implements JWTSubject and/or IAuthUser
+	 */
+	function retrieveUserByUsername( required username ) {
 		return populator.populateFromStruct(
-            new(),
-            qb.from( "users" ).where( "username" , arguments.username ).first()
-        );
+			new (),
+			qb.from( "users" )
+				.where( "username", arguments.username )
+				.first()
+		);
 	}
 
 	/**
-	* retrieveUserById
-	*/
-	function retrieveUserById( required id ){
+	 * Retrieve a user by unique identifier
+	 *
+	 * @id The unique identifier
+	 *
+	 * @return User that implements JWTSubject and/or IAuthUser
+	 */
+	User function retrieveUserById( required id ) {
 		return populator.populateFromStruct(
-            new(),
-            qb.from( "users" ).where( "id" , arguments.id ).first()
-        );
+			new (),
+			qb.from( "users" )
+				.where( "id", arguments.id )
+				.first()
+		);
 	}
-
 
 }
 ```
@@ -1172,9 +1626,9 @@ That's it!  Go run your tests and make sure all the tests pass!  What have you l
 
 ## Invalid Routes
 
-Ok, so what would happen if we try to execute `/api/v1/login` in the browser?  Go and try it!
+Ok, so what would happen if we try to execute `/api/v1/bogus` in the browser?  Go and try it!
 
-You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the `v1` api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Base Handler's `onInvalidRoute()` method.
+You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the `v1` api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Rest Handler's `onInvalidRoute()` method.
 
 Open the `v1` router and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.
 
@@ -1185,7 +1639,9 @@ route( "/:anything", "echo.onInvalidRoute" );
 //route( "/:handler/:action" ).end();
 ```
 
-Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message.
+Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message. Now, this is great, but we lost something? Anybody can guess?
+
+> We lost all of our convention based routing which was below it.  This means, that we must register all the routes we want.
 
 
 ## Listing Content
