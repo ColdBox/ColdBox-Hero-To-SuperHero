@@ -235,27 +235,31 @@
 				// Default Authorization Action: override or redirect when a user does not have enough permissions to access something
 				"defaultAuthorizationAction"  : "override",
 				// You can define global security rules here
-				"rules"                       : [],
+				"rules"                       : [
+					{
+						secureList 	: "v1:content"
+					}
+				],
 				// Use JWT For validation of incoming requests
-				"validator"                   : "JWTService@cbsecurity",
+				"validator"                 : "JWTService@cbsecurity",
 				// We will use cbAuth for authentication by default
-				"authenticationService"       : "authenticationService@cbauth",
+				"authenticationService"     : "authenticationService@cbauth",
 				// WireBox ID of the user service to use
-				"userService"                 : "UserService",
+				"userService"               : "UserService",
 				// The name of the variable to use to store an authenticated user in prc scope if using a validator that supports it.
-				"prcUserVariable"             : "oCurrentUser",
+				"prcUserVariable"           : "oCurrentUser",
 				// Use regular expression matching on the rule match types
-				"useRegex"                    : true,
+				"useRegex"                  : true,
 				// Force SSL for all relocations
-				"useSSL"                      : false,
+				"useSSL"                    : false,
 				// Auto load the global security firewall
-				"autoLoadFirewall"            : true,
+				"autoLoadFirewall"          : true,
 				// Activate handler/action based annotation security
-				"handlerAnnotationSecurity"   : true,
+				"handlerAnnotationSecurity" : true,
 				// Activate security rule visualizer, defaults to false by default
-				"enableSecurityVisualizer"    : true,
+				"enableSecurityVisualizer"  : true,
 				// JWT Settings
-				"jwt"                         : {
+				"jwt"                       : {
 					// The issuer authority for the tokens, placed in the `iss` claim
 					"issuer"           : "",
 					// The jwt secret encoding key, defaults to getSystemEnv( "JWT_SECRET", "" )

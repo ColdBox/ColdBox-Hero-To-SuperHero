@@ -1923,7 +1923,7 @@ describe( "Content Services: In order to interact with content in the CMS you mu
 		it( "should display all content using the default options", function(){
 			var event = get( route = "/api/v1/content" );
 			var response = event.getPrivateValue( "Response" );
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( 200 );
 			expect( response.getData() ).toBeArray();
 		});
 	});
@@ -1937,7 +1937,7 @@ describe( "Content Services: In order to interact with content in the CMS you mu
 
 				debug( response.getMessages() );
 
-				expect( response.getError() ).toBeFalse();
+				expect( response ).toHaveStatus( 200 );
 				expect( response.getData() ).toBeStruct();
 				expect( response.getData().slug ).toBe( testSlug );
 			});
@@ -1951,8 +1951,7 @@ describe( "Content Services: In order to interact with content in the CMS you mu
 
 				debug( response.getMessages() );
 
-				expect( response.getError() ).toBeTrue();
-				expect( response.getStatusCode() ).toBe( 404 );
+				expect( response ).toHaveStatus( 404 );
 			});
 		});
 	});
@@ -1992,17 +1991,20 @@ Now let's build out the handler that can satisfy our previous stories
 /**
 * I am a new handler
 */
-component extends="api.handlers.BaseHandler"{
+component extends="coldbox.system.RestHandler" {
 
 	property name="contentService" inject="ContentService";
 
 	/**
-	* index
-	*/
-	function index( event, rc, prc ){
+	 * index
+	 */
+	function index( event, rc, prc ) {
 		prc.response.setData(
-			contentService.list()
-				.map( ( item ) => { return item.getMemento(); } )
+			contentService
+				.list()
+				.map( ( item ) => {
+					return item.getMemento();
+				} )
 		);
 	}
 
@@ -2014,25 +2016,23 @@ component extends="api.handlers.BaseHandler"{
 	}
 
 	/**
-	* show
-	*/
-	function show( event, rc, prc ){
+	 * show
+	 */
+	function show( event, rc, prc ) {
 		param rc.slug = "";
 
 		prc.oContent = contentService.findBySlug( rc.slug );
 
-		if( !prc.oContent.isLoaded() ){
+		if ( !prc.oContent.isLoaded() ) {
 			prc.response
 				.setError( true )
-				.setStatusCode( STATUS.NOT_FOUND )
+				.setStatusCode( event.STATUS.NOT_FOUND )
 				.setStatusText( "Not Found" )
 				.addMessage( "The requested content object (#rc.slug#) could not be found" );
 			return;
 		}
 
-		prc.response.setData(
-			prc.oContent.getMemento()
-		);
+		prc.response.setData( prc.oContent.getMemento() );
 	}
 
 	/**
@@ -2140,8 +2140,6 @@ Ok, it seems we are done, let's run our tests and make sure we are listing all c
 
 **Extra Credit:** Leverage postman to test these endpoints. Remember you must get a jwt token first!
 
-
-
 ## Creating Content
 
 Ok, we can list all and one piece of content, let's try creating one now.
@@ -2177,7 +2175,7 @@ story( "I want to be able to create new content objects", function(){
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( 200 );
 			expect( response.getData().title ).toBe( "I love BDD" );
 			expect( response.getData().id ).notToBeEmpty();
 		});
@@ -2197,8 +2195,8 @@ story( "I want to be able to create new content objects", function(){
 			// expectations go here.
 			var response = event.getPrivateValue( "Response" );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( 400 );
+			expect( response ).toHaveStatus( 400 );
+			expect( response ).toHaveInvalidData( "slug", "is required" );
 		});
 	});
 });
@@ -2216,10 +2214,7 @@ function create( event, rc, prc ){
 
 	// populate, validate and create
 	prc.oContent = contentService.create(
-		validateOrFail(
-			populateModel( "Content" )
-				.setUser( jwtAuth().getUser() )
-		)
+		validateOrFail( populateModel( "Content" ).setUser( jwtAuth().getUser() ) )
 	);
 
 	prc.response.setData( prc.oContent.getMemento() );
@@ -2290,7 +2285,7 @@ story( "I want to be able to update content objects", function(){
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( 200 );
 			expect( response.getData().title ).toBe( "I just changed you!" );
 			expect( response.getData().id ).notToBeEmpty();
 		});
@@ -2310,8 +2305,7 @@ story( "I want to be able to update content objects", function(){
 			// expectations go here.
 			var response = event.getPrivateValue( "Response" );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( 404 );
+			expect( response ).toHaveStatus( 404 );
 		});
 	});
 });
@@ -2323,17 +2317,17 @@ Ok, now let's put it together!
 
 ```js
 /**
-* update
-*/
-function update( event, rc, prc ){
+ * update
+ */
+function update( event, rc, prc ) {
 	param rc.slug = "";
 
 	prc.oContent = contentService.findBySlug( rc.slug );
 
-	if( !prc.oContent.isLoaded() ){
+	if ( !prc.oContent.isLoaded() ) {
 		prc.response
 			.setError( true )
-			.setStatusCode( STATUS.NOT_FOUND )
+			.setStatusCode( event.STATUS.NOT_FOUND )
 			.setStatusText( "Not Found" )
 			.addMessage( "The requested content object (#rc.slug#) could not be found" );
 		return;
@@ -2341,10 +2335,7 @@ function update( event, rc, prc ){
 
 	// populate, validate and create
 	prc.oContent = contentService.update(
-		validateOrFail(
-			populateModel( prc.oContent )
-				.setUser( jwtAuth().getUser() )
-		)
+		validateOrFail( populateModel( prc.oContent ).setUser( jwtAuth().getUser() ) )
 	);
 
 	prc.response.setData( prc.oContent.getMemento() );
@@ -2423,7 +2414,7 @@ story( "I want to be able to remove content objects", function(){
 
 			debug( response.getData() );
 
-			expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+			expect( response ).toHaveStatus( 200 );
 			expect( response.getMessages().toString() ).toInclude( "Content deleted" );
 		});
 	});
@@ -2437,8 +2428,7 @@ story( "I want to be able to remove content objects", function(){
 			// expectations go here.
 			var response = event.getPrivateValue( "Response" );
 
-			expect( response.getError() ).toBeTrue( response.getMessages().toString() );
-			expect( response.getStatusCode() ).toBe( 404 );
+			expect( response ).toHaveStatus( 404 );
 		});
 	});
 });
@@ -2457,10 +2447,10 @@ function delete( event, rc, prc ){
 
 	prc.oContent = contentService.findBySlug( rc.slug );
 
-	if( !prc.oContent.isLoaded() ){
+	if ( !prc.oContent.isLoaded() ) {
 		prc.response
 			.setError( true )
-			.setStatusCode( STATUS.NOT_FOUND )
+			.setStatusCode( event.STATUS.NOT_FOUND )
 			.setStatusText( "Not Found" )
 			.addMessage( "The requested content object (#rc.slug#) could not be found" );
 		return;
@@ -2469,11 +2459,9 @@ function delete( event, rc, prc ){
 	// populate, validate and create
 	contentService.delete( prc.oContent );
 
-	prc.response.addMessages( "Content deleted!" );
+	prc.response.addMessage( "Content deleted!" );
 }
 ```
-
-We have to also get the authenticated user to add it into the content.
 
 ### Delete Services
 
@@ -2500,13 +2488,13 @@ Run your tests!
 
 We should be excited, exhausted, and amazed that we have started to build a headless CMS!  This is just the start, what else can we do? Here are some more ideas?
 
-- Content Versioning
-- Content Drafts
-- Content Categories
-- Move to an ORM (Hibernate or Quick)
-- Allow creator and editor in content objects
-- Pagination
-- Search
-- The list goes on!!!
+* Content Versioning
+* Content Drafts
+* Content Categories
+* Move to an ORM (Hibernate or Quick)
+* Allow creator and editor in content objects
+* Pagination
+* Search
+* The list goes on!!!
 
 Happy Coding!
