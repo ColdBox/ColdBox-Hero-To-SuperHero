@@ -12,8 +12,11 @@ component {
 		// API Secured Routes
 		get( "/whoami", "Echo.whoami" );
 
+		// Content
+		apiResources( resource="content", parameterName="slug" );
 
-		route( "/:handler/:action" ).end();
+		// Invalid Routes
+		route( "/:anything", "echo.onInvalidRoute" );
 	}
 
 }

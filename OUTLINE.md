@@ -106,38 +106,31 @@ Steps:
 
 - [Start](steps/step-7.md)
 
-### 8. Login & Logout
+### 8. API Tooling
 
-- [ ] Install `cbmessagebox` and make messages prettier
-- [ ] Create the specs
-- [ ] Install and configure `cbsecurity`/`cbauth`/etc
-- [ ] Create routes
-- [ ] Create the user sessions handler
-- [ ] Create the user login screen
-- [ ] Update User and User Service
-- [ ] Create auto-login with registration
+- Listen to invalid routes
+- Prepare for API documentation via OpenAPI
+- Generate the OpenAPI documentation
+- Explore the generated documentation
+- Import the documentation into Postman or Insomnia
 
 Steps:
 
- - [Start 9](steps/step-9.md)
+- [Start](steps/step-8.md)
 
-### 9. Rants
+### 9. Listing Content
 
 What we will do:
 
-- [ ] Create new migration for rants
-- [ ] Scaffold a `rant` resource
-- [ ] Update the resource route
-- [ ] Update the `Rant` object
-- [ ] Update the `RantService`
-- [ ] Create the basic unit tests for both and talk about the pragmatism of unit test vs BDD
-- [ ] Build and Test the CRUD setup
-- [ ] Change application default event to the rants
-- [ ] Update the main layout for adding a rant
+- Create a `Content` object
+- Create a `ContentService`
+- Create the migration and seeders
+- Create the handler
+- Test it out
 
 Steps:
 
- - [Start 10](steps/step-10.md)
+- [Start](steps/step-9.md)
 
 ### 10. Security
 

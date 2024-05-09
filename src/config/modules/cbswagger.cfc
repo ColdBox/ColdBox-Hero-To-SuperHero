@@ -9,7 +9,7 @@ component {
 			// The route prefix to search.  Routes beginning with this prefix will be determined to be api routes
 			"routes"        : [ "api" ],
 			// Any routes to exclude
-			"excludeRoutes" : [],
+			"excludeRoutes" : [ "api/v1/:anything/" ],
 			// The default output format: json or yml
 			"defaultFormat" : "json",
 			// A convention route, relative to your app root, where request/response samples are stored ( e.g. resources/apidocs/responses/[module].[handler].[action].[HTTP Status Code].json )
@@ -17,9 +17,9 @@ component {
 			// Information about your API
 			"info"          : {
 				// A title for your API
-				"title"          : "ColdBox REST Template",
+				"title"       : "Hero to SuperHero Headless CMS",
 				// A description of your API
-				"description"    : "This API produces amazing results and data.",
+				"description" : "A nice hmvc headless CMS",
 				// A terms of service URL for your API
 				"termsOfService" : "",
 				// The contact email address
@@ -50,7 +50,7 @@ component {
 					"description" : "The main production server"
 				},
 				{
-					"url"         : "http://127.0.0.1:60299",
+					"url"         : "http://127.0.0.1:42518",
 					"description" : "The dev server"
 				}
 			],
