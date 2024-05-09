@@ -383,3 +383,18 @@ component singleton {
 Ok, it seems we are done, let's run our tests and make sure we are listing all content and getting a single content.
 
 **Extra Credit:** Leverage postman to test these endpoints. Remember you must get a jwt token first!
+
+
+### Security
+
+Now that we have our first content handler generated, we will secure it using a rule. Open the `config/modules/cbsecurity.cfc` and add the following rule to the firewall rules:
+
+```js
+{
+	secureList 	: "v1:content"
+}
+```
+
+That's it!  Now any requests made to that secure pattern will be inspected by the JWT Validator and a bearer token must be valid to access it!  BOOM!
+
+You can also secure using annotations, we can get rid of the rule and then in our handler we can add the `secured` annotation to the `component` definition.  Same Approach, try it and report back.

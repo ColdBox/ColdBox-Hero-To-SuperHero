@@ -1,17 +1,3 @@
-### Security
-
-Now that we have our handler generated, we will secure it using a rule. Open the `config/ColdBox.cfc` and add the following rule to the `cbsecurity.rules` array:
-
-```
-{
-	secureList 	: "v1:content"
-}
-```
-
-That's it!  Now any requests made to that secure pattern will be inspected by the JWT Validator and a bearer token must be valid to access it!  BOOM!
-
-You can also secure using annotations, we can get rid of the rule and then in our handler we can add the `secured` annotation to the `component` definition.  Same Approach.
-
 ## Creating Content
 
 Ok, we can list all and one piece of content, let's try creating one now.

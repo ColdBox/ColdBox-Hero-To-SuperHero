@@ -83,7 +83,9 @@ component {
 					// This way you can add global roles, permissions, redirects, etc
 					"defaults" : {},
 					// You can store all your rules in this inline array
-					"inline"   : [],
+					"inline"   : [
+						{ secureList : "v1:content" }
+					],
 					// If you don't store the rules inline, then you can use a provider to load the rules
 					// The source can be a json file, an xml file, model, db
 					// Each provider can have it's appropriate properties as well. Please see the documentation for each provider.
