@@ -1,0 +1,59 @@
+{
+    "name":"cms",
+    "version":"1.0.0",
+    "location":"forgeboxStorage",
+    "author":"You",
+    "slug":"cms",
+    "createPackageDirectory":false,
+    "type":"mvc",
+    "homepage":"https://github.com/coldbox-templates/rest-hmvc",
+    "documentation":"https://github.com/coldbox-templates/rest-hmvc",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/coldbox-templates/rest-hmvc"
+    },
+    "bugs":"https://github.com/coldbox-templates/rest-hmvc/issues",
+    "shortDescription":"A modular API RESTFul template",
+    "contributors":[],
+    "ignore":[],
+    "devDependencies":{
+        "testbox":"^5.0.0",
+        "relax":"^4.1.0",
+        "route-visualizer":"*",
+        "commandbox-dotenv":"*",
+        "commandbox-cfconfig":"*",
+        "commandbox-cfformat":"*"
+    },
+    "installPaths":{
+        "coldbox":"coldbox/",
+        "testbox":"testbox/",
+        "relax":"modules/relax/",
+        "cbSwagger":"modules/cbSwagger/",
+        "route-visualizer":"modules/route-visualizer/",
+        "mementifier":"modules/mementifier/",
+        "cbvalidation":"modules/cbvalidation/",
+        "cbsecurity":"modules/cbsecurity/",
+        "qb":"modules/qb/",
+        "BCrypt":"modules/BCrypt/",
+        "cbdebugger":"modules/cbdebugger/"
+    },
+    "dependencies":{
+        "coldbox":"^7.0.0",
+        "cbsecurity":"^3.0.0",
+        "mementifier":"^3.3.0",
+        "cbvalidation":"^4.1.0",
+        "qb":"^9.10.0",
+        "BCrypt":"^3.1.0+4",
+        "cbdebugger":"^4.2.0+4"
+    },
+    "scripts":{
+        "postInstall":"pathExists .env || cp .env.example .env && package set ignore=[]",
+        "format":"cfformat run config/,handlers/,interceptors/,models/,modules_app/,tests/specs/,*.cfc ./.cfformat.json --overwrite",
+        "format:check":"cfformat check config/,handlers/,interceptors/,models/,modules_app/,tests/specs/,*.cfc ./.cfformat.json",
+        "format:watch":"cfformat watch path='config/,handlers/,interceptors/,models/,modules_app/,tests/specs/,*.cfc' settingsPath='.cfformat.json'",
+        "docker:build":"!docker build --no-cache -t my-coldbox-app -f ./build/Dockerfile ./",
+        "docker:run":"!docker run -it -p 8080:8080 my-coldbox-app",
+        "docker:bash":"!docker run -it my-coldbox-app /bin/bash",
+        "docker:stack":"!docker compose -f build/docker-compose.yaml ${1}"
+    }
+}

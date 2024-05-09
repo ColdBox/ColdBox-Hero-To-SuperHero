@@ -1,0 +1,200 @@
+# ColdBox From Hero to SuperHero
+
+In this workshop you will be introduced to the latest version of the most popular CFML MVC framework; ColdBox 7. We will go over the basics of installation, templating and configuration to the most advanced features like HMVC development with modules, RESTFul APIs, interception points, integration testing and much more.
+
+## Prerequisites
+
+- Latest CommandBox CLI
+- A local database server (MySql 8 is recommended)
+  - Or you can use the provided Docker Compose file
+- Basic to Intermediate ColdFusion (CFML) Knowledge
+- Basic ColdBox Experience
+
+## Software Versions
+
+This course at this time is using the following dependencies:
+
+- ColdBox 7.x
+- CBSecurity 3.x
+- CBDebugger 4.x
+- CommandBox Migrations 4.x
+
+**There could be the case that some of the steps fail if you are using future versions of these modules.  Please update accordingly or look for the specific updated version of this course as a branch.**
+
+## Course Outline
+
+This course will focus on building a headless CMS based on different concepts and tool methodologies. We will use ColdBox features, including Behavior Driven Development (BDD) testing and leveraging several ForgeBox modules.
+
+> (All commands assume we are in the `box` shell unless stated otherwise.)
+
+### 1. Course Introduction
+
+- [ ] Introductions
+  - Software Pre-Requisites
+  - Course Expectations
+  - How many have used ColdBox/MVC before?
+  - How many have used BDD/TDD approaches before?
+
+### 2. App Setup
+
+- Run our database
+- Scaffold our application
+- Configure the Test Harness
+- Run our initial tests
+
+Steps:
+
+- [ ] [Start](steps/step-1.md)
+
+### 3. App Configuration
+
+What we will do:
+
+- Prepare app for development
+- Install more modules
+- Datasource configurations
+
+Steps:
+
+- [ ] [Start](steps/step-2.md)
+
+### 4. Setup the Test Harness and Base Spec
+
+What we will do:
+
+- Create a Base Integration Spec
+- Update all our specs to use it
+- Verify our tests are running
+
+Steps:
+
+- [ ] [Start](steps/step-3.md)
+
+### 5. Security Configuration
+
+- Configure the firewall, logging and visualizer
+- Configure the JWT secret
+- Go through the security visualizer
+
+Steps:
+
+- [ ] [Start 4](steps/step-4.md)
+
+### 6. Registration
+
+- Go over our acceptance story
+- Review and update our `User` object
+- Create our migrations
+
+Steps:
+
+- [Start 5](steps/step-5.md)
+
+### 7. User Registration
+
+- [ ] Write our acceptance stories
+- [ ] Create our `User` and update methods to support our stories
+- [ ] Create the registration spec
+- [ ] Install `bcrypt`
+- [ ] Write the registration code as a ColdBox resource with appropriate spec and model methods
+
+Steps:
+
+ - [Start 8](steps/step-8.md)
+
+### 8. Login & Logout
+
+- [ ] Install `cbmessagebox` and make messages prettier
+- [ ] Create the specs
+- [ ] Install and configure `cbsecurity`/`cbauth`/etc
+- [ ] Create routes
+- [ ] Create the user sessions handler
+- [ ] Create the user login screen
+- [ ] Update User and User Service
+- [ ] Create auto-login with registration
+
+Steps:
+
+ - [Start 9](steps/step-9.md)
+
+### 9. Rants
+
+What we will do:
+
+- [ ] Create new migration for rants
+- [ ] Scaffold a `rant` resource
+- [ ] Update the resource route
+- [ ] Update the `Rant` object
+- [ ] Update the `RantService`
+- [ ] Create the basic unit tests for both and talk about the pragmatism of unit test vs BDD
+- [ ] Build and Test the CRUD setup
+- [ ] Change application default event to the rants
+- [ ] Update the main layout for adding a rant
+
+Steps:
+
+ - [Start 10](steps/step-10.md)
+
+### 10. Security
+
+- [ ] Create the security rules
+- [ ] Add the CBSecurity visualizer
+- [ ] Update our navigation using the logged-in helpers
+- [ ] Add Cross-Site Request Forgery tokens to all our forms
+- [ ] Update all our tests
+- [ ] Confirm security
+
+Steps:
+
+ - [Start 11](steps/step-11.md)
+
+### 11. View User Rants
+
+- [ ] Create the spec for a user rants page
+- [ ] Add routes for the user's rants
+- [ ] Update the rant service to get rants per user
+- [ ] Create the handler
+- [ ] Create a reusable partial for our rant display
+
+Steps:
+
+ - [Start 12](steps/step-12.md)
+
+### 12. Add Rant Actions
+
+- [ ] Create the migrations for bumps and poops
+- [ ] Scaffold a Reaction Service for the actions
+- [ ] Update Rant object for **reactions**
+- [ ] Update Tests
+- [ ] Update the rant viewlet
+- [ ] Learn about Wirebox Convention vs Configuration
+
+Steps:
+
+ - [Start 13](steps/step-13.md)
+
+### 13. Make Reactions Functional
+
+- [ ] Add Routing
+- [ ] Create bumps and poops bdd and handlers
+- [ ] Update `User.cfc`
+- [ ] Update `UserServices`
+- [ ] Create the reaction view handlers
+
+Steps:
+
+- [Start 14](steps/step-14.md)
+
+### 14. Extra Credit
+
+- Ability to see global and user rants in JSON
+- Don't let a user poop and bump the same rant
+- When you bump or poop from the user profile page - take the user back to that page, not the main rant page. Ie - return them to where they started
+- Convert the bump and poop to AJAX calls
+- CSRF tokens for login, register, and new rant
+- Move `queryExecute` to `qb`
+
+Other Ideas:
+
+- Environments in ColdBox.cfc
+- Domain Names in CommandBox

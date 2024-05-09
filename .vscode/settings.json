@@ -1,0 +1,36 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "127.0.0.1",
+            "port": 3307,
+            "driver": "MySQL",
+            "name": "cms",
+            "database": "cms",
+            "username": "cms",
+            "connectionTimeout": 2000,
+            "askForPassword": true,
+            "socketPath": "/var/run/mysqld/mysqld.sock"
+        }
+    ],
+    "cfml.mappings": [
+		{
+			"logicalPath": "/coldbox",
+			"directoryPath": "./src/coldbox",
+			"isPhysicalDirectoryPath" :false
+		},
+        {
+			"logicalPath": "/cbsecurity",
+			"directoryPath": "./src/modules/cbsecurity",
+			"isPhysicalDirectoryPath" :false
+		},
+		{
+			"logicalPath": "/testbox",
+			"directoryPath": "./src/testbox",
+			"isPhysicalDirectoryPath" :false
+		}
+	]
+}

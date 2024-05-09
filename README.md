@@ -4,9 +4,9 @@
 
 This repo contains a sample application built to showcase the advanced features of ColdBox, especially for building a BDD API.
 
-To get the most out of the workshop, it is expected that a person
-following along with this workshop will build their own app from scratch,
-using this repository only as a guide. The code for the finished sample
-app is included here under the `hcms` folder.
+This training is meant to be done in-person with a certified Ortus Training.  If you are in need
+of training please contact us at <a href="mailto:training@ortussolutions.com">training@ortussolutions.com</a> so we can schedule a private training
+with you and/or your team.  We can offer them remote or on-site.
 
-Check out the [prerequisites guide](PREREQUISITES.md) to make sure your system is ready to go.
+- [Pre-Requisites](PREREQUISITES.md)
+- [Outline](OUTLINE.md)

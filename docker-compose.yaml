@@ -4,7 +4,7 @@ services:
 
   # MySQL Database
   db:
-    image: mysql:5.7
+    image: mysql:8
     container_name: "cb_database"
     environment:
        MYSQL_ROOT_PASSWORD: coldbox
@@ -13,10 +13,11 @@ services:
        MYSQL_PASSWORD: coldbox
     ports:
       - "3307:3306"
+      - "33070:33060"
     volumes:
       - ./build/db:/var/lib/mysql
-      - ./workbench/db/cms.sql:/docker-entrypoint-initdb.d/cms.sql
-  
+      #- ./workbench/db/cms.sql:/docker-entrypoint-initdb.d/cms.sql
+
   # API
   #api:
   #  depends_on:
