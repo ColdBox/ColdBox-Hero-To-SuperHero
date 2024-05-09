@@ -68,7 +68,11 @@ component accessors="true" singleton {
 		}
 
 		// Check Password Here: Remember to use bcrypt
-		return ( oTarget.getPassword().compareNoCase( arguments.password ) == 0 );
+		try {
+			return variables.bcrypt.checkPassword( arguments.password, oTarget.getPassword() );
+		} catch ( any e ) {
+			return false;
+		}
 	}
 
 	/**
@@ -77,17 +81,12 @@ component accessors="true" singleton {
 	 * @return User that implements JWTSubject and/or IAuthUser
 	 */
 	function retrieveUserByUsername( required username ){
-		return variables.mockUsers
-			.filter( function( record ){
-				return arguments.record.username == username;
-			} )
-			.reduce( function( result, record ){
-				return variables.populator.populateFromStruct(
-					target           : arguments.result,
-					memento          : arguments.record,
-					ignoreTargetLists: true
-				);
-			}, new () );
+		return populator.populateFromStruct(
+			new(),
+			qb.from( "users" )
+				.where( "username", arguments.username )
+				.first()
+		);
 	}
 
 	/**
@@ -98,17 +97,12 @@ component accessors="true" singleton {
 	 * @return User that implements JWTSubject and/or IAuthUser
 	 */
 	User function retrieveUserById( required id ){
-		return variables.mockUsers
-			.filter( function( record ){
-				return arguments.record.id == id;
-			} )
-			.reduce( function( result, record ){
-				return variables.populator.populateFromStruct(
-					target           : arguments.result,
-					memento          : arguments.record,
-					ignoreTargetLists: true
-				);
-			}, new () );
+		return populator.populateFromStruct(
+			new(),
+			qb.from( "users" )
+				.where( "id", arguments.id )
+				.first()
+		);
 	}
 
 }

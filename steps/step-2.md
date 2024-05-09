@@ -1,193 +1,152 @@
-# Step 2 - App Configuration
+# Step 2 - Scaffold Your Application
 
-Open the `config/Coldbox.cfc` so we can start configuring our [application](../src/config/Coldbox.cfc):
+In this step, we will scaffold our application and configure our test harness. Use the provided `src` folder, to create your application. Make sure you are running all commands within that `src` folder.
 
-## Development Settings
+## Starting the Database
 
-* Configure the `configure()` method for production
-* Verify the `environment` structures
-* Add the `development()` method settings
-
-```js
-function development(){
-    coldbox.debugMode               = true;
-    coldbox.customErrorTemplate     = "/coldbox/system/exceptions/Whoops.cfm";
-    coldbox.handlersIndexAutoreload = true;
-    coldbox.reinitPassword          = "";
-    coldbox.handlerCaching          = false;
-    coldbox.viewCaching             = false;
-    coldbox.eventCaching            = false;
-}
-```
-
-### Reiniting The Framework
-
-Please note that every time we make changes to the `config` folder we will most likely need to reinitialize our application. ColdBox caches the contents of this file upon startup. So if you need the changes to take effect you must reinitialize the application.  But how you say?
-
-* Hard Reset : issue a server reset command in CommandBox: `server restart`
-* ColdBox CLI Reinit : issue a ColdBox reinit via CommandBox: `coldbox reinit`
-* ColdBox URL Reinit : use the `http://localhost:42518?fwreinit=1` url action in your app
-
-> You can secure the `fwreinit` by using the `reinitPassword` setting in your configuration. https://coldbox.ortusbooks.com/getting-started/configuration/coldbox.cfc/configuration-directives/coldbox#development-settings
-
-What is cached?
-
-* Configuration
-* Singletons
-* Handlers
-* View/Event Caching
-
-
-## Application Modules
-
-We will install several modules to assist us with the development of our API
-
-* `qb` - Fluent query builder for fancy queries (https://forgebox.io/view/qb)
-* `bcrypt` - To enable encrypting of passwords (https://www.forgebox.io/view/BCrypt)
-* `cbdebugger` - To help us debug our application (https://www.forgebox.io/view/cbdebugger), docs: https://cbdebugger.ortusbooks.com/
+We will be using docker for this section.  Just run this command from the root of this repo.  A new `build/db` will be created that will represent your database.
 
 ```bash
-install qb,bcrypt,cbdebugger
+docker-compose up
 ```
 
-Create the debugger configuration file:
+> If you don't have docker, you better have a MySQL 8 install locally.  You can then use the `workbench/db/cms.sql` to populate your database.
+
+Now open up your favorite SQL tool and make sure you can connect with the following credentials:
 
 ```bash
-touch config/modules/cbdebugger.cfc --open
+server: 127.0.0.1
+port: 3307
+database: cms
+user: cms
+password: coldbox
 ```
 
-Here is our config:
+Your database should be online now, test it with your favorite tool.
 
-```java
-component{
+## Global Dependencies
 
-	function configure(){
-
-		return {
-			// This flag enables/disables the tracking of request data to our storage facilities
-			// To disable all tracking, turn this master key off
-			enabled          : true,
-			// This setting controls if you will activate the debugger for visualizations ONLY
-			// The debugger will still track requests even in non debug mode.
-			debugMode        : controller.getSetting( name = "environment", defaultValue = "production" ) == "development",
-			// The URL password to use to activate it on demand
-			debugPassword    : "cb:null",
-			// This flag enables/disables the end of request debugger panel docked to the bottem of the page.
-			// If you disable i, then the only way to visualize the debugger is via the `/cbdebugger` endpoint
-			requestPanelDock : true,
-			// Request Tracker Options
-			requestTracker   : {
-				// Store the request profilers in heap memory or in cachebox, default is memory
-				storage                      : "memory",
-				// Which cache region to store the profilers in
-				cacheName                    : "template",
-				// Track all cbdebugger events, by default this is off, turn on, when actually profiling yourself :) How Meta!
-				trackDebuggerEvents          : false,
-				// Expand by default the tracker panel or not
-				expanded                     : false,
-				// Slow request threshold in milliseconds, if execution time is above it, we mark those transactions as red
-				slowExecutionThreshold       : 1000,
-				// How many tracking profilers to keep in stack
-				maxProfilers                 : 50,
-				// If enabled, the debugger will monitor the creation time of CFC objects via WireBox
-				profileWireBoxObjectCreation : false,
-				// Profile model objects annotated with the `profile` annotation
-				profileObjects               : false,
-				// If enabled, will trace the results of any methods that are being profiled
-				traceObjectResults           : false,
-				// Profile Custom or Core interception points
-				profileInterceptions         : false,
-				// By default all interception events are excluded, you must include what you want to profile
-				includedInterceptions        : [],
-				// Control the execution timers
-				executionTimers              : {
-					expanded           : true,
-					// Slow transaction timers in milliseconds, if execution time of the timer is above it, we mark it
-					slowTimerThreshold : 250
-				},
-				// Control the coldbox info reporting
-				coldboxInfo : { expanded : false },
-				// Control the http request reporting
-				httpRequest : {
-					expanded        : false,
-					// If enabled, we will profile HTTP Body content, disabled by default as it contains lots of data
-					profileHTTPBody : false
-				}
-			},
-			// ColdBox Tracer Appender Messages
-			tracers     : { enabled : true, expanded : false },
-			// Request Collections Reporting
-			collections : {
-				// Enable tracking
-				enabled      : false,
-				// Expanded panel or not
-				expanded     : false,
-				// How many rows to dump for object collections
-				maxQueryRows : 50,
-				// How many levels to output on dumps for objects
-				maxDumpTop   : 5
-			},
-			// CacheBox Reporting
-			cachebox : { enabled : false, expanded : false },
-			// Modules Reporting
-			modules  : { enabled : false, expanded : false },
-			// Quick and QB Reporting
-			qb       : {
-				enabled   : true,
-				expanded  : true,
-				// Log the binding parameters
-				logParams : true
-			},
-			// cborm Reporting
-			cborm : {
-				enabled   : false,
-				expanded  : false,
-				// Log the binding parameters
-				logParams : true
-			},
-			// Adobe ColdFusion SQL Collector
-			acfSql   : { enabled : false, expanded : false, logParams : true },
-			// Lucee SQL Collector
-			luceeSQL : { enabled : false, expanded : false, logParams : true },
-			// Async Manager Reporting
-			async    : { enabled : true, expanded : false }
-		};
-	}
-}
-```
-
-Now let's retinit the app for the changes to take effect
+Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, cfconfig for CFML portability (cfconfig - https://cfconfig.ortusbooks.com/):
 
 ```bash
-coldbox reinit
+install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat
 ```
 
-Now goto the http://127.0.0.1:42518/cbdebugger and you will see the debugger panel.  You can also use the `?fwreinit=1` to reinit the framework and see the debugger panel.  This will be essential when working with APIs.
+## Scaffold the application
 
-## Datasource Configuration
-
-Open `Application.cfc`  so we can add the global datasource we registered with the CFML Engine via  `.cfconfig.json`
-
-```js
-// App datasource
-this.datasource = "cms";
+```bash
+cd src
+coldbox create app name=cms skeleton=rest-hmvc
 ```
 
-Let's do the same with the tets application: `/tests/Application.cfc`
+We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our `rest-hmvc` template.  It will create a modular approach to our API based on ColdBox 7.  The following dependencies will be installed for you:
 
-```js
-// App datasource
-this.datasource = "cms";
+* `coldbox` - Super HMVC Framework
+* `testbox` - BDD testing library (`development` dependency)
+* `modules/cbsecurity` - For securing your API
+* `modules/cbvalidation` - For validating your API
+* `modules/mementifier` - For marshalling objects to data
+* `modules/relax` - Module for documenting, exploring and testing our API (`development` dependency)
+  * `modules/cbSwagger` - Open API support for documenting our API
+* `modules/route-visualizer` - For visualizing our routes
+
+```bash
+Dependency Hierarchy for cms (1.0.0)
+├── route-visualizer (2.0.0+6)
+├── coldbox (7.2.1+13)
+├── relax (4.1.1+193)
+├── testbox (5.3.1+6)
+├── cbsecurity (3.4.2+4)
+├── mementifier (3.4.0+2)
+└── cbvalidation (4.4.0+26)
 ```
 
+Let's go over what is in this template.
 
-## Ensure Application
+> Also run a `coldbox create app ?` to see all the different ways to generate an app.  You can also use `coldbox create app-wizard ?` and follow our lovely wizard.
 
-Try running the app again. If it runs, it works.  Or just issue a `testbox run`
+## Updating our `.env` file
 
-Verify that we did not break our app:
+Update the environment file with the following information:
 
-* Let's use another cool command: `server open` to open the webroot
-* But we can also use it to open any URI: `server open tests/runner.cfm`
+```bash
+# ColdBox Environment
+APPNAME=ColdBox
+ENVIRONMENT=development
 
-Everything should be <span style="color: green">Green!</span>
+# Database Information
+DB_CONNECTIONSTRING=jdbc:mysql://localhost:3307/cms?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=true&allowPublicKeyRetrieval=true
+DB_CLASS=com.mysql.cj.jdbc.Driver
+DB_BUNDLENAME=com.mysql.cj
+DB_BUNDLEVERSION=8.0.33
+DB_DRIVER=MySQL
+DB_HOST=localhost
+DB_PORT=3307
+DB_DATABASE=cms
+DB_USER=cms
+DB_PASSWORD=coldbox
+
+# JWT Information
+JWT_SECRET=
+```
+
+This will allow for CommandBox and the servers we run have access to these environment settings.  **MAKE SURE YOU USE `LOCALHOST` INSTEAD OF THE IP FOR DOCKER**
+
+> We will fill out the JWT Secret later on.
+
+## Automatic Formatting Goodness
+
+We have included automatic code formatting for you.  This will help you keep your code clean and consistent.  We have added a `.cfformat.json` file that will be used by the `commandbox-cfformat` module.  This will format your code automatically every time you save your file.  Just run the watcher via the CLI:
+
+```bash
+run-script format:watch
+```
+
+## Start up the local server
+
+We use a standard port, so that in the steps and in the training we can all use the same port.  It makes it easier for the class. However, please note that you can omit this and use whatever port is available in your machine.  If the `42518` port is already in use, please make sure you use another port.
+
+```sh
+server start port=42518
+```
+
+Boom!  Our REST API is now online and ready to be consumed.  Let's test it out.
+
+* Open `http://localhost:42518/` in your browser. You should see the default ColdBox app template
+* Open `/tests` in your browser. You should see the TestBox test browser.  This is useful to find a specific test or group of tests to run _before_ running them.
+* Open `/tests/runner.cfm` in your browser. You should see the TestBox test runner for our project
+
+This is running all of our tests by default. We can create our own test runners as needed.  All your tests should be passing at this point. 😉
+
+> Tip: `server log --follow` to see the console logs of your server, try it out. All logging messages will also appear here as well.  Great to have in a separate window.
+
+## Testing via CommandBox
+
+```sh
+# package set testbox.runner="http://localhost:42518/tests/runner.cfm"
+testbox run
+```
+
+You can also configure the way TestBox runs the tests via the `box.json`.  Open it and look for the `testbox` section. You can also find much more detailed information in the docs here:
+
+* https://commandbox.ortusbooks.com/package-management/box.json/testbox
+* https://commandbox.ortusbooks.com/testbox-integration/test-runner
+* https://commandbox.ortusbooks.com/testbox-integration/test-watcher
+
+Now run the help command to check out all the different ways we can test via the CLI: `testbox run ?`
+
+## CommandBox Test Watchers
+
+CommandBox supports Test Watchers. This allows you to automatically run your tests as you make changes to tests or CFCs in your application. You can start CommandBox Test watchers with the following command:
+
+```sh
+testbox watch
+```
+
+You can also control what files to watch via the command or via the `testbox` structure in your `box.json` file.
+
+```sh
+testbox watch **.cfc
+```
+
+`ctl-c` will escape and stop the watching.  Start it up again and now go open the `models/UserService.cfc` that was generated: [Open](../src/models/UserService.cfc:62).  Change the `append()` and introduce a bug by renaming it to `apppend()`. Save the file and check out the watcher!  Fix the bug and see the watcher run the tests again.

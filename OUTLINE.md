@@ -44,7 +44,7 @@ This course will focus on building a headless CMS based on different concepts an
 
 Steps:
 
-- [ ] [Start](steps/step-1.md)
+- [ ] [Start](steps/step-2.md)
 
 ### 3. App Configuration
 
@@ -56,7 +56,7 @@ What we will do:
 
 Steps:
 
-- [ ] [Start](steps/step-2.md)
+- [ ] [Start](steps/step-3.md)
 
 ### 4. Setup the Test Harness and Base Spec
 
@@ -68,7 +68,7 @@ What we will do:
 
 Steps:
 
-- [ ] [Start](steps/step-3.md)
+- [ ] [Start](steps/step-4.md)
 
 ### 5. Security Configuration
 
@@ -78,29 +78,33 @@ Steps:
 
 Steps:
 
-- [ ] [Start 4](steps/step-4.md)
+- [ ] [Start](steps/step-5.md)
 
 ### 6. Registration
 
 - Go over our acceptance story
 - Review and update our `User` object
 - Create our migrations
+- Update our `User` service to make it real
+- Update our tests
 
 Steps:
 
-- [Start 5](steps/step-5.md)
+- [Start](steps/step-6.md)
 
-### 7. User Registration
+### 7. Authentication
 
-- [ ] Write our acceptance stories
-- [ ] Create our `User` and update methods to support our stories
-- [ ] Create the registration spec
-- [ ] Install `bcrypt`
-- [ ] Write the registration code as a ColdBox resource with appropriate spec and model methods
+- Acceptance stories
+- BDD
+- Routing
+- Event Handler
+- User Service
+- Seed Data
+- Tests
 
 Steps:
 
- - [Start 8](steps/step-8.md)
+- [Start](steps/step-7.md)
 
 ### 8. Login & Logout
 

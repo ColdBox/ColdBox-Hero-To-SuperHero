@@ -1,82 +1,69 @@
-# Step 4 - Security Configuration
+# Step 4 - Setup the TestHarness and Base Spec
 
-We will start by configuring `cbsecurity` so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.
+Let's create a base spec class all of our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`.
 
-- Go over cbSecurity
-- Go over cbAuth
-- Go over JWT
+```js
+/**
+ * Base test bundle for our application
+ *
+ * @see https://coldbox.ortusbooks.com/testing/testing-coldbox-applications/integration-testing
+ */
+component extends="coldbox.system.testing.BaseTestCase" autowire{
 
-Let's go over the configuration by opening the [config/modules/cbsecurity.cfc](../src/config/modules/cbsecurity.cfc) file.  Let's do the following changes:
+     /**
+	 * --------------------------------------------------------------------------
+	 * Dependency Injections
+	 * --------------------------------------------------------------------------
+	 */
 
-- Add storage of our JWT tokents to the database
-- Enable firewall logging, if not the visualizer doesn't work
-- Enable the security visualizer
+    /**
+	 * --------------------------------------------------------------------------
+	 * Integration testing controls
+	 * --------------------------------------------------------------------------
+     * - We want the ColdBox virtual application to load once per request and get destroyed at the end of the request.
+	 */
+    this.loadColdBox    = true;
+    this.unloadColdBox  = false;
 
-All of these changes are done in the `jwt` struct of the configuration file.
+	/**
+	 * --------------------------------------------------------------------------
+	 * Fixture Data
+	 * --------------------------------------------------------------------------
+	 * Here is the global fixture data you can use
+	 */
 
-```javascript
+	/*********************************** LIFE CYCLE Methods ***********************************/
 
-firewal : {
-    // Firewall database event logs.
-    "logs"                        : {
-        "enabled"    : true,
-        "dsn"        : "cms",
-        "schema"     : "",
-        "table"      : "cbsecurity_logs",
-        "autoCreate" : true
-    },
-},
+    /**
+     * Run Before all tests
+     */
+    function beforeAll() {
+        super.beforeAll();
+	}
 
-jwt : {
-    // Token Storage
-    tokenStorage               : {
-        // enable or not, default is true
-        "enabled"    : true,
-        // A cache key prefix to use when storing the tokens
-        "keyPrefix"  : "cbjwt_",
-        // The driver to use: db, cachebox or a WireBox ID
-        "driver"     : "db",
-        // Driver specific properties
-        "properties" : { table : "cbjwt" }
+	function afterAll(){
+		super.afterAll();
+	}
+
+    /**
+     * This function is tagged as an around each handler.  All the integration tests we build
+     * will be automatically rolled backed. No database corruption
+     *
+     * @aroundEach
+     */
+    function wrapInTransaction( spec ) {
+        transaction action="begin" {
+            try {
+                arguments.spec.body( argumentCollection = arguments );
+            } catch ( any e ){
+                rethrow;
+            } finally {
+                transaction action="rollback";
+            }
+        }
     }
+
 }
-
-visualizer : {
-    "enabled"      : true,
-    "secured"      : false,
-    "securityRule" : {}
-},
 ```
 
-> We will secure the visualizer later. Also note that we won't be using refresh tokens this time around.
-
-## JWT Secret Key
-
-Let's add the JWT Secret now, let's begin by generating a secret key. Go to CommandBox and let's generate one:
-
-```bash
-#generateSecretKey blowfish 256
-
->/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
-```
-
-Please note that this is not necessary in the latest version of cbSecurity. cbSecurity will generate a new jwt secret each time the application expires and reloads. Which can also be nice to have.  You decide the approach!
-
-Copy the output of the key and paste it into the `.env` setting called `JWT_SECRET`
-
-```bash
-JWT_SECRET=/TvWsL6k2Ap2/wbDroYmM9WT5JF/PndOdlzpJQEqUuI=
-```
-
-Now we need to reinit our server since we added a new secret.
-
-```bash
-// restart the server
-server restart
-```
-
-## Securfity Visualizer
-
-Go to http://127.0.0.1:42518/cbsecurity and you can see the security visualizer.  Super useful!
-
-That's it!  Make sure your tests work: `testbox run`
+Go update the specs you have by adding the `extends="tests.resources.BaseIntegrationSpec"` and let's run the tests again and make sure they pass!
