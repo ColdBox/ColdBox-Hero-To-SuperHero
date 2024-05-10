@@ -1,10 +1,10 @@
-## Removing Content
+# Step 12 - Removing Content
 
 ```js
 story( "I want to be able to remove content objects" )
 ```
 
-### BDD
+## BDD
 
 Update the spec with a new story and scenarios:`
 
@@ -44,7 +44,7 @@ story( "I want to be able to remove content objects", function(){
 
 Ok, now let's put it together!
 
-### Delete Action
+## Delete Action
 
 ```js
 /**
@@ -71,9 +71,9 @@ function delete( event, rc, prc ){
 }
 ```
 
-### Delete Services
+## Delete Services
 
-Now to the ugly (funky) SQL
+Now to the SQL
 
 ```js
 /**
@@ -91,18 +91,3 @@ function delete( required content ){
 ```
 
 Run your tests!
-
-## Where Do We Go From Here
-
-We should be excited, exhausted, and amazed that we have started to build a headless CMS!  This is just the start, what else can we do? Here are some more ideas?
-
-* Content Versioning
-* Content Drafts
-* Content Categories
-* Move to an ORM (Hibernate or Quick)
-* Allow creator and editor in content objects
-* Pagination
-* Search
-* The list goes on!!!
-
-Happy Coding!

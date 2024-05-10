@@ -82,9 +82,23 @@ component extends="coldbox.system.RestHandler"{
 	 * delete
 	 */
 	function delete( event, rc, prc ){
-        event.getResponse()
-            .setData( {} )
-            .addMessage( "Calling content/delete" );
+        param rc.slug = "";
+
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if ( !prc.oContent.isLoaded() ) {
+			prc.response
+				.setError( true )
+				.setStatusCode( event.STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		contentService.delete( prc.oContent );
+
+		prc.response.addMessage( "Content deleted!" );
 	}
 
 

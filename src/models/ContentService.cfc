@@ -110,4 +110,14 @@ component singleton {
 		return arguments.content;
 	}
 
+	function delete( required content ){
+		var qResults = qb.from( "content" )
+			.whereId( arguments.content.getId() )
+			.delete();
+
+		arguments.content.setId( "" );
+
+		return arguments.content;
+	}
+
 }

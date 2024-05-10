@@ -158,16 +158,30 @@ Steps:
 
 - [Start](steps/step-11.md)
 
-### 14. Extra Credit
+### 12. Removing Content
 
-- Ability to see global and user rants in JSON
-- Don't let a user poop and bump the same rant
-- When you bump or poop from the user profile page - take the user back to that page, not the main rant page. Ie - return them to where they started
-- Convert the bump and poop to AJAX calls
-- CSRF tokens for login, register, and new rant
-- Move `queryExecute` to `qb`
+What we will do:
 
-Other Ideas:
+- BDD for removing content
+- Creating the action
+- Creating the service method
+- Testing
 
-- Environments in ColdBox.cfc
-- Domain Names in CommandBox
+Steps:
+
+- [Start](steps/step-12.md)
+
+### 13. Where Do We Go From Here
+
+We should be excited, exhausted, and amazed that we have started to build a headless CMS!  This is just the start, what else can we do? Here are some more ideas?
+
+- Content Versioning
+- Content Drafts
+- Content Categories
+- Move to an ORM (Hibernate or Quick)
+- Allow creator and editor in content objects
+- Pagination
+- Search
+- The list goes on!!!
+
+Happy Coding!
