@@ -68,4 +68,30 @@ component singleton {
         );
 	}
 
+	/**
+	 * Create a new content object
+	 *
+	 * @content The content object to create
+	 *
+	 * @return The persisted content object
+	 */
+	function create( required content ){
+		var qResults = qb.from( "content" )
+			.insert( values = {
+				"slug" 				 = arguments.content.getSlug(),
+				"title" 			  = arguments.content.getTitle(),
+				"body" 				= arguments.content.getBody(),
+				"isPublished" 		 = { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
+				"publishedDate" 	= { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+				"createdDate" 		= { value : arguments.content.getCreatedDate(), cfsqltype : "timestamp" },
+				"modifiedDate" 		= { value : arguments.content.getModifiedDate(), cfsqltype : "timestamp" },
+				"FK_userId"			= arguments.content.getUser().getId()
+			} );
+
+		// populate the id
+		arguments.content.setId( qResults.result.generatedKey );
+
+		return arguments.content;
+	}
+
 }

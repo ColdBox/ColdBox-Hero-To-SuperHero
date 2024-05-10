@@ -29,7 +29,7 @@ This course will focus on building a headless CMS based on different concepts an
 
 ### 1. Course Introduction
 
-- [ ] Introductions
+- Introductions
   - Software Pre-Requisites
   - Course Expectations
   - How many have used ColdBox/MVC before?
@@ -44,7 +44,7 @@ This course will focus on building a headless CMS based on different concepts an
 
 Steps:
 
-- [ ] [Start](steps/step-2.md)
+- [Start](steps/step-2.md)
 
 ### 3. App Configuration
 
@@ -56,7 +56,7 @@ What we will do:
 
 Steps:
 
-- [ ] [Start](steps/step-3.md)
+- [Start](steps/step-3.md)
 
 ### 4. Setup the Test Harness and Base Spec
 
@@ -68,7 +68,7 @@ What we will do:
 
 Steps:
 
-- [ ] [Start](steps/step-4.md)
+- [Start](steps/step-4.md)
 
 ### 5. Security Configuration
 
@@ -78,7 +78,7 @@ Steps:
 
 Steps:
 
-- [ ] [Start](steps/step-5.md)
+- [Start](steps/step-5.md)
 
 ### 6. Registration
 
@@ -132,55 +132,18 @@ Steps:
 
 - [Start](steps/step-9.md)
 
-### 10. Security
+### 10. Creating Content
 
-- [ ] Create the security rules
-- [ ] Add the CBSecurity visualizer
-- [ ] Update our navigation using the logged-in helpers
-- [ ] Add Cross-Site Request Forgery tokens to all our forms
-- [ ] Update all our tests
-- [ ] Confirm security
+What we will do:
 
-Steps:
-
- - [Start 11](steps/step-11.md)
-
-### 11. View User Rants
-
-- [ ] Create the spec for a user rants page
-- [ ] Add routes for the user's rants
-- [ ] Update the rant service to get rants per user
-- [ ] Create the handler
-- [ ] Create a reusable partial for our rant display
+- BDD for creating content
+- Creating the action
+- Creating the service method
+- Testing
 
 Steps:
 
- - [Start 12](steps/step-12.md)
-
-### 12. Add Rant Actions
-
-- [ ] Create the migrations for bumps and poops
-- [ ] Scaffold a Reaction Service for the actions
-- [ ] Update Rant object for **reactions**
-- [ ] Update Tests
-- [ ] Update the rant viewlet
-- [ ] Learn about Wirebox Convention vs Configuration
-
-Steps:
-
- - [Start 13](steps/step-13.md)
-
-### 13. Make Reactions Functional
-
-- [ ] Add Routing
-- [ ] Create bumps and poops bdd and handlers
-- [ ] Update `User.cfc`
-- [ ] Update `UserServices`
-- [ ] Create the reaction view handlers
-
-Steps:
-
-- [Start 14](steps/step-14.md)
+- [Start](steps/step-10.md)
 
 ### 14. Extra Credit
 

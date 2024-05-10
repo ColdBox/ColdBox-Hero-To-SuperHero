@@ -68,6 +68,52 @@
 					});
 				});
 			});
+
+			story( "I want to be able to create new content objects", function(){
+				given( "valid incoming data", function(){
+					then( "it should create a new content object", function(){
+						var event = post(
+							route = "/api/v1/content",
+							params = {
+								slug          : "my-new-test-#createUUID()#",
+								title         : "I love BDD",
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						// debug( response.getData() );
+
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData().title ).toBe( "I love BDD" );
+						expect( response.getData().id ).notToBeEmpty();
+					});
+				});
+
+				given( "invalid data", function(){
+					then( "it should throw a validation error", function(){
+						var event = post(
+							route = "/api/v1/content",
+							params = {
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response ).toHaveStatus( 400 );
+						expect( response.getData() ).toHaveKey( "slug" );
+						expect( response.getData() ).toHaveKey( "title" );
+					});
+				});
+			});
 		});
 
 	}

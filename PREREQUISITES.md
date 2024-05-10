@@ -18,8 +18,7 @@ You will need a restful client for making requests. There are many, here are som
 
 * [Postman](https://www.getpostman.com/)
 * [Insomnia](https://insomnia.rest/)
-* [Chrome REST](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo?hl=en-US)
-* [FireFox REST](https://addons.mozilla.org/en-US/firefox/addon/restclient/)
+* [RestFox](https://github.com/flawiddsouza/Restfox)
 
 ## [Git](https://git-scm.com)
 
@@ -41,7 +40,7 @@ This can be downloaded bundled with CommandBox if needed
 You will need Docker Desktop installed so we can run the database and be able to deploy our API as a docker container.   Once installed please issue the following commands to have our images ready in your machine:
 
 ```bash
-docker pull mysql:5.7
+docker pull mysql:8
 docker pull ortussolutions/commandbox
 ```
 
@@ -55,16 +54,12 @@ Once CommandBox is installed we will need to install some global modules. Start 
 install commandbox-dotenv,commandbox-migrations,commandbox-cfformat,commandbox-cfconfig
 ```
 
-## MySQL Server (5.7)
+## MySQL Server (8)
 
-You need to have a running MySQL Server version 5.7 locally or use a provided Docker Compose file during the workshop.
+You need to have a running MySQL Server version 8 locally or use a provided Docker Compose file during the workshop.
 
 If you don't have one already on your system, you can get started easily with
 [Docker](https://www.docker.com/community-edition#/download) or download [MySQL](https://dev.mysql.com/downloads/mysql/) for your operating system.
-
-> **Important** : Please make sure you have version 5.7 and not 5.8.  The JDBC drivers in Lucee and ACF have conflicting issues with MySQL version 5.8.
-
-Make sure you download the image by issuing the following command: `docker pull mysql:5.7`
 
 ## MySQL Client
 

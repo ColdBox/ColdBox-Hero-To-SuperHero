@@ -5,6 +5,7 @@ component accessors="true"{
 
 	// DI
 	property name="userService" inject="UserService";
+	property name="qb" inject="provider:QueryBuilder@qb";
 
 	// Properties
 	property name="id" type="string";
@@ -47,6 +48,7 @@ component accessors="true"{
 	// Mementifier
 	this.memento = {
 		defaultIncludes = [
+			"id",
 			"slug",
 			"title",
 			"body",

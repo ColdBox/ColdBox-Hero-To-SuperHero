@@ -58,6 +58,7 @@ component accessors="true"{
 
 	// inject the user service
 	property name="userService" inject="UserService";
+	property name="qb" inject="provider:QueryBuilder@qb";
 
 	// Properties
 	property name="id"            type="string";
@@ -82,6 +83,7 @@ component accessors="true"{
 
 	this.memento = {
 		defaultIncludes = [
+            "id",
 			"slug",
 			"title",
 			"body",
