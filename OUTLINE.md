@@ -145,6 +145,19 @@ Steps:
 
 - [Start](steps/step-10.md)
 
+### 11. Updating Content
+
+What we will do:
+
+- BDD for updating content
+- Creating the action
+- Creating the service method
+- Testing
+
+Steps:
+
+- [Start](steps/step-11.md)
+
 ### 14. Extra Credit
 
 - Ability to see global and user rants in JSON

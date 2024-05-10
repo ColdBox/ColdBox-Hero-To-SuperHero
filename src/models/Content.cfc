@@ -1,7 +1,11 @@
 /**
  * I am a Content Object
  */
-component accessors="true"{
+component
+	accessors="true"
+	transientCache="false"
+	delegates     ="Validatable@cbvalidation,Population@cbDelegates"
+	{
 
 	// DI
 	property name="userService" inject="UserService";
@@ -23,10 +27,7 @@ component accessors="true"{
 	this.constraints = {
 		slug    	: {
 			required : true,
-			udf : ( value, target ) => {
-				if( isNull( arguments.value ) ) return false;
-            	return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
-			}
+			unique : { table : "content" }
 		},
 		title       : { required : true },
 		body       	: { required : true },

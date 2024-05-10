@@ -54,7 +54,11 @@ Open up the object and the companion unit test so we can:
 /**
 * I am a new Model Object
 */
-component accessors="true"{
+component
+	accessors="true"
+    transientCache="false"
+	delegates     ="Validatable@cbvalidation,Population@cbDelegates"
+{
 
 	// inject the user service
 	property name="userService" inject="UserService";

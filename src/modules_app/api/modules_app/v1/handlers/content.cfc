@@ -26,7 +26,9 @@ component extends="coldbox.system.RestHandler"{
 	function create( event, rc, prc ){
         // populate, validate and create
 		prc.oContent = contentService.create(
-			validateOrFail( populateModel( "Content" ).setUser( jwtAuth().getUser() ) )
+			populateModel( "Content" )
+				.setUser( jwtAuth().getUser() )
+				.validateOrFail()
 		);
 
 		prc.response.setData( prc.oContent.getMemento() );
@@ -51,12 +53,30 @@ component extends="coldbox.system.RestHandler"{
 		prc.response.setData( prc.oContent.getMemento() );
 	}
 	/**
-	 * update
+	 * Update a content object
 	 */
 	function update( event, rc, prc ){
-        event.getResponse()
-            .setData( {} )
-            .addMessage( "Calling content/update" );
+        param rc.slug = "";
+
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if ( !prc.oContent.isLoaded() ) {
+			prc.response
+				.setError( true )
+				.setStatusCode( event.STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		prc.oContent = contentService.update(
+			populateModel( prc.oContent )
+				.setUser( jwtAuth().getUser() )
+				.validateOrFail()
+		);
+
+		prc.response.setData( prc.oContent.getMemento() );
 	}
 	/**
 	 * delete

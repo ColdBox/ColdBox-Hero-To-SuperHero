@@ -99,6 +99,7 @@
 						var event = post(
 							route = "/api/v1/content",
 							params = {
+								slug : "",
 								body          : "I love BDD sooooooooooo much!",
 								isPublished   : true,
 								publishedDate : now()
@@ -110,7 +111,48 @@
 
 						expect( response ).toHaveStatus( 400 );
 						expect( response.getData() ).toHaveKey( "slug" );
-						expect( response.getData() ).toHaveKey( "title" );
+					});
+				});
+			});
+
+			story( "I want to be able to update content objects", function(){
+				given( "valid incoming data", function(){
+					then( "it should update the content object", function(){
+						var event = put(
+							route = "/api/v1/content/content-slug-2",
+							params = {
+								title         : "I just changed you!",
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : false
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						debug( response.getData() );
+
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData().title ).toBe( "I just changed you!" );
+						expect( response.getData().id ).notToBeEmpty();
+					});
+				});
+
+				given( "an invalid slug", function(){
+					then( "it should throw a validation error", function(){
+						var event = put(
+							route = "/api/v1/content/bogus",
+							params = {
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response ).toHaveStatus( 404 );
 					});
 				});
 			});

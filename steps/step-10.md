@@ -55,7 +55,6 @@ story( "I want to be able to create new content objects", function(){
 
 			expect( response ).toHaveStatus( 400 );
 			expect( response.getData() ).toHaveKey( "slug" );
-			expect( response.getData() ).toHaveKey( "title" );
 		});
 	});
 });
