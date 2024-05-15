@@ -29,7 +29,7 @@ Your database should be online now, test it with your favorite tool.
 Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, cfconfig for CFML portability (cfconfig - https://cfconfig.ortusbooks.com/):
 
 ```bash
-install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat
+install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat,coldbox-cli
 ```
 
 ## Scaffold the application
