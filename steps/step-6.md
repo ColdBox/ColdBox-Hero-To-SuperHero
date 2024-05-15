@@ -51,6 +51,13 @@ In our constructor we will also add new features for:
 * memento
 
 ```groovy
+// Injections
+property name="qb" inject="model:QueryBuilder@qb";
+
+// Properties
+property name="createdDate" type="date";
+property name="modifiedDate" type="date";
+
 function init(){
     super.init();
 
@@ -112,7 +119,7 @@ Please note that migrations leverages also the `qb` module which allows you to d
 Run the following command to initialize your project with migrations:
 
 ```bash
-migrations init
+migrate init
 ```
 
 This will create a `.cfmigrations` in your root.  This file is used to describe where your migrations live and the connection details.  Please note that as of v4 of cfmigrations, you can use this file to maintain multiple managers.  Meaning you can create multiple migrations with different configurations.

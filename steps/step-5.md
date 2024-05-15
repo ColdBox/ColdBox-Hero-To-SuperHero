@@ -16,7 +16,7 @@ All of these changes are done in the `jwt` struct of the configuration file.
 
 ```javascript
 
-firewal : {
+firewall : {
     // Firewall database event logs.
     "logs"                        : {
         "enabled"    : true,
