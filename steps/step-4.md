@@ -66,4 +66,4 @@ component extends="coldbox.system.testing.BaseTestCase" autowire{
 }
 ```
 
-Go update the specs you have by adding the `extends="tests.resources.BaseIntegrationSpec"` and let's run the tests again and make sure they pass!
+Go update the **integration specs** ONLY by adding the `extends="tests.resources.BaseIntegrationSpec"` and let's run the tests again and make sure they pass!
