@@ -1,13 +1,15 @@
 # ColdBox From Hero to SuperHero
 
-In this workshop you will be introduced to the latest version of the most popular CFML MVC framework; ColdBox 7. We will go over the basics of installation, templating and configuration to the most advanced features like HMVC development with modules, RESTFul APIs, interception points, integration testing and much more.
+![ColdBox](coldbox-logo.png)
+
+In this workshop you will be introduced to the latest version of the most popular CFML MVC framework; **ColdBox 7**. We will go over the basics of installation, templating and configuration to the most advanced features like HMVC development with modules, RESTFul APIs, interception points, integration testing and much more.
 
 ## Prerequisites
 
-- Latest CommandBox CLI
+- Latest [CommandBox CLI](https://www.ortussolutions.com/products/commandbox)
 - A local database server (MySql 8 is recommended)
-  - Or you can use the provided Docker Compose file
-- Basic to Intermediate ColdFusion (CFML) Knowledge
+  - Or you can use the provided [Docker Compose](docker-compose.yaml) file
+- Basic to Intermediate BoxLang or ColdFusion (CFML) Knowledge
 - Basic ColdBox Experience
 
 ## Software Versions

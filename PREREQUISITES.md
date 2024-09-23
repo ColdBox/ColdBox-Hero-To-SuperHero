@@ -24,14 +24,13 @@ You will need a restful client for making requests. There are many, here are som
 
 * https://git-scm.com
 
-## [Java](https://www.java.com/en/) (Version 11+)
+## Java JDK 21
 
-This can be downloaded bundled with CommandBox if needed
+Version 17 (CFML) or 21 BoxLang
 
-* https://www.java.com/en/
-* https://www.ortussolutions.com/products/commandbox
+* https://adoptium.net/temurin/releases/
 
-## [CommandBox CLI](https://www.ortussolutions.com/products/commandbox#download) (Version 5.\*)
+## CommandBox CLI (Version 6.\*)
 
 * https://www.ortussolutions.com/products/commandbox#download
 
@@ -80,11 +79,11 @@ We recommend the following IDEs for development for this workshop
 
 If using VS Code, please install the following extensions:
 
-* CFML - KamasamaK
-* vscode-coldbox
-* vscode-testbox
-* Docker
-* Yaml
+* [BoxLang](https://marketplace.visualstudio.com/items?itemName=ortus-solutions.vscode-boxlang)
+* `vscode-coldbox`
+* `vscode-testbox`
+* `Docker`
+* `Yaml`
 
 If using Sublime, please install the following extensions:
 
@@ -97,9 +96,9 @@ If using Sublime, please install the following extensions:
 
 ## Useful Resources
 
-* ColdBox Api Docs: https://apidocs.ortussolutions.com/coldbox/6.0.0/index.html
+* ColdBox API Docs: https://apidocs.ortussolutions.com/coldbox/current/index.html
+* TestBox API Docs: https://apidocs.ortussolutions.com/testbox/current
 * ColdBox Docs: https://coldbox.ortusbooks.com
 * WireBox Docs: https://wirebox.ortusbooks.com
 * TestBox Docs: https://testbox.ortusbooks.com
-* TestBox Api Docs: https://apidocs.ortussolutions.com/testbox/4.2.0/index.html
 * Migrations: https://www.forgebox.io/view/commandbox-migrations
