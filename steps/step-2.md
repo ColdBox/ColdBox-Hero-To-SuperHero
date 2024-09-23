@@ -52,13 +52,10 @@ We will now begin creating our application using CommandBox.  This will scaffold
 
 ```bash
 Dependency Hierarchy for cms (1.0.0)
-├── route-visualizer (2.0.0+6)
-├── coldbox (7.2.1+13)
-├── relax (4.1.1+193)
-├── testbox (5.3.1+6)
-├── cbsecurity (3.4.2+4)
-├── mementifier (3.4.0+2)
-└── cbvalidation (4.4.0+26)
+"coldbox":"^7.0.0",
+"cbsecurity":"^3.0.0",
+"mementifier":"^3.3.0",
+"cbvalidation":"^4.1.0"
 ```
 
 Let's go over what is in this template.
@@ -129,9 +126,9 @@ testbox run
 
 You can also configure the way TestBox runs the tests via the `box.json`.  Open it and look for the `testbox` section. You can also find much more detailed information in the docs here:
 
-* https://commandbox.ortusbooks.com/package-management/box.json/testbox
-* https://commandbox.ortusbooks.com/testbox-integration/test-runner
-* https://commandbox.ortusbooks.com/testbox-integration/test-watcher
+* https://testbox.ortusbooks.com/getting-started/running-tests/commandbox-runner
+* https://testbox.ortusbooks.com/getting-started/running-tests/test-runner
+* https://testbox.ortusbooks.com/getting-started/running-tests/boxlang-cli-runner
 
 Now run the help command to check out all the different ways we can test via the CLI: `testbox run ?`
 
