@@ -22,7 +22,7 @@ Where do we go to discover what these methods are???
 
 * https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox-modules/cbvalidation/4.4.0/index.html
 * https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/index.html
-* https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox/7.3.0/index.html
+* https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox/7.4.0/index.html
 
 The properties we inherit from cbsecurity are:
 
@@ -134,8 +134,8 @@ Now let's make sure we can connect to our database and create the migrations tab
 
 ```bash
 migrate install
-
-Migration table installed!
+> Created seeds directory
+> Migration table installed!
 ```
 
 If the table does not exist, this will create the table in your db called `cfmigrations`. If you refresh your db, you should see the table. If you run the command again, it will let you know it is already installed. Try it!
@@ -184,6 +184,7 @@ Check your database, and you should see the database table. You can migrate `up`
 
 > If all else fails: `migrate fresh` is your best bet! (https://www.forgebox.io/view/commandbox-migrations)
 
+Now also run your tests again. They should be green!
 
 ## BDD Tests
 
