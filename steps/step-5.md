@@ -75,8 +75,8 @@ Now we need to reinit our server since we added a new secret.
 server restart
 ```
 
-## Securfity Visualizer
+## Security Visualizer
 
-Go to http://127.0.0.1:42518/cbsecurity and you can see the security visualizer.  Super useful!
+Go to http://127.0.0.1:42518/cbsecurity and you can see the security visualizer.  Super useful! Now open your database and you will see the `cbsecurity_logs` table created as well.
 
 That's it!  Make sure your tests work: `testbox run`
