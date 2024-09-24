@@ -37,7 +37,6 @@ What is cached?
 * Handlers
 * View/Event Caching
 
-
 ## Application Modules
 
 We will install several modules to assist us with the development of our API
@@ -179,7 +178,6 @@ Let's do the same with the tets application: `/tests/Application.cfc`
 // App datasource
 this.datasource = "cms";
 ```
-
 
 ## Ensure Application
 
