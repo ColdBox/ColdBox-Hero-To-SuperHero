@@ -2,6 +2,12 @@
 
 Let's create a base spec class all of our integration tests will inherit from.  Place it under `tests/resources/BaseIntegrationSpec.cfc`.
 
+```bash
+touch tests/resources/BaseIntegrationSpec.cfc --open
+```
+
+Now add this.
+
 ```js
 /**
  * Base test bundle for our application
