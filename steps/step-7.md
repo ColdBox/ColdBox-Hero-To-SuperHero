@@ -308,7 +308,7 @@ function run( qb, mockdata ) {
             "id": "autoincrement",
             "firstName": "fname",
             "lastName": "lname",
-            "username" : ( index ) => { "admin#index#" },
+            "username" : ( index ) => "admin#index#",
             "password": "oneOf:#bcrypt_test#"
         )
     );
@@ -344,6 +344,7 @@ given( "a valid username and password", function(){
 
         expect( response ).toHaveStatus( 200 );
         expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+        // Test the user and token
         expect( response.getData() ).toHaveKey( "user" );
         expect( response.getData() ).toHaveKey( "token" );
 
@@ -375,3 +376,5 @@ given( "a valid incoming jwt token", function(){
     } );
 } );
 ```
+
+Ok, now go update the logout story!
