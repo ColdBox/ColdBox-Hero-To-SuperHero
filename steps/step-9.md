@@ -127,7 +127,7 @@ component
 	}
 
 	Content function setUser( required user ){
-		if( user.isLoaded() ){
+		if( arguments.user.isLoaded() ){
 			variables.FK_userId = arguments.user.getId();
 		}
 		return this;
@@ -209,14 +209,14 @@ component {
 		).map( function( row ) {
 			row.publishedDate = {
 				value : dateTimeFormat( row.publishedDate, "iso8601" ),
-				cfsqltype : "timestamp"
+				sqltype : "timestamp"
 			}
 			return row;
 		} );
 
 		//writedump( var: aContent, output : "console" );
 
-		qb.table( "contents" ).insert( aContent );
+		qb.table( "content" ).insert( aContent );
     }
 
 }
@@ -230,6 +230,8 @@ migrate seed run ContentFixtures
 
 
 ### BDD
+
+>https://coldbox.ortusbooks.com/the-basics/routing/routing-dsl/resourceful-routes
 
 Now that we have our model let's start with the stories and integration. We can create a nice ColdBox resource for our content: `resources( "content" )` and it will provide us with the following:
 
@@ -396,11 +398,22 @@ Ok, it seems we are done, let's run our tests and make sure we are listing all c
 Now that we have our first content handler generated, we will secure it using a rule. Open the `config/modules/cbsecurity.cfc` and add the following rule to the firewall rules:
 
 ```js
-{
-	secureList 	: "v1:content"
-}
+// You can store all your rules in this inline array
+"inline"   : [
+    { secureList 	: "v1:content" }
+],
 ```
 
 That's it!  Now any requests made to that secure pattern will be inspected by the JWT Validator and a bearer token must be valid to access it!  BOOM!
+
+Now secure the security visualizer as well:
+
+```js
+visualizer : {
+    "enabled"      : true,
+    "secured"      : true,
+    "securityRule" : {}
+},
+```
 
 You can also secure using annotations, we can get rid of the rule and then in our handler we can add the `secured` annotation to the `component` definition.  Same Approach, try it and report back.
