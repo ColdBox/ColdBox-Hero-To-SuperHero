@@ -1,0 +1,47 @@
+name: Build Snapshot Release
+
+on:
+  push:
+    branches:
+      - 'development'
+
+jobs:
+  ##########################################################################################
+  # Tests
+  ##########################################################################################
+  tests:
+    secrets: inherit
+    uses: ./.github/workflows/tests.yml
+
+  ##########################################################################################
+  # Format Source Code
+  ##########################################################################################
+  format:
+    name: Code Auto-Formatting
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup CommandBox CLI
+        uses: Ortus-Solutions/setup-commandbox@v2.0.1
+
+      - name: Auto-format
+        run: |
+          box install commandbox-cfformat
+          box run-script format
+
+      - name: Commit Format Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply cfformat changes
+          push_options: --force
+
+  ##########################################################################################
+  # Release it
+  ##########################################################################################
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [ tests, format ]
+    secrets: inherit
+    with:
+      snapshot: true
