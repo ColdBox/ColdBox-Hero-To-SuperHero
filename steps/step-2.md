@@ -7,7 +7,11 @@ In this step, we will scaffold our application and configure our test harness. U
 We will be using docker for this section.  Just run this command from the root of this repo.  A new `build/db` will be created that will represent your database.
 
 ```bash
+# Windows/Linux
 docker-compose up
+
+# Mac
+docker compose up
 ```
 
 > If you don't have docker, you better have a MySQL 8 install locally.  You can then use the `workbench/db/cms.sql` to populate your database.
