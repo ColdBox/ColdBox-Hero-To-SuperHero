@@ -31,6 +31,11 @@
 			"logicalPath": "/testbox",
 			"directoryPath": "./src/testbox",
 			"isPhysicalDirectoryPath" :false
+		},
+        {
+			"logicalPath": "/tests",
+			"directoryPath": "./src/tests",
+			"isPhysicalDirectoryPath" :false
 		}
 	]
 }
