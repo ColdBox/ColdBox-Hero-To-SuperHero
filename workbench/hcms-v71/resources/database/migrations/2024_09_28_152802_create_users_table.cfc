@@ -1,6 +1,6 @@
 component {
 
-    function up( schema ) {
+    function up( schema, qb ) {
         schema.create( "users", function( table ) {
             table.increments( "id" )
             table.string( "firstName" )
@@ -11,8 +11,8 @@ component {
         } );
     }
 
-    function down( schema ) {
-        schema.drop( "users" )
+    function down( schema, qb ) {
+		schema.drop( "users" )
     }
 
 }

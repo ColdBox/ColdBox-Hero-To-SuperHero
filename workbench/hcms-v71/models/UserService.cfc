@@ -20,7 +20,6 @@ component accessors="true" singleton {
 	 * --------------------------------------------------------------------------
 	 */
 
-
 	/**
 	 * Constructor
 	 */
@@ -68,8 +67,8 @@ component accessors="true" singleton {
 			return false;
 		}
 
-		 // Check Password Here: Remember to use bcrypt
-		 try {
+		// Check Password Here: Remember to use bcrypt
+		try {
 			return variables.bcrypt.checkPassword( arguments.password, oTarget.getPassword() );
 		} catch ( any e ) {
 			return false;

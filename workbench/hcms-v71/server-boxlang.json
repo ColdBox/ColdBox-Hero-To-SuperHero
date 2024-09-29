@@ -1,0 +1,24 @@
+{
+    "name":"cms-boxlang",
+    "web":{
+        "http":{
+            "port":"42519"
+        },
+        "rewrites":{
+            "enable":true
+        }
+    },
+    "app":{
+        "cfengine":"boxlang"
+    },
+    "jvm":{
+        "javaVersion":"openjdk21_jdk",
+        "args":"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8888"
+    },
+    "env":{
+        "BOXLANG_DEBUG":true
+    },
+    "scripts":{
+        "onServerInitialInstall":"install bx-compat-cfml,bx-unsafe-evaluate,bx-mysql"
+    }
+}

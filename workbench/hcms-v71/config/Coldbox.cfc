@@ -19,9 +19,9 @@
 			appName                  : getSystemSetting( "APPNAME", "Your app name here" ),
 			eventName                : "event",
 			// Development Settings
-			reinitPassword           : "",
+			reinitPassword           : "123",
 			reinitKey                : "fwreinit",
-			handlersIndexAutoReload  : true,
+			handlersIndexAutoReload  : false,
 			// Implicit Events
 			defaultEvent             : "v1:Echo.index",
 			requestStartHandler      : "Main.onRequestStart",
@@ -43,12 +43,12 @@
 			// Error/Exception Handling
 			invalidHTTPMethodHandler : "",
 			exceptionHandler         : "v1:Echo.onError",
-			invalidEventHandler      : "",
+			invalidEventHandler      : "v1:echo.onInvalidRoute",
 			customErrorTemplate      : "",
 			// Application Aspects
-			handlerCaching           : false,
-			eventCaching             : false,
-			viewCaching              : false,
+			handlerCaching           : true,
+			eventCaching             : true,
+			viewCaching              : true,
 			// Will automatically do a mapDirectory() on your `models` for you.
 			autoMapModels            : true,
 			// Auto converts a json body payload into the RC

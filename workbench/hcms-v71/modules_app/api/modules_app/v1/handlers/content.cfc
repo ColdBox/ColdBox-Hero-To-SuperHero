@@ -2,35 +2,39 @@
  * I am a new handler
  * Implicit Functions: preHandler, postHandler, aroundHandler, onMissingAction, onError, onInvalidHTTPMethod
  */
-component extends="coldbox.system.RestHandler"{
+component extends="coldbox.system.RestHandler" secured{
 
 	property name="contentService" inject="ContentService";
 
 	/**
-	 * index
+	 * Lists all content in the system
 	 */
 	function index( event, rc, prc ){
-        prc.response.setData(
-			contentService
-				.list()
-				.map( ( item ) => {
-					return item.getMemento();
-				} )
+        event.getResponse()
+            .setData(
+				contentService
+					.list()
+					.map( (item) => item.getMemento() )
+			 )
+	}
+	/**
+	 * Create a new content object
+	 */
+	function create( event, rc, prc ){
+		// Populate, validate and save the content object
+		prc.response.setData(
+			populateModel( "Content"  )
+				.setUser( jwtAuth().getUser() )
+				.validateOrFail()
+				.save()
+				.getMemento()
 		);
 	}
 	/**
-	 * create
-	 */
-	function create( event, rc, prc ){
-        event.getResponse()
-            .setData( {} )
-            .addMessage( "Calling content/create" );
-	}
-	/**
-	 * show
+	 * Get a content object by its slug
 	 */
 	function show( event, rc, prc ){
-        param rc.slug = "";
+		param rc.slug = "";
 
 		prc.oContent = contentService.findBySlug( rc.slug );
 

@@ -2,6 +2,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 
 	property name="jwtService" inject="provider:JwtService@cbsecurity";
 	property name="cbauth"     inject="provider:authenticationService@cbauth";
+	property name="qb" inject="model:QueryBuilder@qb";
 
 	/*********************************** LIFE CYCLE Methods ***********************************/
 
@@ -30,24 +31,22 @@ component extends="tests.resources.BaseIntegrationSpec" {
 				given( "a valid username and password", function(){
 					then( "I will be authenticated and will receive the JWT token", function(){
 						// Use a user in the seeded db
-						var event = this.post(
+						var event = post(
 							route  = "/api/v1/login",
 							params = { username : "admin1", password : "test" }
 						);
 						var response = event.getPrivateValue( "Response" );
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
+						expect( response.getData() )
+							.toBeStruct()
+							.toHaveKey( "token,user" );
 
-						expect( response ).toHaveStatus( 200 )
-						expect( response.getError() ).toBeFalse( response.getMessages().toString() )
-						// Test the user and token
-						expect( response.getData() ).toHaveKey( "user" );
-        				expect( response.getData() ).toHaveKey( "token" );
-
-						// debug( response.getData() );
+						debug( response.getData() );
 
 						var decoded = jwtService.decode( response.getData().token );
-						expect( decoded.sub ).toBe( 1 );
-						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
 						expect( decoded.sub ).toBe( response.getData().user.id );
+						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
 					} );
 				} );
 				given( "invalid username and password", function(){
@@ -96,13 +95,6 @@ component extends="tests.resources.BaseIntegrationSpec" {
 						expect( response.getStatusCode() ).toBe( 400 );
 					} );
 				} );
-
-				given( "valid registration data but with a non-unique username", function(){
-					then( "a validation message should be sent to the user with an error message", function(){
-
-					});
-				} );
-
 			} );
 
 			story( "I want to be able to logout from the system using my JWT token", function(){
@@ -133,6 +125,10 @@ component extends="tests.resources.BaseIntegrationSpec" {
 					} );
 				} );
 			} );
+
+			xstory( "I want to reset a valid user's password", function(){
+			});
+
 		} );
 	}
 

@@ -16,18 +16,6 @@
  *******************************************************************************/
 component extends="tests.resources.BaseIntegrationSpec" {
 
-	/*********************************** LIFE CYCLE Methods ***********************************/
-
-	function beforeAll(){
-		super.beforeAll();
-		// do your own stuff here
-	}
-
-	function afterAll(){
-		// do your own stuff here
-		super.afterAll();
-	}
-
 	/*********************************** BDD SUITES ***********************************/
 
 	function run(){
@@ -36,6 +24,8 @@ component extends="tests.resources.BaseIntegrationSpec" {
 				// Setup as a new ColdBox request, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
 				setup();
 			} );
+
+			// it, then, test
 
 			it( "can handle global exceptions", function(){
 				var event = execute(
@@ -56,13 +46,14 @@ component extends="tests.resources.BaseIntegrationSpec" {
 			} );
 
 			it( "can handle an echo", function(){
-				var event    = this.request( "/api/v1/" );
+				var event    = request( "/api/v1/echo/index" );
 				var response = event.getPrivateValue( "response" );
+				debug( event.getRenderedContent() );
 				expect( response.getError() ).toBeFalse();
-				expect( response.getData() ).toBe( "Welcome to my ColdBox RESTFul Service" );
+				expect( response.getData() ).toBe( "Welcome to my Vegas RESTFul Service" );
 			} );
 
-			it( "can handle missing actions", function(){
+			test( "missing actions", function(){
 				var event    = this.request( "/api/v1/echo/bogus" );
 				var response = event.getPrivateValue( "response" );
 				expect( response.getError() ).tobeTrue();

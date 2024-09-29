@@ -48,7 +48,7 @@ component{
 				coldboxInfo : { expanded : false },
 				// Control the http request reporting
 				httpRequest : {
-					expanded        : false,
+					expanded        : true,
 					// If enabled, we will profile HTTP Body content, disabled by default as it contains lots of data
 					profileHTTPBody : false
 				}
@@ -89,7 +89,7 @@ component{
 			// Lucee SQL Collector
 			luceeSQL : { enabled : false, expanded : false, logParams : true },
 			// Async Manager Reporting
-			async    : { enabled : true, expanded : false }
+			async    : { enabled : false, expanded : false }
 		};
 	}
 }

@@ -1,4 +1,4 @@
-component extends="tests.resources.BaseIntegrationSpec" {
+component extends="coldbox.system.testing.BaseTestCase" {
 
 	/*********************************** LIFE CYCLE Methods ***********************************/
 

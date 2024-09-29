@@ -1,8 +1,25 @@
 {
-    "data": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE1ODkzMDUwMzEsInNjb3BlcyI6W10sImlzcyI6Imh0dHA6Ly8xMjcuMC4wLjE6NjUxMDAvIiwic3ViIjoxLCJleHAiOjE1ODkzMDg2MzEsImp0aSI6IkQxNkI4Qzg5NTc2OUU5MDcyNUNBQTU3M0I3M0FCNTc2In0.VDsqEDCXtHnrMXZYXqE2To2lQpmQAmHP8asXjhw_c2KsI_1mx2gZETuIrVNXckUl9zdevx2O818PlCkp6znmGw",
-    "error": false,
-    "pagination": {},
-    "messages": [
-        "Bearer token created and it expires in 60 minutes"
-    ]
-}
+	"data": {
+	  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3Mjc2MzE5NDIsInJvbGUiOiIiLCJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjQyNTE4LyIsInN1YiI6MSwiZXhwIjoxNzI3NjM1NTQyLCJzY29wZSI6IiIsImp0aSI6IkNCOTQzQzhGRTc5REIyRDRFRkUyMUNEMzU2NTZGQjhCIn0.wVIv1G6ZM7jH4yHOKaTt6KeJELTjZxYv2Y8lJRcnj4iGlMbaudOBUDT-OmXE0SQIzAPCOoWPAWpBd3ng7MgDcQ",
+	  "user": {
+		"permissions": [],
+		"lastName": "Moore",
+		"createdDate": "2024-09-29T16:50:51+00:00",
+		"id": 1,
+		"firstName": "Alexia",
+		"modifiedDate": "2024-09-29T16:50:51+00:00",
+		"roles": []
+	  }
+	},
+	"error": false,
+	"pagination": {
+	  "totalPages": 1,
+	  "maxRows": 0,
+	  "offset": 0,
+	  "page": 1,
+	  "totalRecords": 0
+	},
+	"messages": [
+	  "Bearer token created and it expires in 60 minutes"
+	]
+  }

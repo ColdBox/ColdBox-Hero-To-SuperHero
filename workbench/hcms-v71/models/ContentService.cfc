@@ -3,9 +3,14 @@
  */
 component singleton {
 
-	// DI
-	property name="populator" 	inject="wirebox:populator";
-	property name="qb"          inject="provider:QueryBuilder@qb";
+	/**
+	 * --------------------------------------------------------------------------
+	 * DI
+	 * --------------------------------------------------------------------------
+	 */
+
+	 property name="populator" inject="wirebox:populator";
+	 property name="qb"          inject="provider:QueryBuilder@qb";
 
 	/**
 	 * Constructor
@@ -14,17 +19,13 @@ component singleton {
 		return this;
 	}
 
-	Content function new() provider="Content";
-
 	/**
-	 * List all content
-     *
-	 * @orderBy The field to order by default is publishedDate
-	 * @orderType The order type (asc or desc) default is asc
-	 *
-	 * @return array
+	 * Construct a new content object via WireBox Providers
 	 */
-	array function list( orderBy="publishedDate", orderType="asc" ){
+	Content function new() provider="Content"{
+	}
+
+	Array function list( orderBy="publishedDate", orderType="asc" ){
 		return qb
 			.from( "content" )
 			.orderBy( arguments.orderBy, arguments.orderType )
@@ -67,5 +68,32 @@ component singleton {
 			ignoreTargetLists : true
         );
 	}
+
+	/**
+	 * Create a new content object
+	 *
+	 * @content The content object to create
+	 *
+	 * @return The persisted content object
+	 */
+	Content function create( required content ){
+		var qResults = qb.from( "content" )
+			.insert( values = {
+				"slug" 				 = arguments.content.getSlug(),
+				"title" 			  = arguments.content.getTitle(),
+				"body" 				= arguments.content.getBody(),
+				"isPublished" 		 = { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
+				"publishedDate" 	= { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
+				"createdDate" 		= { value : arguments.content.getCreatedDate(), cfsqltype : "timestamp" },
+				"modifiedDate" 		= { value : arguments.content.getModifiedDate(), cfsqltype : "timestamp" },
+				"FK_userId"			= arguments.content.getUser().getId()
+			} );
+
+		// populate the id
+		arguments.content.setId( qResults.result.generatedKey );
+
+		return arguments.content;
+	}
+
 
 }

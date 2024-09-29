@@ -20,7 +20,7 @@ component
 	"
 {
 
-	// DI
+	// Injections
 	property name="qb" inject="model:QueryBuilder@qb";
 
 	// Properties
@@ -33,8 +33,8 @@ component
 	function init(){
 		super.init();
 
-		 // Update constraints
-		 this.constraints.username = {
+		// Update constraints
+		this.constraints.username = {
 			required : true,
 			udf : ( value, target ) => {
 				if( isNull( arguments.value ) ) return false;
@@ -44,6 +44,7 @@ component
 
 		// Change default includes to just *
 		this.memento.defaultIncludes = [ "*" ];
+		this.memento.defaultExcludes = [ "username" ];
 
 		// Initialize dates
 		variables.createdDate = now();

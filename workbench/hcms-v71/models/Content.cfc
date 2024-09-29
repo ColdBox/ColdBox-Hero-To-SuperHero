@@ -1,14 +1,15 @@
 /**
- * I am a new Model Object
+ * I am a Content object
  */
 component
 	accessors="true"
-	transientCache = false
-	delegates     ="Validatable@cbvalidation,Population@cbDelegates"
+	transientCache="false"
+	delegates = "Validatable@cbValidation,Population@cbDelegates"
 {
 
 	// inject the user service
 	property name="userService" inject="UserService";
+	property name="contentService" inject="ContentService";
 	property name="qb" inject="provider:QueryBuilder@qb";
 
 	// Properties
@@ -21,10 +22,11 @@ component
 	property name="createdDate" type="date";
 	property name="modifiedDate" type="date";
 	property name="FK_userID" type="string";
+	property name="user";
+
 
 	// Validation Constraints
 	this.constraints = {
-		// Example: age = { required=true, min="18", type="numeric" }
 		slug    	: { required : true, udf : ( value, target ) => {
 			if( isNull( arguments.value ) ) return false;
             return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
@@ -49,7 +51,7 @@ component
 	this.memento = {
 		// An array of the properties/relationships to include by default
 		defaultIncludes = [
-            "id",
+			"id",
 			"slug",
 			"title",
 			"body",
@@ -59,12 +61,14 @@ component
 			"modifiedDate",
 			"user.name",
 			"user.email"
-		],
+		 ],
 		// An array of properties/relationships to exclude by default
 		defaultExcludes = [
 			"FK_userID",
 			"user.id",
 			"user.username",
+			"user.roles",
+			"user.permissions",
 			"user.modifiedDate",
 			"user.createdDate"
 		],
@@ -99,10 +103,21 @@ component
 	}
 
 	Content function setUser( required user ){
+
+		if( isSimpleValue( arguments.user ) ){
+			variables.FK_userId = arguments.user;
+			return this;
+		}
+
 		if( arguments.user.isLoaded() ){
 			variables.FK_userId = arguments.user.getId();
 		}
 		return this;
 	}
+
+	Content function save(){
+		return variables.contentService.create( this );
+	}
+
 
 }

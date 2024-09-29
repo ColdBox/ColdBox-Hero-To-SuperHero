@@ -67,7 +67,7 @@ component {
 				// Firewall database event logs.
 				"logs"                        : {
 					"enabled"    : true,
-					"dsn"        : "cms",
+					"dsn"        : "",
 					"schema"     : "",
 					"table"      : "cbsecurity_logs",
 					"autoCreate" : true
@@ -84,7 +84,7 @@ component {
 					"defaults" : {},
 					// You can store all your rules in this inline array
 					"inline"   : [
-						{ secureList 	: "v1:content" }
+						//{ secureList 	: "v1:content" }
 					],
 					// If you don't store the rules inline, then you can use a provider to load the rules
 					// The source can be a json file, an xml file, model, db

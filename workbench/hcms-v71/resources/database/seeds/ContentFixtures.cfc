@@ -21,7 +21,6 @@ component {
 			return row;
 		} );
 
-		//writedump( var: aContent, output : "console" );
 		qb.table( "content" ).insert( aContent );
     }
 

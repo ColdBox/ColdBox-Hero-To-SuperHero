@@ -13,7 +13,7 @@
  *
  * You can also use the HTTP executables: get(), post(), put(), path(), delete(), request()
  **/
-component extends="tests.resources.BaseIntegrationSpec"{
+component extends="tests.resources.BaseIntegrationSpec" {
 
 	property name="jwtService" inject="provider:JwtService@cbsecurity";
 	property name="cbauth"     inject="provider:authenticationService@cbauth";
@@ -39,6 +39,7 @@ component extends="tests.resources.BaseIntegrationSpec"{
 			beforeEach(function( currentSpec ){
 				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
 				setup();
+
 				// Need to login
 				jwt = jwtService.attempt( "admin1", "test" );
 				getRequestContext().setValue( "x-auth-token", jwt );
@@ -49,7 +50,61 @@ component extends="tests.resources.BaseIntegrationSpec"{
 					var event = get( route = "/api/v1/content" );
 					var response = event.getPrivateValue( "Response" );
 					expect( response ).toHaveStatus( 200 );
-					expect( response.getData() ).toBeArray();
+					debug( response.getData() );
+					expect( response.getData() )
+						.toBeArray()
+						.notToBeEmpty();
+				});
+			});
+
+			story( "I want to be able to create new content objects", function(){
+				given( "valid incoming data", function(){
+					then( "it should create a new content object", function(){
+						var event = post(
+							route = "/api/v1/content",
+							params = {
+								slug          : "my-new-test-#createUUID()#",
+								title         : "I love BDD",
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						debug( response.getData() );
+
+						expect( response ).toHaveStatus( 200 );
+						expect( response.getData().title ).toBe( "I love BDD" );
+						expect( response.getData().id ).notToBeEmpty();
+					});
+				});
+
+				given( "invalid data", function(){
+					then( "it should throw a validation error", function(){
+						var event = post(
+							route = "/api/v1/content",
+							params = {
+								body          : "I love BDD sooooooooooo much!",
+								isPublished   : true,
+								publishedDate : now()
+							}
+						)
+
+						// expectations go here.
+						var response = event.getPrivateValue( "Response" );
+
+						expect( response ).toHaveStatus( 400 );
+						expect( response.getData() ).toHaveKey( "slug" );
+					});
+				});
+
+				given( "an existing content slug", function(){
+					then( "I should throw a 400 error", function(){
+
+					});
 				});
 			});
 
@@ -81,21 +136,14 @@ component extends="tests.resources.BaseIntegrationSpec"{
 				});
 			});
 
-			it( "create", function(){
-                // Execute event or route via GET http method. Spice up accordingly
-				var event = get( "content.create" );
-				// expectations go here.
-				expect( false ).toBeTrue();
-			});
-
-			it( "update", function(){
+			xit( "update", function(){
                 // Execute event or route via GET http method. Spice up accordingly
 				var event = get( "content.update" );
 				// expectations go here.
 				expect( false ).toBeTrue();
 			});
 
-			it( "delete", function(){
+			xit( "delete", function(){
                 // Execute event or route via GET http method. Spice up accordingly
 				var event = get( "content.delete" );
 				// expectations go here.

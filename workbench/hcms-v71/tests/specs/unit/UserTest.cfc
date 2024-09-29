@@ -23,12 +23,16 @@ component extends="coldbox.system.testing.BaseModelTest" model="models.User" {
 
 	/*********************************** BDD SUITES ***********************************/
 
-	function run(){
-		describe( "A User", function(){
-			it( "can be created", function(){
-				expect( model ).toBeComponent();
-			} );
-		} );
+	// function run(){
+	// 	describe( "A User", function(){
+	// 		it( "can be created", function(){
+	// 			expect( model ).toBeComponent();
+	// 		} );
+	// 	} );
+	// }
+
+	function testCreate() displayName="A user can be created"{
+		expect( model ).toBeComponent();
 	}
 
 }

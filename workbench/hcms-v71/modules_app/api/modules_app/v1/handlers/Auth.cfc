@@ -24,8 +24,8 @@ component extends="coldbox.system.RestHandler" {
 		event
 			.getResponse()
 			.setData( {
-				"token" : token,
-				"user"  : cbSecure().getUser().getMemento()
+				"token": token,
+				"user" : jwtAuth().getUser().getMemento()
 			} )
 			.addMessage(
 				"Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"

@@ -17,7 +17,7 @@
     "contributors":[],
     "ignore":[],
     "devDependencies":{
-        "testbox":"^5.0.0",
+        "testbox":"*",
         "relax":"*",
         "route-visualizer":"*",
         "commandbox-dotenv":"*",
@@ -31,7 +31,11 @@
         "cbvalidation":"^4.1.0",
         "qb":"^9.11.1",
         "BCrypt":"^3.1.0+4",
-        "cbdebugger":"^4.3.0+5"
+        "cbdebugger":"^4.3.0+5",
+        "bx-compat-cfml":"^1.6.0+9",
+        "bx-unsafe-evaluate":"^1.0.0+2",
+        "bx-mysql":"^1.0.0-SNAPSHOT",
+        "cbSwaggerUI":"^1.2.1"
     },
     "scripts":{
         "postInstall":"pathExists .env || cp .env.example .env && package set ignore=[]",
@@ -44,8 +48,13 @@
         "docker:stack":"!docker compose -f build/docker-compose.yaml ${1}"
     },
     "installPaths":{
+        "testbox":"testbox/",
         "qb":"modules/qb/",
         "BCrypt":"modules/BCrypt/",
-        "cbdebugger":"modules/cbdebugger/"
+        "cbdebugger":"modules/cbdebugger/",
+        "bx-compat-cfml":"/Users/lmajano/.CommandBox/server/AE953B77FEA2A1C5E91CF3A9C2F947A8-cms-boxlang/boxlang-1.0.0-snapshot/WEB-INF/boxlang/modules/bx-compat-cfml/",
+        "bx-unsafe-evaluate":"/Users/lmajano/.CommandBox/server/AE953B77FEA2A1C5E91CF3A9C2F947A8-cms-boxlang/boxlang-1.0.0-snapshot/WEB-INF/boxlang/modules/bx-unsafe-evaluate/",
+        "bx-mysql":"/Users/lmajano/.CommandBox/server/AE953B77FEA2A1C5E91CF3A9C2F947A8-cms-boxlang/boxlang-1.0.0-snapshot/WEB-INF/boxlang/modules/bx-mysql/",
+        "cbSwaggerUI":"modules/cbSwaggerUI/"
     }
 }

@@ -28,7 +28,7 @@ component
 
 	function run(){
 
-		describe( "Content Object", function(){
+		describe( "Content Suite", function(){
 
 			it( "can be created", function(){
 				expect( model ).toBeComponent();

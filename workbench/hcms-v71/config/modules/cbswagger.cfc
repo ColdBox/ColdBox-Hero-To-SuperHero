@@ -8,8 +8,8 @@ component {
 		return {
 			// The route prefix to search.  Routes beginning with this prefix will be determined to be api routes
 			"routes"        : [ "api" ],
-			// Any routes to exclude: EXCLUDE OUR INVALID ROUTES
-			"excludeRoutes" : [ "api/v1/:anything/" ],
+			// Any routes to exclude
+			"excludeRoutes" : [],
 			// The default output format: json or yml
 			"defaultFormat" : "json",
 			// A convention route, relative to your app root, where request/response samples are stored ( e.g. resources/apidocs/responses/[module].[handler].[action].[HTTP Status Code].json )

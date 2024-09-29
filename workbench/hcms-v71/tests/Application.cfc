@@ -30,7 +30,7 @@ component {
 	this.mappings[ "/coldbox" ] = rootPath & "coldbox";
 	this.mappings[ "/testbox" ] = rootPath & "testbox";
 
-	// App datasource
+	// Datasource
 	this.datasource = "cms";
 
 	/**
