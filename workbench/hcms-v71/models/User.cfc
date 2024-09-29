@@ -24,7 +24,7 @@ component
 	property name="qb" inject="model:QueryBuilder@qb";
 
 	// Properties
-	property name="createdDate" type="date";
+	property name="createdDate"  type="date";
 	property name="modifiedDate" type="date";
 
 	/**
@@ -36,10 +36,7 @@ component
 		// Update constraints
 		this.constraints.username = {
 			required : true,
-			udf : ( value, target ) => {
-				if( isNull( arguments.value ) ) return false;
-				return qb.from( "users" ).where( "username", arguments.value ).count() == 0;
-			}
+			unique : { table : "users" }
 		};
 
 		// Change default includes to just *
@@ -47,7 +44,7 @@ component
 		this.memento.defaultExcludes = [ "username" ];
 
 		// Initialize dates
-		variables.createdDate = now();
+		variables.createdDate  = now();
 		variables.modifiedDate = now();
 
 		return this;

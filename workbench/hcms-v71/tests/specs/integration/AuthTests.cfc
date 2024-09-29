@@ -2,7 +2,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 
 	property name="jwtService" inject="provider:JwtService@cbsecurity";
 	property name="cbauth"     inject="provider:authenticationService@cbauth";
-	property name="qb" inject="model:QueryBuilder@qb";
+	property name="qb"         inject="model:QueryBuilder@qb";
 
 	/*********************************** LIFE CYCLE Methods ***********************************/
 
@@ -38,9 +38,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 						var response = event.getPrivateValue( "Response" );
 						expect( response ).toHaveStatus( 200 );
 						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getData() )
-							.toBeStruct()
-							.toHaveKey( "token,user" );
+						expect( response.getData() ).toBeStruct().toHaveKey( "token,user" );
 
 						debug( response.getData() );
 
@@ -127,8 +125,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 			} );
 
 			xstory( "I want to reset a valid user's password", function(){
-			});
-
+			} );
 		} );
 	}
 

@@ -13,10 +13,10 @@ component {
 		get( "/whoami", "Echo.whoami" );
 
 		// Content Routes
-		apiResources( resource="content", parameterName="slug" );
+		apiResources( resource = "content", parameterName = "slug" );
 
 		// Invalid Routes
-		//route( "/:anything", "echo.onInvalidRoute" );
+		// route( "/:anything", "echo.onInvalidRoute" );
 
 		route( "/:handler/:action" ).end();
 	}

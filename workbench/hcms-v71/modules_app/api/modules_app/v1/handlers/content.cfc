@@ -2,7 +2,7 @@
  * I am a new handler
  * Implicit Functions: preHandler, postHandler, aroundHandler, onMissingAction, onError, onInvalidHTTPMethod
  */
-component extends="coldbox.system.RestHandler" secured{
+component extends="coldbox.system.RestHandler" secured {
 
 	property name="contentService" inject="ContentService";
 
@@ -10,12 +10,7 @@ component extends="coldbox.system.RestHandler" secured{
 	 * Lists all content in the system
 	 */
 	function index( event, rc, prc ){
-        event.getResponse()
-            .setData(
-				contentService
-					.list()
-					.map( (item) => item.getMemento() )
-			 )
+		event.getResponse().setData( contentService.list().map( ( item ) => item.getMemento() ) )
 	}
 	/**
 	 * Create a new content object
@@ -23,7 +18,7 @@ component extends="coldbox.system.RestHandler" secured{
 	function create( event, rc, prc ){
 		// Populate, validate and save the content object
 		prc.response.setData(
-			populateModel( "Content"  )
+			populateModel( "Content" )
 				.setUser( jwtAuth().getUser() )
 				.validateOrFail()
 				.save()
@@ -53,18 +48,49 @@ component extends="coldbox.system.RestHandler" secured{
 	 * update
 	 */
 	function update( event, rc, prc ){
-        event.getResponse()
-            .setData( {} )
-            .addMessage( "Calling content/update" );
+		param rc.slug = "";
+
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if ( !prc.oContent.isLoaded() ) {
+			prc.response
+				.setError( true )
+				.setStatusCode( event.STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		prc.response.setData(
+			populateModel( prc.oContent )
+			.setUser( jwtAuth().getUser() )
+			.validateOrFail()
+			.save()
+			.getMemento()
+		);
 	}
 	/**
 	 * delete
 	 */
 	function delete( event, rc, prc ){
-        event.getResponse()
-            .setData( {} )
-            .addMessage( "Calling content/delete" );
-	}
+		param rc.slug = "";
 
+		prc.oContent = contentService.findBySlug( rc.slug );
+
+		if ( !prc.oContent.isLoaded() ) {
+			prc.response
+				.setError( true )
+				.setStatusCode( event.STATUS.NOT_FOUND )
+				.setStatusText( "Not Found" )
+				.addMessage( "The requested content object (#rc.slug#) could not be found" );
+			return;
+		}
+
+		// populate, validate and create
+		contentService.delete( prc.oContent );
+
+		prc.response.addMessage( "Content deleted!" );
+	}
 
 }

@@ -9,8 +9,8 @@ component singleton {
 	 * --------------------------------------------------------------------------
 	 */
 
-	 property name="populator" inject="wirebox:populator";
-	 property name="qb"          inject="provider:QueryBuilder@qb";
+	property name="populator" inject="wirebox:populator";
+	property name="qb"        inject="provider:QueryBuilder@qb";
 
 	/**
 	 * Constructor
@@ -25,16 +25,16 @@ component singleton {
 	Content function new() provider="Content"{
 	}
 
-	Array function list( orderBy="publishedDate", orderType="asc" ){
+	Array function list( orderBy = "publishedDate", orderType = "asc" ){
 		return qb
 			.from( "content" )
 			.orderBy( arguments.orderBy, arguments.orderType )
 			.get()
 			.map( ( content ) => {
 				return populator.populateFromStruct(
-					target : new(),
-					memento : content,
-					ignoreTargetLists : true
+					target           : new (),
+					memento          : content,
+					ignoreTargetLists: true
 				);
 			} );
 	}
@@ -48,10 +48,13 @@ component singleton {
 	 */
 	function get( required id ){
 		return populator.populateFromStruct(
-            target : new(),
-            memento : qb.from( "content" ).where( "id" , arguments.id ).first(),
-			ignoreTargetLists : true
-        );
+			target : new (),
+			memento: qb
+				.from( "content" )
+				.where( "id", arguments.id )
+				.first(),
+			ignoreTargetLists: true
+		);
 	}
 
 	/**
@@ -63,10 +66,13 @@ component singleton {
 	 */
 	function findBySlug( required slug ){
 		return populator.populateFromStruct(
-            target : new(),
-            memento : qb.from( "content" ).where( "slug" , arguments.slug ).first(),
-			ignoreTargetLists : true
-        );
+			target : new (),
+			memento: qb
+				.from( "content" )
+				.where( "slug", arguments.slug )
+				.first(),
+			ignoreTargetLists: true
+		);
 	}
 
 	/**
@@ -77,17 +83,32 @@ component singleton {
 	 * @return The persisted content object
 	 */
 	Content function create( required content ){
-		var qResults = qb.from( "content" )
-			.insert( values = {
-				"slug" 				 = arguments.content.getSlug(),
-				"title" 			  = arguments.content.getTitle(),
-				"body" 				= arguments.content.getBody(),
-				"isPublished" 		 = { value : arguments.content.getIsPublished(), cfsqltype : "tinyint" },
-				"publishedDate" 	= { value : arguments.content.getPublishedDate(), cfsqltype : "timestamp" },
-				"createdDate" 		= { value : arguments.content.getCreatedDate(), cfsqltype : "timestamp" },
-				"modifiedDate" 		= { value : arguments.content.getModifiedDate(), cfsqltype : "timestamp" },
-				"FK_userId"			= arguments.content.getUser().getId()
-			} );
+		var qResults = qb
+			.from( "content" )
+			.insert(
+				values = {
+					"slug"        : arguments.content.getSlug(),
+					"title"       : arguments.content.getTitle(),
+					"body"        : arguments.content.getBody(),
+					"isPublished" : {
+						value     : arguments.content.getIsPublished(),
+						cfsqltype : "tinyint"
+					},
+					"publishedDate" : {
+						value     : arguments.content.getPublishedDate(),
+						cfsqltype : "timestamp"
+					},
+					"createdDate" : {
+						value     : arguments.content.getCreatedDate(),
+						cfsqltype : "timestamp"
+					},
+					"modifiedDate" : {
+						value     : arguments.content.getModifiedDate(),
+						cfsqltype : "timestamp"
+					},
+					"FK_userId" : arguments.content.getUser().getId()
+				}
+			);
 
 		// populate the id
 		arguments.content.setId( qResults.result.generatedKey );
@@ -95,5 +116,43 @@ component singleton {
 		return arguments.content;
 	}
 
+	/**
+	 * update
+	 */
+	function update( required content ){
+		var qResults = qb
+			.from( "content" )
+			.whereId( arguments.content.getId() )
+			.update( {
+				"slug"        : arguments.content.getSlug(),
+				"title"       : arguments.content.getTitle(),
+				"body"        : arguments.content.getBody(),
+				"isPublished" : {
+					value     : arguments.content.getIsPublished(),
+					cfsqltype : "tinyint"
+				},
+				"publishedDate" : {
+					value     : arguments.content.getPublishedDate(),
+					cfsqltype : "timestamp"
+				},
+				"modifiedDate" : { value : now(), cfsqltype : "timestamp" },
+				"FK_userId"    : arguments.content.getUser().getId()
+			} );
+
+		return arguments.content;
+	}
+
+	/**
+	 * delete
+	 */
+	function delete( required content ){
+		var qResults = qb.from( "content" )
+			.whereId( arguments.content.getId() )
+			.delete();
+
+		arguments.content = new();
+
+		return arguments.content;
+	}
 
 }

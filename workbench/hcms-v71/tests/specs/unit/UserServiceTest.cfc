@@ -22,7 +22,6 @@ component extends="coldbox.system.testing.BaseTestCase" {
 			it( "can be created", function(){
 				expect( model ).toBeComponent();
 			} );
-
 		} );
 	}
 

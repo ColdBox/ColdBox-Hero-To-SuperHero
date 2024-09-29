@@ -2,55 +2,47 @@
  * I am a Content object
  */
 component
-	accessors="true"
+	accessors     ="true"
 	transientCache="false"
-	delegates = "Validatable@cbValidation,Population@cbDelegates"
+	delegates     ="Validatable@cbValidation,Population@cbDelegates,Flow@coreDelegates"
 {
 
 	// inject the user service
-	property name="userService" inject="UserService";
+	property name="userService"    inject="UserService";
 	property name="contentService" inject="ContentService";
-	property name="qb" inject="provider:QueryBuilder@qb";
+	property name="qb"             inject="provider:QueryBuilder@qb";
 
 	// Properties
-	property name="id" type="string";
-	property name="slug" type="string";
-	property name="title" type="string";
-	property name="body" type="string";
-	property name="isPublished" type="boolean";
+	property name="id"            type="string";
+	property name="slug"          type="string";
+	property name="title"         type="string";
+	property name="body"          type="string";
+	property name="isPublished"   type="boolean";
 	property name="publishedDate" type="date";
-	property name="createdDate" type="date";
-	property name="modifiedDate" type="date";
-	property name="FK_userID" type="string";
+	property name="createdDate"   type="date";
+	property name="modifiedDate"  type="date";
+	property name="FK_userID"     type="string";
 	property name="user";
 
 
 	// Validation Constraints
 	this.constraints = {
-		slug    	: { required : true, udf : ( value, target ) => {
-			if( isNull( arguments.value ) ) return false;
-            return qb.from( "content" ).where( "slug", arguments.value ).count() == 0;
-		}},
-		title       : { required : true },
-		body       	: { required : true },
-		FK_userID	: { required : true }
+		slug      : { required : true, unique : { table : "content" } },
+		title     : { required : true },
+		body      : { required : true },
+		FK_userID : { required : true }
 	};
 
 	// Constraint Profiles
-	this.constraintProfiles = {
-		"update" : {}
-	};
+	this.constraintProfiles = { "update" : {} };
 
 	// Population Control
-	this.population = {
-		include : [],
-		exclude : [ "id" ]
-	};
+	this.population = { include : [], exclude : [ "id" ] };
 
 	// Mementifier
 	this.memento = {
 		// An array of the properties/relationships to include by default
-		defaultIncludes = [
+		defaultIncludes : [
 			"id",
 			"slug",
 			"title",
@@ -61,9 +53,9 @@ component
 			"modifiedDate",
 			"user.name",
 			"user.email"
-		 ],
+		],
 		// An array of properties/relationships to exclude by default
-		defaultExcludes = [
+		defaultExcludes : [
 			"FK_userID",
 			"user.id",
 			"user.username",
@@ -73,21 +65,21 @@ component
 			"user.createdDate"
 		],
 		// An array of properties/relationships to NEVER include
-		neverInclude = [],
+		neverInclude : [],
 		// A struct of defaults for properties/relationships if they are null
-		defaults = {},
+		defaults     : {},
 		// A struct of mapping functions for properties/relationships that can transform them
-		mappers = {}
+		mappers      : {}
 	};
 
 	/**
 	 * Constructor
 	 */
 	Content function init(){
-		variables.createdDate 	= now();
-		variables.modifiedDate 	= now();
-		variables.isPublished 	= false;
-		variables.FK_userID 	= "";
+		variables.createdDate  = now();
+		variables.modifiedDate = now();
+		variables.isPublished  = false;
+		variables.FK_userID    = "";
 		return this;
 	}
 
@@ -103,21 +95,19 @@ component
 	}
 
 	Content function setUser( required user ){
-
-		if( isSimpleValue( arguments.user ) ){
+		if ( isSimpleValue( arguments.user ) ) {
 			variables.FK_userId = arguments.user;
 			return this;
 		}
 
-		if( arguments.user.isLoaded() ){
+		if ( arguments.user.isLoaded() ) {
 			variables.FK_userId = arguments.user.getId();
 		}
 		return this;
 	}
 
 	Content function save(){
-		return variables.contentService.create( this );
+		return ( isLoaded() ? variables.contentService.update( this ) : variables.contentService.create( this ) );
 	}
-
 
 }

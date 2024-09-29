@@ -11,8 +11,8 @@ component accessors="true" singleton {
 	 */
 
 	property name="populator" inject="wirebox:populator";
-	property name="bcrypt"      inject="@BCrypt";
-	property name="qb"          inject="provider:QueryBuilder@qb";
+	property name="bcrypt"    inject="@BCrypt";
+	property name="qb"        inject="provider:QueryBuilder@qb";
 
 	/**
 	 * --------------------------------------------------------------------------
@@ -41,13 +41,16 @@ component accessors="true" singleton {
 	 * @return The created user
 	 */
 	User function create( required user ){
-		var qResults = qb.from( "users" )
-			.insert( values = {
-				"firstName"   : arguments.user.getFirstName(),
-				"lastName"    : arguments.user.getLastName(),
-				"username"    : arguments.user.getUsername(),
-				"password" 	:  variables.bcrypt.hashPassword( arguments.user.getPassword() )
-			} );
+		var qResults = qb
+			.from( "users" )
+			.insert(
+				values = {
+					"firstName" : arguments.user.getFirstName(),
+					"lastName"  : arguments.user.getLastName(),
+					"username"  : arguments.user.getUsername(),
+					"password"  : variables.bcrypt.hashPassword( arguments.user.getPassword() )
+				}
+			);
 
 		// populate the id
 		arguments.user.setId( qResults.result.generatedKey );
@@ -82,7 +85,7 @@ component accessors="true" singleton {
 	 */
 	function retrieveUserByUsername( required username ){
 		return populator.populateFromStruct(
-			new(),
+			new (),
 			qb.from( "users" )
 				.where( "username", arguments.username )
 				.first()
@@ -98,7 +101,7 @@ component accessors="true" singleton {
 	 */
 	User function retrieveUserById( required id ){
 		return populator.populateFromStruct(
-			new(),
+			new (),
 			qb.from( "users" )
 				.where( "id", arguments.id )
 				.first()

@@ -1,7 +1,6 @@
-component{
+component {
 
 	function configure(){
-
 		return {
 			// This flag enables/disables the tracking of request data to our storage facilities
 			// To disable all tracking, turn this master key off
@@ -92,4 +91,5 @@ component{
 			async    : { enabled : false, expanded : false }
 		};
 	}
+
 }

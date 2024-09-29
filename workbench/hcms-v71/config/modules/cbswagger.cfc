@@ -17,9 +17,9 @@ component {
 			// Information about your API
 			"info"          : {
 				// A title for your API
-				"title"       : "Hero to SuperHero Headless CMS",
+				"title"          : "Hero to SuperHero Headless CMS",
 				// A description of your API
-				"description" : "A nice hmvc headless CMS",
+				"description"    : "A nice hmvc headless CMS",
 				// A terms of service URL for your API
 				"termsOfService" : "",
 				// The contact email address
