@@ -42,7 +42,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 				jwtService.getTokenStorage().clearAll();
 			} );
 
-			story( "I want to authenticate a user and receive a JWT token", function(){
+			story( "I want to be able to authenticate with a username/password and receive a JWT token", function(){
 				given( "a valid username and password", function(){
 					then( "I will be authenticated and will receive the JWT token", function(){
 						// Use a user in the seeded db
