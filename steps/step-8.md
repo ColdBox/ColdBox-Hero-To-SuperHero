@@ -27,6 +27,15 @@ WOW! Our API is fully documented! What magic unicorn is this!
 * https://www.forgebox.io/view/cbswagger
 * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md
 
+Let's also install another module to visualize our swagger docs in a nice UI https://forgebox.io/view/cbswaggerUI.  Run the following command:
+
+```bash
+box install cbswaggerUI
+box coldbox reinit
+```
+
+Then hit the app: http://localhost:42518/cbswaggerUI
+
 ### Customize It
 
 Open your [`config/modules/cbswagger.cfc`](../src/config/modules/cbswagger.cfc).  Let's update it a bit to match what we are building:

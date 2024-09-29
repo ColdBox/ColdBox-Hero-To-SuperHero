@@ -3,6 +3,7 @@
 Ok, we have all the building blocks for now focusing on our first content stories:
 
 ```js
+
 story( "In order to interact with content in the CMS you must be authenticated" );
 story( "I want to see content with different filtering options" )
 story( "I want to see a single content object via a nice slug" )
@@ -127,6 +128,11 @@ component
 	}
 
 	Content function setUser( required user ){
+        if( isSimpleValue( arguments.user ) ){
+			variables.FK_userId = arguments.user;
+			return this;
+		}
+
 		if( arguments.user.isLoaded() ){
 			variables.FK_userId = arguments.user.getId();
 		}
