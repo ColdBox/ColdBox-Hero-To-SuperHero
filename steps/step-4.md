@@ -72,4 +72,12 @@ component extends="coldbox.system.testing.BaseTestCase" autowire{
 }
 ```
 
-Go update the **integration specs** ONLY by adding the `extends="tests.resources.BaseIntegrationSpec"` and let's run the tests again and make sure they pass!
+Go update the **integration specs** ONLY by adding the `extends="tests.resources.BaseIntegrationSpec"`, remove the following:
+
+* `autowire` not needed anymore
+* `beforeAll` and `afterAll` methods
+
+Then make sure all tests pass.
+
+* [AuthTests](../src/tests/specs/integration/AuthTests.cfc)
+* [EchoTests](../src/tests/specs/integration/EchoTests.cfc)
