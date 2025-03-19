@@ -108,7 +108,7 @@ component{
 				coldboxInfo : { expanded : false },
 				// Control the http request reporting
 				httpRequest : {
-					expanded        : false,
+					expanded        : true,
 					// If enabled, we will profile HTTP Body content, disabled by default as it contains lots of data
 					profileHTTPBody : false
 				}
@@ -165,14 +165,14 @@ Now goto the http://127.0.0.1:42518/cbdebugger and you will see the debugger pan
 
 ## Datasource Configuration
 
-Open `Application.cfc`  so we can add the global datasource we registered with the CFML Engine via  `.cfconfig.json`
+Open [`Application.cfc`](../src/Application.cfc)  so we can add the global datasource we registered with the CFML Engine via  `.cfconfig.json`
 
 ```js
 // App datasource
 this.datasource = "cms";
 ```
 
-Let's do the same with the tets application: `/tests/Application.cfc`
+Let's do the same with the tets application: [`/tests/Application.cfc`](../src/tests/Application.cfc)
 
 ```js
 // App datasource
