@@ -19,7 +19,7 @@ This course at this time is using the following dependencies:
 - ColdBox 7.x
 - CBSecurity 3.x
 - CBDebugger 4.x
-- CommandBox Migrations 4.x
+- CommandBox Migrations 5.x
 
 **There could be the case that some of the steps fail if you are using future versions of these modules.  Please update accordingly or look for the specific updated version of this course as a branch.**
 

@@ -1,5 +1,7 @@
 # ColdBox: Hero to Superhero
 
+![ColdBox](coldbox-logo.png)
+
 ## Getting Started
 
 This repo contains a sample application built to showcase the advanced features of ColdBox, especially for building a BDD API.

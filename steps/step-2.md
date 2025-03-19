@@ -8,7 +8,7 @@ We will be using docker for this section.  Just run this command from the root o
 
 ```bash
 # Windows/Linux
-docker-compose up
+docker compose up
 
 # Mac
 docker compose up
@@ -30,10 +30,18 @@ Your database should be online now, test it with your favorite tool.
 
 ## Global Dependencies
 
-Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, cfconfig for CFML portability (cfconfig - https://cfconfig.ortusbooks.com/):
+Before we start let's make sure we have our global CommandBox dependencies that we will use for environment control, engine configuration (cfconfig - https://cfconfig.ortusbooks.com/) and more.
+
+* `commandbox-dotenv` - To load environment variables from a `.env` file
+* `commandbox-cfconfig` - To manage your CF engine configuration
+* `commandbox-cfformat` - To format your code automatically
+* `commandbox-migrations` - To manage your database migrations
+* `commandbox-boxlang` - To run BoxLang servers
+* `coldbox-cli` - The ColdBox CLI for scaffolding and more
+* `testbox-cli` - The TestBox CLI for running tests
 
 ```bash
-install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat,coldbox-cli,testbox-cli
+install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat,commandbox-boxlang,coldbox-cli,testbox-cli
 ```
 
 ## Scaffold the application
