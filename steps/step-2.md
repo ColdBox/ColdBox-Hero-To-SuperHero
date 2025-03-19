@@ -46,12 +46,14 @@ install commandbox-dotenv,commandbox-cfconfig,commandbox-cfformat,commandbox-box
 
 ## Scaffold the application
 
+We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our `rest-hmvc` template.  It will create a modular approach to our API based on ColdBox 7.
+
 ```bash
 cd src
 coldbox create app name=cms skeleton=rest-hmvc
 ```
 
-We will now begin creating our application using CommandBox.  This will scaffold out a REST application using our `rest-hmvc` template.  It will create a modular approach to our API based on ColdBox 7.  The following dependencies will be installed for you:
+The following dependencies will be installed for you:
 
 * `coldbox` - Super HMVC Framework
 * `testbox` - BDD testing library (`development` dependency)
@@ -61,6 +63,8 @@ We will now begin creating our application using CommandBox.  This will scaffold
 * `modules/relax` - Module for documenting, exploring and testing our API (`development` dependency)
   * `modules/cbSwagger` - Open API support for documenting our API
 * `modules/route-visualizer` - For visualizing our routes
+
+If you want to see the dependency hierarchy, you can run the following command: `list`
 
 ```bash
 Dependency Hierarchy for cms (1.0.0)
@@ -118,6 +122,8 @@ We use a standard port, so that in the steps and in the training we can all use 
 ```sh
 server start port=42518
 ```
+
+> Tip: add `--debug` to the `server start` command to start the server in debug mode.
 
 Boom!  Our REST API is now online and ready to be consumed.  Let's test it out.
 
