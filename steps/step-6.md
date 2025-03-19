@@ -10,6 +10,10 @@ Let's start by modeling our user object, which our rest template has already pre
 
 ## `User.cfc`
 
+Our default user leverages WireBox delegations and extends the `cbsecurity` user object.
+
+> WireBox Delegates: https://wirebox.ortusbooks.com/usage/wirebox-delegators
+
 The delegations we defaulted by the rest template are:
 
 * `Validatable@cbvalidation` - Tons of cool validation methods
@@ -20,11 +24,11 @@ The delegations we defaulted by the rest template are:
 
 Where do we go to discover what these methods are???
 
-* https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox-modules/cbvalidation/4.4.0/index.html
-* https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/index.html
-* https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox/7.4.0/index.html
+* https://apidocs.ortussolutions.com/coldbox-modules/cbvalidation/4.6.0/index.html
+* https://apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/index.html
+* https://apidocs.ortussolutions.com/coldbox/7.4.0/index.html
 
-The properties we inherit from cbsecurity are:
+The properties we inherit from [cbsecurity](../src/modules/cbsecurity/models/auth/User.cfc) are:
 
 * `id`
 * `firstName`
@@ -47,8 +51,8 @@ property name="qb" inject="model:QueryBuilder@qb";
 
 In our constructor we will also add new features for:
 
-* constraints
-* memento
+* [constraints](https://coldbox-validation.ortusbooks.com/overview/valid-constraints) - How we do validation for our model
+* [memento](https://forgebox.io/view/mementifier) - How our model becomes JSON
 
 ```groovy
 // Injections
@@ -61,7 +65,7 @@ property name="modifiedDate" type="date";
 function init(){
     super.init();
 
-    // Update constraints
+    // Validation constraints
     this.constraints.username = {
         required : true,
         udf : ( value, target ) => {
@@ -82,7 +86,6 @@ function init(){
 ```
 
 Run your tests! We have broken a few things, but we will get them sorted out soon.
-
 
 ## Database Migrations
 
@@ -124,10 +127,30 @@ migrate init
 
 This will create a `.cfmigrations` in your root.  This file is used to describe where your migrations live and the connection details.  Please note that as of v4 of cfmigrations, you can use this file to maintain multiple managers.  Meaning you can create multiple migrations with different configurations.
 
-Update the following properties in the `.cfmigrations` file:
+Update the file to include a `database` in the `connectionInfo`
 
 ```json
-"schema": "${DB_DATABASE}",
+{
+    "default": {
+        "manager": "cfmigrations.models.QBMigrationManager",
+        "migrationsDirectory": "resources/database/migrations/",
+        "seedsDirectory": "resources/database/seeds/",
+        "properties": {
+            "defaultGrammar": "AutoDiscover@qb",
+            "schema": "${DB_SCHEMA}",
+            "migrationsTable": "cfmigrations",
+            "connectionInfo": {
+                "password": "${DB_PASSWORD}",
+                "connectionString": "${DB_CONNECTIONSTRING}",
+                "class": "${DB_CLASS}",
+                "username": "${DB_USER}",
+				"database": "${DB_DATABASE}",
+                "bundleName": "${DB_BUNDLENAME}",
+                "bundleVersion": "${DB_BUNDLEVERSION}"
+            }
+        }
+    }
+}
 ```
 
 Now let's make sure we can connect to our database and create the migrations table:
@@ -267,7 +290,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
 						expect( response.getData() ).toHaveKey( "token,user" );
 
-						// debug( response.getData() );
+						debug( response.getData() );
 
 						var decoded = jwtService.decode( response.getData().token );
 						expect( decoded.sub ).toBe( response.getData().user.id );
@@ -278,7 +301,7 @@ component extends="tests.resources.BaseIntegrationSpec" {
 					then( "I should get an error message", function(){
 						var event    = this.post( route = "/api/v1/register", params = {} );
 						var response = event.getPrivateValue( "Response" );
-						// debug( response.getMemento() );
+						debug( response.getMemento() );
 						expect( response.getError() ).toBeTrue();
 						expect( response.getStatusCode() ).toBe( 400 );
 					} );
@@ -320,7 +343,6 @@ component extends="tests.resources.BaseIntegrationSpec" {
 ```
 
 It will be green, but remember we are mocking everything still.
-
 
 ## Routing
 
