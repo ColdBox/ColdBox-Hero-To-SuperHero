@@ -2,17 +2,15 @@
 
 We will start by configuring `cbsecurity` so we can secure our app and be able to provide Json Web Tokens (JWT) for securing our app.  Once the configuration is done, we will move on to start the user registration process.
 
-- Go over cbSecurity
-- Go over cbAuth
-- Go over JWT
+- Go over [cbSecurity](https://coldbox-security.ortusbooks.com/)
+- Go over [cbAuth](https://cbauth.ortusbooks.com/)
+- Go over [JWT](https://coldbox-security.ortusbooks.com/jwt/jwt-services)
 
 Let's go over the configuration by opening the [config/modules/cbsecurity.cfc](../src/config/modules/cbsecurity.cfc) file.  Let's do the following changes:
 
 - Add storage of our JWT tokents to the database
 - Enable firewall logging, if not the visualizer doesn't work
 - Enable the security visualizer
-
-All of these changes are done in the `jwt` struct of the configuration file.
 
 ```javascript
 
