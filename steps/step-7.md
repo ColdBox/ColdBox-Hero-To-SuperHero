@@ -21,13 +21,15 @@ I want to start with the happy path of the login and add the following acceptanc
 
 The last criteria is very important as it will allow us to test the JWT token generation and validation.  However, the pre-generated code does NOT return the `user` in the response, so we need to update the `login()` method in the `Auth` handler to return the user in the response.
 
+> Don't worry about data yet, we still don't have any, just image the data 🤣
+
 We will end up with the following tests:
 
 ```java
 component extends="tests.resources.BaseIntegrationSpec" {
 
-	property name="jwtService" inject="provider:JwtService@cbsecurity";
-	property name="cbauth"     inject="provider:authenticationService@cbauth";
+	property name = "jwtService" inject = "provider:JwtService@cbsecurity";
+	property name = "cbauth"     inject = "provider:authenticationService@cbauth";
 
 	/*********************************** BDD SUITES ***********************************/
 
@@ -48,22 +50,25 @@ component extends="tests.resources.BaseIntegrationSpec" {
 						// Use a user in the seeded db
 						var event = this.post(
 							route  = "/api/v1/login",
-							params = {
-								username : "admin",
-								password : "admin"
-							}
+							params = { username : "admin", password : "admin" }
 						);
 						var response = event.getPrivateValue( "Response" );
 
-						expect( response ).toHaveStatus( 200 );
+						expect( response ).toHaveStatus( 200 )
 						expect( response.getError() ).toBeFalse( response.getMessages().toString() );
-						expect( response.getData() ).toBeString();
 
-						// debug( response.getData() );
+						debug( response.getData() );
 
-						var decoded = jwtService.decode( response.getData() );
+						// We need to get a user and a token
+						expect( response.getData() )
+							.toBeStruct()
+							.toHaveKey( "user" )
+							.toHaveKey( "token" )
+
+						var decoded = jwtService.decode( response.getData().token );
 						expect( decoded.sub ).toBe( 1 );
 						expect( decoded.exp ).toBeGTE( dateAdd( "h", 1, decoded.iat ) );
+						// user id to match
 						expect( decoded.sub ).toBe( response.getData().user.id );
 					} );
 				} );
@@ -87,10 +92,10 @@ component extends="tests.resources.BaseIntegrationSpec" {
 						var event = this.post(
 							route  = "/api/v1/register",
 							params = {
-								firstName : "luis",
-								lastName  : "majano",
-								username  : "lmajano@coldbox.org",
-								password  : "lmajano"
+								firstName: "luis",
+								lastName : "majano",
+								username : "lmajano@coldbox.org",
+								password : "lmajano"
 							}
 						);
 						var response = event.getPrivateValue( "Response" );
@@ -159,11 +164,22 @@ If you run them, they will fail. Good!  Time to code!
 
 ## Routing
 
-Open the `v1` module's router: [`modules_app/api/modules_app/v1/config/Router.cfc`](../src/modules_app/api/modules_app/v1/config/Router.cfc) and verify all the pre-generated routes.  As before we don't have to do anything now, but verify all of our routing in the route visualizer module: http://127.0.0.1:42518/route-visualizer
+Open the `v1` module's router: [`modules_app/api/modules_app/v1/config/Router.cfc`](../src/modules_app/api/modules_app/v1/config/Router.cfc) and verify all the pre-generated routes.  As before we don't have to do anything now, but verify all of our routing in the route visualizer module: http: //127.0.0.1:42518/route-visualizer
 
 ## Event Handler
 
-Open the [`Auth.cfc`](../src/modules_app/api/modules_app/v1/handlers/Auth.cfc) in our `v1` module and review the `login() and logout()` actions.  The one we will modify is the `login()` as we need to return the authenticated user back in the data packet.  To do this, we will use the `cbSecure()` mixin provided by the `cbsecurity` module.  This returns an instance of the `CBSecurity` model.  You can find all of it's methods here: https://s3.amazonaws.com/apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/models/CBSecurity.html
+Open the [`Auth.cfc`](../src/modules_app/api/modules_app/v1/handlers/Auth.cfc) in our `v1` module and review the `login() and logout()` actions.  The one we will modify is the `login()` as we need to return the authenticated user back in the data packet.  To do this, we will use the `cbSecure()` mixin provided by the `cbsecurity` module.  This returns an instance of the `CBSecurity` model.
+
+However, please note that you have two mixins available to you:
+
+- `jwtAuth()` which is a facade to the `JwtService` and provides you with all the jwt methods
+  - https: //apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/models/jwt/JwtService.html
+  - https: //coldbox-security.ortusbooks.com/jwt/jwt-validator
+- `cbSecure()` which is a facade to the `CBSecurity` model and provides you with all the security methods
+  - https: //apidocs.ortussolutions.com/coldbox-modules/cbsecurity/3.5.0/models/CBSecurity.html
+  - https: //coldbox-security.ortusbooks.com/usage/cbsecurity-model
+
+> Technically you can use either the JwtService or the CBSecurity service, but we are just showcasing you have options here.
 
 ```java
 function login( event, rc, prc ){
@@ -176,8 +192,8 @@ function login( event, rc, prc ){
     event
         .getResponse()
         .setData( {
-            "token" : token,
-            "user"  : cbSecure().getUser().getMemento()
+            "token": token,
+            "user" : cbSecure().getUser().getMemento()
         } )
         .addMessage(
             "Bearer token created and it expires in #jwtAuth().getSettings().jwt.expiration# minutes"
@@ -185,11 +201,16 @@ function login( event, rc, prc ){
 }
 ```
 
+- **Where does the `getMemento()` function come from in the user object?**
+- Open the [`User.cfc`](../src/models/User.cfc), what indicates that it has a `getMemento()` function?
+
+```java
+
 Wow, our handlers look so nice and tidy and with strange documentation!  However, we still need to build out our User Service that will power all this goodness.
 
 Please check out all of the jwt service methods, there are tons of them and really helpful!
 
-https://coldbox-security.ortusbooks.com/jwt/jwt-services
+https: //coldbox-security.ortusbooks.com/jwt/jwt-services
 
 
 ## User Service
@@ -198,7 +219,7 @@ Now to the next layer the models.  Our `User` object is already in place, but we
 
 In order for the jwt services and `cbauth` can authenticate and create tokens for us, we must adhere to the following interface (https://coldbox-security.ortusbooks.com/usage/authentication-services#user-services).  This is needed so the calls in our handlers can work correctly as the cbauth and jwt services will be calling our user services and leveraging our `User` object.
 
-```js
+```java
 interface{
 
 	/**
@@ -227,7 +248,11 @@ interface{
 }
 ```
 
-These are pre-generated for you with mock implementations.  You can find them in the [`UserService.cfc`](../src/models/UserService.cfc) in the `models` folder of the `api` module.  Let's do live coding:
+These are pre-generated for you with mock implementations.  You can find them in the [`UserService.cfc`](../src/models/UserService.cfc) in the `models` folder of the `api` module.  Since we are now dealing with objects now and not mock data, how do we convert a query to a user object?  We will use the `populator` object that is available to us in the `UserService` object.  This object is a facade to the `Populator` object that is part of `WireBox`.
+
+> Object Populators allow you to populate objects from XML, Queries, Structs, JSON data: https://wirebox.ortusbooks.com/advanced-topics/wirebox-object-populator/populatefromquery
+
+Let's do live coding:
 
 ```java
 /**
@@ -250,44 +275,46 @@ boolean function isValidCredentials( required username, required password ){
     }
 }
 
-/**
+    /**
     * Retrieve a user by username
     *
     * @return User that implements JWTSubject and/or IAuthUser
     */
-function retrieveUserByUsername( required username ){
-    return populator.populateFromStruct(
-        new(),
-        qb.from( "users" )
-            .where( "username", arguments.username )
-            .first()
-    );
-}
+    function retrieveUserByUsername( required username ){
+        return populator.populateFromStruct(
+            new(),
+            qb.from( "users" )
+                .where( "username", arguments.username )
+                .first()
+        );
+    }
 
-/**
+    /**
     * Retrieve a user by unique identifier
     *
     * @id The unique identifier
     *
     * @return User that implements JWTSubject and/or IAuthUser
     */
-User function retrieveUserById( required id ){
-    return populator.populateFromStruct(
-        new(),
-        qb.from( "users" )
-            .where( "id", arguments.id )
-            .first()
-    );
-}
+    User function retrieveUserById( required id ){
+        return populator.populateFromStruct(
+            new(),
+            qb.from( "users" )
+                .where( "id", arguments.id )
+                .first()
+        );
+    }
 ```
 
 Ok we have finished all layers. Let's run our tests! Did it work? Why not?
 
+Well..... We have no data in our database.  Let's seed our database with some users so we can test our authentication.
+
 ## Seeders
 
-As you can see, we have no users in our database.  We need to seed our database with a user so we can test our authentication.  Let's create a seeder for our users.  We will create a new seeder called `UserFixtures` in the `seeders`.
+As you can see, we have no users in our database.  We need to seed our database with a user so we can test our authentication.  Let's create a seeder for our users.  We will create a new seeder called `UserFixtures` in the `seeders` directory.
 
-> Hint: Our mock generator is called `MockdataCFC` and is bundled with our `cfmigrations` and also with `TestBox`: https://github.com/ortus-solutions/mockdatacfc
+> Hint: Our mock generator is called `cbMockData` and is bundled with our `cfmigrations` and also with `TestBox`: https: //github.com/coldbox-modules/cbmockdata
 
 Go to the shell and execute our seeder creation:
 
@@ -304,12 +331,13 @@ bcrypt_test = "$2a$12$5d31nX1hRnkvP/8QMkS/yOuqHpPZSGGDzH074MjHk6u2tYOG5SJ5W";
 function run( qb, mockdata ) {
     qb.table( "users" ).insert(
         mockdata.mock(
-            $num : 25,
-            "id": "autoincrement",
-            "firstName": "fname",
-            "lastName": "lname",
+            // A special argument that indicates how many records
+            $num       : 25,
+            "id"         : "autoincrement",
+            "firstName" : "fname",
+            "lastName" : "lname",
             "username" : ( index ) => "admin#index#",
-            "password": "oneOf:#bcrypt_test#"
+            "password" : "oneOf:#bcrypt_test#"
         )
     );
 }
@@ -336,8 +364,8 @@ given( "a valid username and password", function(){
         var event = this.post(
             route  = "/api/v1/login",
             params = {
-                username : "admin1",
-                password : "test"
+                username: "admin1",
+                password: "test"
             }
         );
         var response = event.getPrivateValue( "Response" );
@@ -377,4 +405,4 @@ given( "a valid incoming jwt token", function(){
 } );
 ```
 
-Ok, now go update the logout story!
+Ok, now go update the logout story and test!

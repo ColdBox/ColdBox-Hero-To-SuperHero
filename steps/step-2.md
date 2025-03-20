@@ -74,7 +74,7 @@ Dependency Hierarchy for cms (1.0.0)
 "cbvalidation":"^4.1.0"
 ```
 
-Let's go over what is in this template.
+Let's go over what is in this template and discover the power of RestFul Handlers in ColdBox: https://coldbox.ortusbooks.com/digging-deeper/rest-handler
 
 > Also run a `coldbox create app ?` to see all the different ways to generate an app.  You can also use `coldbox create app-wizard ?` and follow our lovely wizard.
 
