@@ -2,3 +2,4 @@ build/**
 src/**
 !src/.gitkeep
 grapher/**
+.tmp/**
