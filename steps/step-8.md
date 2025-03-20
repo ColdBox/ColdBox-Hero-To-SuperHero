@@ -6,7 +6,7 @@ Ok, so what would happen if we try to execute `/api/v1/bogus` in the browser?  G
 
 You will see that the browser blows up with a nasty invalid event. actually, ANY route we try to execute in the `v1` api will fail like this and this is not nice.  We want uniformity, so let's add a catch all route that issues the Rest Handler's `onInvalidRoute()` method.
 
-Open the `v1` router and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.
+Open the `v1` [router](../src/modules_app/api/modules_app/v1/config/Router.cfc) and add the invalid routes catch all before the default route and actually remove the default route as we won't be using it.
 
 ```java
 // Invalid Routes
@@ -14,9 +14,42 @@ route( "/:anything", "echo.onInvalidRoute" );
 //route( "/:handler/:action" ).end();
 ```
 
+> Note that this new anything route will be our catch all, we will lose our /:handler/:action routing by convention.
+
 Issue a nice `coldbox reinit` and hit the route again or any invalid route and you should see a nice API return 404 message. Now, this is great, but we lost something? Anybody can guess?
 
+http://127.0.0.1:42518/tests/runner.cfm
+
 > We lost all of our convention based routing which was below it.  This means, that we must register all the routes we want.
+
+How do we fix the [EchoTests](../src/tests/specs/integration/EchoTests.cfc) to work with this new routing?
+
+```js
+it( "can handle an echo", function(){
+    var event    = this.request( "/api/v1/echo/index" );
+    var response = event.getPrivateValue( "response" );
+    expect( response.getError() ).toBeFalse();
+    expect( response.getData() ).toBe( "Welcome to my ColdBox RESTFul Service" );
+} );
+
+it( "can handle missing actions", function(){
+    var event    = this.request( "/api/v1/bogus" );
+    var response = event.getPrivateValue( "response" );
+    debug( response )
+    expect( response.getError() ).tobeTrue();
+    expect( response.getStatusCode() ).toBe( 404 );
+} );
+```
+
+Ideas? Since all the routing by convention is eliminated, we need to register all the routes explicitly.  Let's update the test to use the new route:
+
+```js
+// API Echo
+get( "/", "Echo.index" );
+get( "/echo", "Echo.index" );
+```
+
+Update the tests now, since our routing changed.  This new tingly feeling you are starting to get is called the `Refactoring Feelling` and it is good!  Get used to it, it's part of the development process.
 
 ## Swagger
 
@@ -34,7 +67,7 @@ box install cbswaggerUI
 box coldbox reinit
 ```
 
-Then hit the app: http://localhost:42518/cbswaggerUI
+Then hit the app: http://localhost:42518/cbswaggerUI, Holy Swagger Batman!
 
 ### Customize It
 
@@ -80,10 +113,6 @@ cbswagger : {
 	// https://swagger.io/specification/#serverObject
 	"servers" : [
 		{
-			"url"         : "https://mysite.com/v1",
-			"description" : "The main production server"
-		},
-		{
 			"url"         : "http://127.0.0.1:42518",
 			"description" : "The dev server"
 		}
@@ -119,6 +148,24 @@ cbswagger : {
 },
 ```
 
+Ok, reinit the app once more: `coldbox reinit` and hit the swagger UI again.  You should see the new API information and even more goodies.
+
+### Test It
+
+Try to test the `login` in the UI.  Did you get an error? Hmm, CORS error!  The dreaded CORS error.  **Extra Credit** : Who can tell my why a CORS error is happening?
+
+Let's fix it by adding a CORS interceptor to our API module.
+
+```bash
+box install cbcors
+```
+
+This will install the CORS module that is needed in order for our JS app to communicate with our API.
+
+> CORS (Cross-Origin Resource Sharing) is a security feature implemented by web browsers that controls how resources (like APIs, fonts, images, or scripts) can be accessed from different origins. It prevents unauthorized cross-origin requests, protecting users from security risks like Cross-Site Request Forgery (CSRF) and data leakage.
+
+Now reinit the app `coldbox reinit` and try again!  You should see the login working now.
+
 ### Resources
 
 You can also find all the resources we generated previously from our app template in the `resources/apidocs` folder. You will find here global schemas, and our routing by convention.  Let's explore them and update them accordingly since our model changed.
@@ -130,8 +177,12 @@ You can also find all the resources we generated previously from our app templat
 Regenerate the swagger doc and we have our internal routing removed! Voila!
 
 
-### PostMan / Insomnia Automation
+### PostMan / Insomnia / RestFox Automation
 
-Let's do one more mystical trick.  Copy the swagger json and open Postman or Insomnia. Look for the import and import our cbwagger.
+Let's do one more mystical trick.  Copy the swagger json or URL into our tools. Look for the import and import our cbwagger.
 
 WOW!  We know have imported all of our API into Postman / Insomnia for testing and even more sweet documentation!
+
+### Debugger
+
+We kinda forgot about our CBDebugger, why don't we open it and check it out: http://127.0.0.1:42518/cbdebugger.  Let's leave it open to the side if we want now.
