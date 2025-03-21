@@ -69,12 +69,20 @@ Ok, now let's put it together!
  * Create a new content object
  */
 function create( event, rc, prc ){
-	// populate, validate and create
-	prc.oContent = contentService.create(
-		validateOrFail( populateModel( "Content" ).setUser( jwtAuth().getUser() ) )
-	);
+    // Params
+    param rc.slug = "";
+    param rc.title = "";
+    param rc.body = "";
+    param rc.isPublished = false;
+    param rc.publishedDate = "";
 
-	prc.response.setData( prc.oContent.getMemento() );
+    prc.response.setData(
+        populateModel( "Content" )
+            .setUser( jwtAuth().getUser() )
+            .validateOrFail()
+            .save()
+            .getMemento()
+    )
 }
 ```
 
@@ -85,6 +93,9 @@ We have to also get the authenticated user to add it into the content.
 Now to the services:
 
 ```js
+property name="contentService" inject;
+
+
 /**
  * Create a new content object
  *
@@ -109,6 +120,13 @@ function create( required content ){
     arguments.content.setId( qResults.result.generatedKey );
 
     return arguments.content;
+}
+
+/**
+ * Save yourself to the database
+ */
+Content function save(){
+    return contentService.create( this );
 }
 ```
 
