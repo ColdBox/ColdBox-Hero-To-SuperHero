@@ -119,7 +119,7 @@ cbswagger : {
 	],
 	// An element to hold various schemas for the specification.
 	// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#componentsObject
-	"components" : {
+	"components" : {****
 		// Define your security schemes here
 		// https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#securitySchemeObject
 		"securitySchemes" : {
@@ -157,7 +157,7 @@ Try to test the `login` in the UI.  Did you get an error? Hmm, CORS error!  The 
 Let's fix it by adding a CORS interceptor to our API module.
 
 ```bash
-box install cbcors
+box install cors
 ```
 
 This will install the CORS module that is needed in order for our JS app to communicate with our API.

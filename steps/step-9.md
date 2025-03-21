@@ -3,7 +3,6 @@
 Ok, we have all the building blocks for now focusing on our first content stories:
 
 ```js
-
 story( "In order to interact with content in the CMS you must be authenticated" );
 story( "I want to see content with different filtering options" )
 story( "I want to see a single content object via a nice slug" )
@@ -16,8 +15,8 @@ Ok, let's start by modeling our content object.
 We will be creating a `Content.cfc` that will store our headless content:
 
 * `id`
-* `slug`
-* `title`
+* `slug` - URL safe title for the content entry, example: "my-first-blog-post"
+* `title` - The title of the content, example: "My First Blog Post"
 * `body`
 * `isPublished:boolean`
 * `publishedDate:date`
@@ -149,6 +148,7 @@ describe( "Content Object", function(){
 
 	it( "can be created", function(){
 		expect( model ).toBeComponent();
+        expect( model.isLoaded() ).toBeFalse()
 	});
 
 });
@@ -166,13 +166,12 @@ component {
     function up( schema, queryBuilder ) {
         schema.create( "content", function( table ){
             table.increments( "id" );
+            table.timestamps();
             table.string( "slug" ).unique();
             table.string( "title" );
             table.longText( "body" );
             table.boolean( "isPublished" ).default( false );
             table.datetime( "publishedDate" ).nullable();
-            table.timestamp( "createdDate" );
-            table.timestamp( "modifiedDate" );
             table.unsignedInteger( "FK_userID" );
             table.foreignKey( "FK_userID" ).references( "id" ).onTable( "users" );
             table.index( [ "isPublished", "publishedDate" ], "idx_publishing" );
@@ -180,7 +179,7 @@ component {
     }
 
     function down( schema, queryBuilder ) {
-        schema.drop( "content" );
+        schema.dropIfExists( "content" );
     }
 
 }
@@ -254,7 +253,86 @@ coldbox create handler name="content" directory=modules_app/api/modules_app/v1/h
 Let's open up the specs and start building it out:
 
 ```js
+/**
+ * 	ColdBox Integration Test
+ *
+ * 	The 'appMapping' points by default to the '/root ' mapping created in  the test folder Application.cfc.  Please note that this
+ * 	Application.cfc must mimic the real one in your root, including ORM  settings if needed.
+ *
+ *	The 'execute()' method is used to execute a ColdBox event, with the  following arguments
+ *	- event : the name of the event
+ *	- private : if the event is private or not
+ *	- prePostExempt : if the event needs to be exempt of pre post interceptors
+ *	- eventArguments : The struct of args to pass to the event
+ *	- renderResults : Render back the results of the event
+ *
+ * You can also use the HTTP executables: get(), post(), put(), path(), delete(), request()
+ **/
+component extends="tests.resources.BaseIntegrationSpec" {
 
+	/*********************************** BDD SUITES ***********************************/
+
+	function run(){
+
+		describe( "Content Suite", function(){
+
+			beforeEach(function( currentSpec ){
+				// Setup as a new ColdBox request for this suite, VERY IMPORTANT. ELSE EVERYTHING LOOKS LIKE THE SAME REQUEST.
+				setup();
+
+				// Log in as the default user
+			});
+
+			story( "I want to see all the content with different filtering options", () => {
+                given( "The default options", () => {
+					then( "I should get an array of content items", () => {
+						// Execute event or route via GET http method. Spice up accordingly
+						var event = get( "/api/v1/contents" )
+						var response = event.getResponse()
+
+						// Validate the results
+						debug( response.getData() )
+						expect( response ).toHaveStatus( 200 )
+						expect( response.getData() ).notToBeEmpty();
+					})
+				} )
+
+				given( "Pagination options", ()=> {
+					then( "I should get an array of paginated content items", () => {
+					})
+				})
+			});
+
+			story( "I want to see a single content object via a nice slug", () => {
+				given( "A valid slug", () => {
+					then( "I should get a single content object", () => {
+						var event = get( "/api/v1/contents/content-slug-4" )
+						var response = event.getResponse()
+
+						// Validate the results
+						expect( response ).toHaveStatus( 200 )
+						expect( response.getData() ).toBeStruct();
+						expect( response.getData().slug ).toBe( "content-slug-4" );
+					})
+				})
+
+				given( "An invalid slug", () => {
+					then( "I should get a 404 response", () => {
+						var event = get( "/api/v1/contents/invalid-slug" )
+						var response = event.getResponse()
+
+						// Validate the results
+						expect( response ).toHaveStatus( 404 )
+					})
+				})
+			});
+
+
+		});
+
+	}
+
+}
 ```
 
 ### Routing
@@ -278,7 +356,7 @@ Now let's build out the handler that can satisfy our previous stories: `index` a
 */
 component extends="coldbox.system.RestHandler" {
 
-	property name="contentService" inject="ContentService";
+	property name="contentService";
 
 	/**
 	 * index
@@ -305,7 +383,6 @@ component extends="coldbox.system.RestHandler" {
 			prc.response
 				.setError( true )
 				.setStatusCode( event.STATUS.NOT_FOUND )
-				.setStatusText( "Not Found" )
 				.addMessage( "The requested content object (#rc.slug#) could not be found" );
 			return;
 		}
