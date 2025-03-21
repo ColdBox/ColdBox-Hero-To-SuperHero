@@ -18,7 +18,7 @@ story( "I want to be able to create new content objects", function(){
 	given( "valid incoming data", function(){
 		then( "it should create a new content object", function(){
 			var event = post(
-				route = "/api/v1/content",
+				route = "/api/v1/contents",
 				params = {
 					slug          : "my-new-test-#createUUID()#",
 					title         : "I love BDD",
@@ -42,7 +42,7 @@ story( "I want to be able to create new content objects", function(){
 	given( "invalid data", function(){
 		then( "it should throw a validation error", function(){
 			var event = post(
-				route = "/api/v1/content",
+				route = "/api/v1/contents",
 				params = {
 					body          : "I love BDD sooooooooooo much!",
 					isPublished   : true,
