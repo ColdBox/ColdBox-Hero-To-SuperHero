@@ -14,10 +14,11 @@ story( "I want to be able to logout from the system using my JWT token", functio
 
 ## BDD
 
-I want to start with the happy path of the login and add the following acceptance criteria:
+I want to start with the happy path of the login and add the following **acceptance criteria**:
 
 - The request must give a `200` status code
 - The response jwt subject id must be the same as the `user` id in the data packet
+- I want to return the generated `token` and also the `user` that representation that logged in.
 
 The last criteria is very important as it will allow us to test the JWT token generation and validation.  However, the pre-generated code does NOT return the `user` in the response, so we need to update the `login()` method in the `Auth` handler to return the user in the response.
 
@@ -204,8 +205,6 @@ function login( event, rc, prc ){
 - **Where does the `getMemento()` function come from in the user object?**
 - Open the [`User.cfc`](../src/models/User.cfc), what indicates that it has a `getMemento()` function?
 
-```java
-
 Wow, our handlers look so nice and tidy and with strange documentation!  However, we still need to build out our User Service that will power all this goodness.
 
 Please check out all of the jwt service methods, there are tons of them and really helpful!
@@ -314,7 +313,7 @@ Well..... We have no data in our database.  Let's seed our database with some us
 
 As you can see, we have no users in our database.  We need to seed our database with a user so we can test our authentication.  Let's create a seeder for our users.  We will create a new seeder called `UserFixtures` in the `seeders` directory.
 
-> Hint: Our mock generator is called `cbMockData` and is bundled with our `cfmigrations` and also with `TestBox`: https: //github.com/coldbox-modules/cbmockdata
+> Hint: Our mock generator is called `cbMockData` and is bundled with our `cfmigrations` and also with `TestBox`: https://github.com/coldbox-modules/cbmockdata
 
 Go to the shell and execute our seeder creation:
 
